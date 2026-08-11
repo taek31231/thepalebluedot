@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>원소의 기원 — 내 몸을 이루는 원소는 어디에서 왔는가</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+:root{
+  --bg:#f5f8fc; --surface:#ffffff; --surface-2:#f1f5fa; --surface-3:#e6eef7;
+  --line:#e4eaf2; --line-2:#cfdbe8;
+  --text:#0b1420; --mid:#243141; --dim:#4a5a6b;
+  --accent:#0369a1; --warm:#9c5c00; --cool:#2563eb;
+  --good:#0b7d73; --bad:#dc2626; --violet:#7c3aed;
+  --bang:#b45f06; --star:#dc2626; --nova:#7c3aed;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',-apple-system,sans-serif;}
+body{background:var(--bg);color:var(--text);-webkit-text-size-adjust:100%;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+/* button 은 color 를 물려받지 않아 기본 검정이 된다. 어두운 배경에서 안 보이므로 지정. */
+button{font:inherit;cursor:pointer;color:var(--text);}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.topbar{flex:0 0 54px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);}
+.topbar h1{font-size:.9rem;font-weight:800;letter-spacing:-.02em;white-space:nowrap;}
+.topbar h1 span{color:var(--accent);}
+.std{font-size:.66rem;color:var(--dim);background:var(--surface-2);border:1px solid var(--line);
+  padding:3px 8px;border-radius:5px;white-space:nowrap;}
+.tabs{display:flex;gap:3px;}
+.tab{padding:7px 12px;font-size:.79rem;font-weight:700;color:var(--dim);background:transparent;
+  border:1px solid transparent;border-radius:8px;transition:.15s;white-space:nowrap;}
+.tab:hover{color:var(--mid);background:var(--surface-2);}
+.tab.on{color:#ffffff;background:var(--accent);border-color:var(--accent);}
+.tab-n{opacity:.6;margin-right:4px;}
+
+.wrap{flex:1;min-height:0;}
+.page{display:none;height:100%;overflow-y:auto;}
+.page.on{display:block;}
+.pane{padding:24px;max-width:1080px;margin:0 auto;}
+
+h2.sec{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+p.sub{font-size:.82rem;color:var(--mid);line-height:1.75;margin-bottom:16px;word-break:keep-all;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+label.lbl{display:block;font-size:.75rem;font-weight:700;color:var(--mid);margin-bottom:5px;}
+input[type=text],input[type=number],select,textarea{width:100%;padding:8px 10px;background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;color:var(--text);font-size:.85rem;}
+textarea{resize:vertical;min-height:62px;line-height:1.6;}
+.btn{padding:8px 14px;border:1px solid var(--line-2);border-radius:7px;background:var(--surface-2);
+  color:var(--text);font-size:.82rem;font-weight:700;transition:.15s;}
+.btn:hover{background:var(--surface-3);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#ffffff;}
+.btn.primary:hover{background:#0ea5e9;}
+.btn.sm{padding:5px 10px;font-size:.75rem;}
+
+.proc{display:grid;grid-template-columns:repeat(auto-fit,minmax(206px,1fr));gap:12px;margin-bottom:20px;}
+.proc-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px;}
+.proc-no{font-size:.66rem;font-weight:800;color:var(--accent);letter-spacing:.1em;margin-bottom:7px;}
+.proc-card h4{font-size:.88rem;font-weight:800;margin-bottom:6px;}
+.proc-card p{font-size:.78rem;color:var(--mid);line-height:1.65;word-break:keep-all;}
+.proc-card .tip{margin-top:8px;font-size:.73rem;color:var(--warm);line-height:1.55;}
+/* 설계도 · 영상 카드 */
+.make-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-bottom:20px;}
+.dl-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  display:flex;flex-direction:column;}
+.dl-thumb{display:block;background:#f8fafc;padding:10px;text-align:center;}
+.dl-thumb img{max-width:100%;max-height:230px;object-fit:contain;display:inline-block;}
+.dl-body{padding:15px;display:flex;flex-direction:column;gap:8px;flex:1;}
+.dl-body h4{font-size:.92rem;font-weight:800;}
+.dl-body p{font-size:.79rem;color:var(--mid);line-height:1.75;word-break:keep-all;}
+.dl-body b{color:var(--text);}
+.dl-meta{font-size:.75rem;color:var(--accent);background:var(--surface-2);
+  border-left:3px solid var(--accent);border-radius:0 7px 7px 0;padding:8px 11px;line-height:1.6;}
+.dl-btns{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto;}
+.dl-btns .btn{text-decoration:none;display:inline-block;}
+.credit{font-size:.71rem;color:var(--mid);}
+.yt{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#e6eef7,#ffffff);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+  border-bottom:1px solid var(--line);transition:.15s;}
+.yt:hover{background:linear-gradient(135deg,#e8f0f9,#f1f5fa);}
+.yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.yt-play{width:56px;height:56px;border-radius:50%;background:#ef4444;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;padding-left:4px;}
+.yt-cap{font-size:.8rem;font-weight:700;color:var(--mid);}
+.kit{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
+.kit span{font-size:.75rem;padding:5px 11px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;color:var(--mid);}
+.warn{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.32);
+  border-radius:10px;padding:13px 15px;margin-bottom:20px;}
+.warn strong{color:var(--bad);font-size:.83rem;display:block;margin-bottom:5px;}
+.warn p{font-size:.79rem;color:var(--mid);line-height:1.7;word-break:keep-all;}
+
+/* 스펙트럼 */
+.spec-row{margin-bottom:12px;}
+.spec-lab{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:.78rem;font-weight:700;margin-bottom:4px;}
+.spec-lab small{font-weight:500;color:var(--dim);font-size:.71rem;}
+.spec-box{position:relative;border:1px solid var(--line-2);border-radius:6px;overflow:hidden;}
+.spec-box canvas{display:block;width:100%;height:52px;}
+.spec-box.tall canvas{height:66px;}
+.axis{display:flex;justify-content:space-between;font-size:.66rem;color:var(--dim);
+  margin-top:3px;padding:0 1px;}
+.el-pick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.el-btn{padding:6px 12px;font-size:.79rem;font-weight:700;border-radius:7px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--mid);transition:.15s;}
+.el-btn:hover{background:var(--surface-3);}
+.el-btn.on{color:#ffffff;}
+.quiz{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px;}
+.quiz-q{font-size:.85rem;font-weight:700;margin-bottom:10px;line-height:1.55;}
+.quiz-opts{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px;}
+.opt{padding:7px 14px;font-size:.8rem;font-weight:700;border-radius:7px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--mid);transition:.15s;}
+.opt:hover{background:var(--surface-3);}
+.opt.ok{background:rgba(52,211,153,.16);border-color:var(--good);color:var(--good);}
+.opt.no{background:rgba(248,113,113,.16);border-color:var(--bad);color:var(--bad);}
+.fb{margin-top:10px;font-size:.79rem;line-height:1.7;padding:10px 12px;border-radius:8px;display:none;word-break:keep-all;}
+.fb.ok{display:block;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.35);color:#6ee7b7;}
+.fb.no{display:block;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.35);color:#fca5a5;}
+
+/* 존재비 */
+.env-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin-bottom:18px;}
+.env{padding:11px 9px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface-2);
+  text-align:center;transition:.15s;}
+.env:hover{background:var(--surface-3);}
+.env.on{border-color:var(--accent);background:rgba(56,189,248,.12);}
+.env .ico{font-size:1.35rem;display:block;margin-bottom:4px;}
+.env .nm{font-size:.79rem;font-weight:800;}
+.env .sub2{font-size:.67rem;color:var(--dim);margin-top:2px;}
+.bars{display:flex;flex-direction:column;gap:6px;}
+.bar-row{display:flex;align-items:center;gap:9px;font-size:.79rem;}
+.bar-nm{flex:0 0 92px;font-weight:700;text-align:right;}
+.bar-nm em{font-style:normal;color:var(--dim);font-weight:500;font-size:.72rem;margin-left:3px;}
+.bar-track{display:block;flex:1;height:19px;background:var(--surface-2);
+  border-radius:5px;overflow:hidden;position:relative;}
+/* span은 기본이 inline이라 width·height가 먹지 않는다. 반드시 block으로. */
+.bar-fill{display:block;height:100%;min-width:3px;border-radius:5px;
+  transition:width .45s cubic-bezier(.2,.8,.3,1);}
+.bar-v{flex:0 0 62px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--mid);}
+.rank-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px;}
+.rank-col{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;}
+.rank-col h5{font-size:.78rem;font-weight:800;margin-bottom:8px;text-align:center;color:var(--accent);}
+.rank-col ol{list-style:none;counter-reset:r;}
+.rank-col li{counter-increment:r;display:flex;gap:7px;align-items:center;font-size:.78rem;
+  padding:4px 0;border-bottom:1px solid var(--line);}
+.rank-col li:last-child{border:none;}
+.rank-col li::before{content:counter(r);flex:0 0 16px;height:16px;border-radius:4px;background:var(--surface-3);
+  color:var(--dim);font-size:.65rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.rank-col li b{flex:1;}
+.rank-col li span{color:var(--dim);font-variant-numeric:tabular-nums;font-size:.72rem;}
+
+/* 족보 */
+.origin-legend{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px;}
+.olg{display:flex;align-items:center;gap:6px;font-size:.76rem;color:var(--mid);
+  padding:6px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;}
+.olg i{width:10px;height:10px;border-radius:3px;display:inline-block;}
+.eltab{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.el{width:56px;height:56px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface-2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.15s;padding:2px;}
+.el:hover{transform:translateY(-2px);}
+.el .sym{font-size:1rem;font-weight:800;line-height:1;}
+.el .z{font-size:.6rem;color:var(--dim);}
+.el .kn{font-size:.6rem;color:var(--mid);margin-top:2px;}
+.el.sel{outline:2px solid var(--accent);outline-offset:1px;}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-height:120px;}
+.detail h3{font-size:1.05rem;font-weight:800;margin-bottom:4px;}
+.detail .badge{display:inline-block;font-size:.68rem;font-weight:800;padding:3px 9px;
+  border-radius:5px;margin-bottom:10px;}
+.detail p{font-size:.82rem;color:var(--mid);line-height:1.8;word-break:keep-all;}
+.body-calc{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px;}
+.origin-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;}
+.os{border-radius:12px;padding:15px;border:1px solid;}
+.os .t{font-size:.75rem;font-weight:800;margin-bottom:6px;}
+.os .v{font-size:1.6rem;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
+.os .d{font-size:.73rem;color:var(--dim);margin-top:4px;line-height:1.5;}
+
+/* 총정리 */
+.sum-hero{background:linear-gradient(180deg,rgba(56,189,248,.09),rgba(56,189,248,.02));
+  border:1px solid rgba(56,189,248,.28);border-radius:14px;padding:22px;margin-bottom:24px;}
+.sum-hero h1{font-size:1.4rem;font-weight:800;letter-spacing:-.03em;margin-bottom:8px;}
+.sum-hero p{font-size:.85rem;color:var(--mid);line-height:1.85;word-break:keep-all;}
+.concept{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:13px;margin-bottom:26px;}
+.cc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.cc-n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;
+  background:var(--accent);color:#ffffff;font-size:.72rem;font-weight:800;margin-bottom:9px;}
+.cc h4{font-size:.92rem;font-weight:800;margin-bottom:8px;word-break:keep-all;}
+.cc p{font-size:.79rem;color:var(--mid);line-height:1.8;word-break:keep-all;}
+.cc p+p{margin-top:7px;}
+.cc b{color:var(--text);}
+.cc .link{margin-top:10px;padding:9px 11px;background:var(--surface-2);border-left:3px solid var(--warm);
+  border-radius:0 7px 7px 0;font-size:.75rem;color:var(--warm);line-height:1.65;word-break:keep-all;}
+.ftable{width:100%;border-collapse:collapse;font-size:.77rem;margin-top:8px;}
+.ftable th,.ftable td{padding:7px 8px;border:1px solid var(--line);text-align:left;line-height:1.5;}
+.ftable th{background:var(--surface-2);color:var(--dim);font-size:.71rem;font-weight:700;}
+.ftable td b{color:var(--text);}
+.flowbox{display:flex;flex-wrap:wrap;align-items:center;gap:7px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;padding:16px;}
+.fl{font-size:.79rem;font-weight:700;padding:7px 11px;border-radius:7px;background:var(--surface-2);
+  border:1px solid var(--line-2);color:var(--mid);word-break:keep-all;}
+.fl.bang{border-color:rgba(251,191,36,.5);color:var(--bang);}
+.fl.star{border-color:rgba(248,113,113,.5);color:var(--star);}
+.fl.nova{border-color:rgba(192,132,252,.5);color:var(--nova);}
+.fl.good{border-color:rgba(52,211,153,.5);color:var(--good);}
+.ar{color:var(--mid);font-size:.9rem;}
+.chk{display:flex;flex-direction:column;gap:8px;}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;background:var(--surface);
+  border:1px solid var(--line);border-radius:9px;font-size:.82rem;line-height:1.6;color:var(--mid);
+  cursor:pointer;transition:.15s;word-break:keep-all;}
+.chk label:hover{border-color:var(--line-2);}
+.chk input{accent-color:var(--good);margin-top:3px;flex-shrink:0;}
+.chk input:checked+span{color:var(--good);}
+.qa{display:flex;flex-direction:column;gap:12px;}
+.qa-item{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:14px 16px;}
+.qa-item.deep{border-left-color:var(--violet);}
+.qa-q{font-size:.85rem;font-weight:700;margin-bottom:9px;line-height:1.6;word-break:keep-all;}
+.qa-q em{font-style:normal;color:var(--accent);}
+.qa-item.deep .qa-q em{color:var(--violet);}
+.qa-tag{display:inline-block;font-size:.66rem;font-weight:800;padding:2px 7px;border-radius:4px;
+  background:var(--surface-3);color:var(--dim);margin-right:6px;vertical-align:2px;}
+.ans-block{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-bottom:9px;}
+.ans-q{font-size:.79rem;font-weight:700;color:var(--mid);margin-bottom:6px;line-height:1.55;}
+.ans-a{font-size:.83rem;color:var(--text);line-height:1.75;white-space:pre-wrap;word-break:break-word;}
+.ans-a.none{color:var(--dim);font-style:italic;}
+.empty{padding:32px;text-align:center;color:var(--dim);font-size:.83rem;line-height:1.85;}
+@media(max-width:760px){ .pane{padding:16px;} .topbar{flex-wrap:wrap;height:auto;flex:0 0 auto;padding:8px 12px;} .std{display:none;} }
+
+/* ═══════════ 스펙트럼 분석 ═══════════ */
+.stp{display:flex;align-items:center;gap:9px;font-size:.9rem;font-weight:800;color:var(--text);margin-bottom:12px;}
+.stp b{flex:0 0 auto;width:23px;height:23px;border-radius:50%;background:var(--accent);color:#fff;
+  font-size:.76rem;display:grid;place-items:center;}
+.sub3{font-size:.84rem;font-weight:800;margin:18px 0 8px;color:var(--text);}
+.up{display:block;border:2px dashed var(--line-2);border-radius:12px;padding:26px 18px;text-align:center;
+  cursor:pointer;background:var(--surface-2);transition:.15s;}
+.up:hover,.up.drag{border-color:var(--accent);background:var(--sky-ll,rgba(3,105,161,.05));}
+.up-ico{display:block;font-size:1.7rem;color:var(--accent);line-height:1;margin-bottom:8px;}
+.up-t{display:block;font-size:.87rem;font-weight:700;color:var(--text);margin-bottom:5px;}
+.up-s{display:block;font-size:.74rem;color:var(--dim);line-height:1.65;word-break:keep-all;}
+.cvwrap{background:#101418;border:1px solid var(--line-2);border-radius:10px;overflow:hidden;line-height:0;}
+#sp-cv,#sp-graph{width:100%;height:auto;display:block;touch-action:manipulation;cursor:crosshair;}
+#sp-graph{background:var(--surface);}
+.sp-guide{font-size:.82rem;line-height:1.7;color:var(--mid);background:var(--surface-2);
+  border-left:3px solid var(--accent);border-radius:0 7px 7px 0;padding:9px 12px;margin-bottom:11px;word-break:keep-all;}
+.sp-guide b{color:var(--text);}
+.sp-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px;align-items:center;}
+.nudge{display:inline-flex;gap:6px;align-items:center;font-size:.78rem;color:var(--mid);}
+.nudge .btn{padding:5px 9px;}
+.nudge b{min-width:44px;text-align:center;font-variant-numeric:tabular-nums;}
+.rd{font-size:.82rem;color:var(--mid);background:var(--surface-2);border:1px solid var(--line);
+  border-radius:8px;padding:9px 12px;margin-bottom:9px;line-height:1.6;min-height:38px;
+  word-break:keep-all;font-variant-numeric:tabular-nums;}
+.rd b{color:var(--text);font-size:.92rem;}
+.rd .rd-ok{color:var(--accent);} .rd .rd-ok b{color:var(--accent);}
+.rd .rd-x{color:var(--dim);}
+#sp-graph{touch-action:none;}
+.sp-meta{font-size:.74rem;color:var(--dim);line-height:1.7;margin-top:9px;word-break:keep-all;}
+.pk-t{width:100%;border-collapse:collapse;font-size:.79rem;}
+.pk-t th,.pk-t td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;}
+.pk-t th{font-size:.72rem;color:var(--dim);font-weight:700;}
+.pk-t td.w{font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;}
+.pk-t button{border:none;background:none;color:var(--dim);cursor:pointer;font-size:.9rem;padding:2px 6px;}
+.pk-t button:hover{color:var(--bad,#dc2626);}
+.opts3{display:grid;gap:8px;}
+.opt3{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line-2);border-radius:9px;
+  padding:11px 13px;cursor:pointer;background:var(--surface-2);transition:.13s;}
+.opt3:hover{border-color:var(--accent);}
+.opt3.on{border-color:var(--accent);background:rgba(3,105,161,.08);box-shadow:inset 0 0 0 1px var(--accent);}
+.opt3 input{margin-top:3px;flex:0 0 auto;}
+.opt3 .t{font-size:.84rem;font-weight:700;color:var(--text);}
+.opt3 .d{font-size:.74rem;color:var(--dim);line-height:1.6;margin-top:3px;word-break:keep-all;}
+.fbk{margin-top:12px;border-radius:9px;padding:12px 14px;font-size:.8rem;line-height:1.75;word-break:keep-all;}
+.fbk.ok{background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.3);}
+.fbk.no{background:rgba(234,88,12,.08);border:1px solid rgba(234,88,12,.32);}
+.fbk b{color:var(--text);}
+.mt{width:100%;border-collapse:collapse;font-size:.76rem;margin-top:10px;}
+.mt th,.mt td{border:1px solid var(--line);padding:5px 7px;text-align:center;font-variant-numeric:tabular-nums;}
+.mt th{background:var(--surface-2);font-weight:700;color:var(--mid);font-size:.71rem;}
+.mt td.hit{background:rgba(22,163,74,.10);font-weight:700;}
+.mt td.miss{color:var(--dim);}
+.mt .el-n{text-align:left;font-weight:800;}
+.adv{margin-top:16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);}
+.adv summary{cursor:pointer;padding:11px 15px;font-size:.8rem;font-weight:700;color:var(--mid);}
+.adv-in{padding:0 15px 15px;}
+.how{margin:9px 0 12px 18px;font-size:.78rem;line-height:1.85;color:var(--mid);}
+.calrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.calrow input{width:150px;}
+.ck{display:flex;gap:8px;align-items:flex-start;margin-top:13px;font-size:.76rem;color:var(--mid);line-height:1.6;cursor:pointer;}
+.ck input{margin-top:2px;flex:0 0 auto;}
+
+/* ── 원리 설명 ── */
+.princ{margin-bottom:18px;}
+.pr-h{font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:7px;}
+.pr-step{display:flex;gap:12px;margin-top:15px;}
+.pr-n{flex:0 0 auto;width:25px;height:25px;border-radius:50%;background:var(--surface-3);
+  color:var(--accent);font-size:.78rem;font-weight:800;display:grid;place-items:center;margin-top:1px;}
+.pr-b{flex:1 1 auto;min-width:0;}
+.pr-b h4{font-size:.85rem;font-weight:800;color:var(--text);margin-bottom:5px;line-height:1.5;}
+.pr-b p{font-size:.8rem;line-height:1.8;color:var(--mid);word-break:keep-all;margin-bottom:7px;}
+.pr-b p b{color:var(--text);}
+.pr-eq{background:var(--surface-2);border-left:3px solid var(--accent);border-radius:0 7px 7px 0;
+  padding:9px 13px;margin:8px 0;}
+.pr-eq b{display:block;font-size:.94rem;color:var(--accent);letter-spacing:.01em;
+  font-variant-numeric:tabular-nums;margin-bottom:3px;}
+.pr-eq span{font-size:.72rem;color:var(--dim);line-height:1.6;}
+.pr-fig{margin:14px 0 4px;border:1px solid var(--line);border-radius:10px;
+  background:var(--surface-2);padding:10px 8px;overflow-x:auto;}
+.pr-fig svg{width:100%;min-width:600px;height:auto;display:block;}
+.pr-fig .fg-t{font:800 12.5px system-ui,sans-serif;fill:var(--text);}
+.pr-fig .fg-s{font:600 11px system-ui,sans-serif;fill:var(--mid);}
+.pr-fig .fg-s2{font:400 10.5px system-ui,sans-serif;fill:var(--dim);}
+.pr-fig .fg-ray{stroke:#fbbf24;stroke-width:2;}
+.pr-fig .fg-ray0{stroke:var(--dim);stroke-width:2;stroke-dasharray:5 4;}
+.pr-warn{margin-top:16px;background:rgba(2,132,199,.06);border:1px solid rgba(2,132,199,.26);
+  border-radius:9px;padding:12px 14px;font-size:.78rem;line-height:1.8;color:var(--mid);word-break:keep-all;}
+.pr-warn b{color:var(--text);}
+.pr-warn>b:first-child{display:block;color:var(--accent);margin-bottom:5px;font-size:.82rem;}
+@media(max-width:600px){ .pr-step{gap:9px;} .pr-n{width:22px;height:22px;font-size:.72rem;} }
+
+/* ═══════════ 모바일 대응 ═══════════ */
+@supports (height:100dvh){ body{height:100dvh;} }
+@media(max-width:820px){
+  .topbar{flex:0 0 auto;height:auto;flex-wrap:wrap;padding:8px 12px;gap:6px 8px;}
+  .topbar h1{font-size:.82rem;order:1;flex:1 1 auto;white-space:normal;line-height:1.35;}
+  .std{order:2;font-size:.58rem;}
+  .tabs{order:3;flex:1 1 100%;max-width:none;overflow-x:auto;scrollbar-width:none;
+        padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .tabs::-webkit-scrollbar{height:0;}
+  .tab{flex:0 0 auto;padding:8px 11px;font-size:.75rem;}
+  .pane{padding:14px 12px 34px;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+
+  table.dt{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.dt tbody{display:table;width:100%;min-width:460px;}
+  table.dt th,table.dt td{padding:5px 6px;}
+  h2.sec{font-size:.98rem;}
+  p.sub{font-size:.79rem;}
+  textarea{min-height:76px;}
+  .btn,.btn.sm{padding:8px 12px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1>원소의 기원 <span>· 내 몸을 이루는 원소는 어디에서 왔는가</span></h1>
+  <span class="std">[10통과1-02-01] · [10통과1-02-02]</span>
+  <nav class="tabs">
+    <button class="tab on" data-tab="0"><span class="tab-n">0</span>분광기 만들기</button>
+    <button class="tab" data-tab="1"><span class="tab-n">1</span>스펙트럼 읽기</button>
+    <button class="tab" data-tab="2"><span class="tab-n">2</span>내 사진 분석</button>
+    <button class="tab" data-tab="3"><span class="tab-n">3</span>어디에 얼마나</button>
+    <button class="tab" data-tab="4"><span class="tab-n">4</span>원소의 족보</button>
+    <button class="tab" data-tab="5"><span class="tab-n">5</span>총정리</button>
+  </nav>
+</header>
+
+<div class="wrap">
+
+<!-- ============ 0. 분광기 ============ -->
+<section class="page on" id="page0"><div class="pane">
+  <h2 class="sec">CD로 분광기 만들기</h2>
+  <p class="sub">빛을 파장별로 펼쳐 보는 도구입니다. CD 표면의 아주 촘촘한 홈이 회절 격자 역할을 합니다. 10분이면 만듭니다.</p>
+
+  <div class="make-grid">
+    <!-- 설계도 -->
+    <div class="dl-card">
+      <a class="dl-thumb" href="분광기_설계도.pdf" target="_blank" rel="noopener" title="크게 보기">
+        <img src="분광기_설계도_미리보기.png" alt="분광기 설계도 전개도">
+      </a>
+      <div class="dl-body">
+        <h4>분광기 설계도 (A4 1장)</h4>
+        <p>실선은 <b>자르는 선</b>, 점선은 <b>접는 선</b>입니다.
+           위쪽 면의 굵은 세로선이 빛이 들어오는 <b>슬릿</b>,
+           아래쪽 면의 직사각형이 CD를 붙이고 들여다보는 <b>관찰 창</b>입니다.</p>
+        <div class="dl-meta">
+          완성 크기 약 <b>33 × 35 × 120 mm</b> · 슬릿 길이 약 24 mm · 관찰 창 약 32 × 14 mm
+        </div>
+        <div class="dl-btns">
+          <a class="btn primary" href="분광기_설계도.pdf" download>설계도 내려받기</a>
+          <a class="btn" href="분광기_설계도.pdf" target="_blank" rel="noopener">새 창에서 보기</a>
+        </div>
+        <div class="credit">설계 · 박대현 (dhpark5@gmail.com)</div>
+      </div>
+    </div>
+
+    <!-- 영상 -->
+    <div class="dl-card">
+      <div class="yt" id="yt" data-id="QRAX3RnTWco">
+        <div class="yt-play">▶</div>
+        <div class="yt-cap">제작 영상 보기</div>
+      </div>
+      <div class="dl-body">
+        <h4>만드는 법 영상</h4>
+        <p>설계도를 인쇄한 뒤 <b>영상 순서를 그대로 따라</b> 하면 됩니다.
+           자르고 접는 순서, CD 조각을 붙이는 위치와 각도가 영상에 나옵니다.</p>
+        <div class="dl-btns">
+          <a class="btn" href="https://youtu.be/QRAX3RnTWco" target="_blank" rel="noopener">유튜브에서 열기 ↗</a>
+        </div>
+        <div class="credit">인터넷이 막혀 있으면 교사가 미리 내려받아 틀어 주세요.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="kit">
+    <span>설계도를 인쇄한 A4 (되도록 두꺼운 종이)</span>
+    <span>안 쓰는 CD 또는 DVD</span>
+    <span>가위 · 커터칼</span>
+    <span>자 · 접는 선용 볼펜</span>
+    <span>풀 또는 양면테이프</span>
+    <span>검은 절연 테이프</span>
+  </div>
+
+  <div class="proc">
+    <div class="proc-card"><div class="proc-no">STEP 01</div><h4>설계도 인쇄</h4>
+      <p>PDF를 <b>A4에 100% 배율</b>로 인쇄합니다. '페이지에 맞춤'을 켜면 크기가 달라지니 반드시 끄세요.</p>
+      <p class="tip">일반 A4보다 두꺼운 종이에 인쇄하면 상자가 훨씬 튼튼합니다.</p></div>
+    <div class="proc-card"><div class="proc-no">STEP 02</div><h4>자르고 접기</h4>
+      <p><b>실선</b>을 따라 바깥 테두리를 오려 냅니다. <b>점선</b>은 자르지 말고, 자와 볼펜으로 눌러 자국을 낸 뒤 접습니다.</p>
+      <p class="tip">먼저 점선을 눌러 놓고 나중에 접으면 선이 곧게 나옵니다.</p></div>
+    <div class="proc-card"><div class="proc-no">STEP 03</div><h4>슬릿과 창 뚫기</h4>
+      <p>윗면의 <b>굵은 세로선</b>을 커터칼로 그어 가느다란 틈을 만듭니다. 아랫면의 <b>직사각형</b>은 오려 냅니다.</p>
+      <p class="tip">틈은 좁을수록 선이 또렷합니다. 너무 벌어졌다면 검은 테이프를 양옆에서 살짝 겹쳐 좁히세요.</p></div>
+    <div class="proc-card"><div class="proc-no">STEP 04</div><h4>CD 붙이고 조립</h4>
+      <p>CD를 부채꼴로 잘라 관찰 창 안쪽에 붙입니다. 상자를 접어 붙인 뒤, 남은 틈새를 검은 테이프로 모두 막습니다.</p>
+      <p class="tip">완성되면 슬릿을 광원 쪽으로 향하고 창으로 들여다봅니다. 상자를 조금씩 돌리면 무지개가 나타납니다.</p></div>
+  </div>
+
+  <div class="warn">
+    <strong>안전 — 반드시 지켜 주세요</strong>
+    <p>· <b>태양을 직접 보지 마세요.</b> 분광기로도 절대 안 됩니다. 눈을 크게 다칠 수 있습니다.
+       햇빛을 볼 때는 흰 종이나 구름에 반사된 빛, 또는 창가의 밝은 하늘을 봅니다.<br>
+       · 레이저 포인터도 분광기로 보지 않습니다.<br>
+       · CD를 자를 때는 조각이 튀지 않게 천으로 덮고, 잘린 면이 날카로우니 손을 베지 않도록 합니다.</p>
+  </div>
+
+  <h2 class="sec">무엇이 보였나요</h2>
+  <p class="sub">여러 광원을 보고 기록하세요. 어떤 것은 무지개가 이어지고, 어떤 것은 몇 개의 <b>줄</b>만 보입니다.</p>
+  <div class="card">
+    <div id="obs-list"></div>
+    <div style="font-size:.76rem;color:var(--dim);line-height:1.7;margin-top:12px;">
+      <b style="color:var(--mid)">이어진 무지개</b>는 뜨거운 고체·액체가 내는 <b>연속 스펙트럼</b>,
+      <b style="color:var(--mid)">몇 개의 줄</b>만 보이는 것은 기체가 내는 <b>선(방출) 스펙트럼</b>입니다.
+      원소마다 줄의 위치가 다르기 때문에, 이 줄이 곧 <b style="color:var(--accent)">원소의 지문</b>이 됩니다.
+    </div>
+  </div>
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="1">1단계로 넘어가기 →</button></div>
+</div></section>
+
+<!-- ============ 1. 스펙트럼 ============ -->
+<section class="page" id="page1"><div class="pane">
+  <h2 class="sec">스펙트럼은 원소의 지문이다</h2>
+  <p class="sub">원소를 눌러 보세요. 그 원소가 내는 빛의 파장이 어디에 있는지 보여 줍니다.
+     아래에는 태양빛을 펼친 스펙트럼이 있습니다. <b>검은 줄이 있는 자리</b>를 원소의 지문과 맞춰 보세요.</p>
+
+  <div class="el-pick" id="el-pick"></div>
+
+  <div class="spec-row">
+    <div class="spec-lab"><span id="emit-name">수소 (H)</span><small>방출 스펙트럼 — 기체가 내는 빛</small></div>
+    <div class="spec-box"><canvas id="sp-emit"></canvas></div>
+    <div class="axis"><span>380 nm 보라</span><span>500</span><span>600</span><span>750 nm 빨강</span></div>
+  </div>
+
+  <div class="spec-row">
+    <div class="spec-lab"><span>태양</span><small>흡수 스펙트럼 — 검은 줄이 곧 태양에 있는 원소</small></div>
+    <div class="spec-box tall"><canvas id="sp-sun"></canvas></div>
+    <div class="axis"><span>380 nm</span><span>500</span><span>600</span><span>750 nm</span></div>
+  </div>
+
+  <div class="card" style="margin:16px 0 20px;">
+    <div style="font-size:.8rem;line-height:1.85;color:var(--mid);word-break:keep-all;">
+      태양빛이 태양의 바깥 대기를 지나올 때, 그곳에 있는 원소가 <b style="color:var(--text)">자기가 낼 수 있는 파장의 빛만 골라 흡수</b>합니다.
+      그래서 그 자리가 어둡게 남습니다. 방출선과 흡수선의 위치가 같다는 사실이,
+      <b style="color:var(--accent)">태양에 어떤 원소가 있는지를 지구에서 알아낼 수 있게</b> 해 줍니다.
+    </div>
+  </div>
+
+  <h2 class="sec">정체를 맞혀 봅시다</h2>
+  <p class="sub">아래는 어떤 기체의 방출 스펙트럼입니다. 위의 지문과 비교해 어느 원소인지 고르세요.</p>
+  <div id="quiz-wrap"></div>
+
+  <div class="card" style="margin-top:18px;">
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">기록</span>우리 반 분광기로 본 광원 중, <em>선이 보였던 것</em>은 무엇이었나요? 어떤 원소가 들어 있을지 짐작해 보세요.
+    </div>
+    <textarea id="q-spec" placeholder="예: 네온사인에서 빨강·주황 줄이 여러 개 보였다. …"></textarea>
+  </div>
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="2">2단계 · 내 사진 분석하기 →</button></div>
+</div></section>
+
+<!-- ============ 2. 내 사진 분석 ============ -->
+<section class="page" id="page2"><div class="pane">
+  <h2 class="sec">내가 찍은 사진에서 파장을 읽어낸다</h2>
+  <p class="sub">0단계에서 만든 CD 분광기로 찍은 사진을 올리면, 사진의 색을 <b>파장에 따른 세기 그래프</b>로 바꿔 줍니다.
+     그래프의 봉우리를 누르면 그 빛의 <b>파장</b>이 나옵니다. 눈으로 "빨간 줄이 있네"가 아니라
+     <b style="color:var(--accent)">656 나노미터</b>라고 말할 수 있게 됩니다.</p>
+
+  <!-- ── 원리 설명 ── -->
+  <div class="card princ">
+    <h3 class="pr-h">사진 한 장이 어떻게 그래프가 되는가</h3>
+    <p class="note">자를 대고 잰 것도, 특별한 기계로 잰 것도 아닙니다.
+       <b>사진 파일에 들어 있는 숫자</b>만 가지고 다음 네 단계를 밟습니다.</p>
+
+    <!-- 1 -->
+    <div class="pr-step">
+      <div class="pr-n">1</div>
+      <div class="pr-b">
+        <h4>CD의 홈이 빛을 파장별로 갈라놓는다</h4>
+        <p>CD 표면에는 소리골이 <b>1.6 μm</b> 간격으로 촘촘히 파여 있습니다. 머리카락 굵기의 약 50분의 1입니다.
+           이 간격이 빛의 파장(수백 nm)과 비슷하기 때문에, 빛이 지나가면 <b>파장마다 다른 각도로 꺾입니다.</b>
+           이것을 <b>회절</b>이라 하고, 이런 구실을 하는 것을 <b>회절격자</b>라 합니다.</p>
+        <div class="pr-eq"><b>sin θ = λ / d</b>
+          <span>θ 꺾인 각 · λ 파장 · d 홈 간격(1600 nm)</span></div>
+        <p>파장 λ가 클수록 sin θ가 커집니다. <b>붉은 빛일수록 크게 꺾인다</b>는 뜻입니다.
+           그래서 사진에 무지개가 펼쳐집니다.</p>
+      </div>
+    </div>
+
+    <!-- 그림 -->
+    <div class="pr-fig">
+      <svg viewBox="0 0 760 250" role="img" aria-label="CD 격자에서 빛이 갈라져 사진에 무지개로 찍히는 모습">
+        <defs>
+          <linearGradient id="rbR" x1="0" x2="1">
+            <stop offset="0"   stop-color="#7c3aed"/><stop offset=".18" stop-color="#2563eb"/>
+            <stop offset=".38" stop-color="#06b6d4"/><stop offset=".56" stop-color="#22c55e"/>
+            <stop offset=".74" stop-color="#eab308"/><stop offset="1"   stop-color="#dc2626"/>
+          </linearGradient>
+          <linearGradient id="rbL" x1="1" x2="0">
+            <stop offset="0"   stop-color="#7c3aed"/><stop offset=".18" stop-color="#2563eb"/>
+            <stop offset=".38" stop-color="#06b6d4"/><stop offset=".56" stop-color="#22c55e"/>
+            <stop offset=".74" stop-color="#eab308"/><stop offset="1"   stop-color="#dc2626"/>
+          </linearGradient>
+          <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <!-- 왼쪽: 원리 -->
+        <text x="14" y="18" class="fg-t">빛이 갈라지는 원리</text>
+        <circle cx="34" cy="130" r="11" fill="#fbbf24"/>
+        <text x="34" y="162" class="fg-s" text-anchor="middle">광원</text>
+        <line x1="47" y1="130" x2="150" y2="130" class="fg-ray"/>
+        <rect x="150" y="72" width="9" height="116" fill="var(--surface-3)" stroke="var(--line-2)"/>
+        <g stroke="var(--dim)" stroke-width="1">
+          <line x1="150" y1="80"  x2="159" y2="80"/><line x1="150" y1="92" x2="159" y2="92"/>
+          <line x1="150" y1="104" x2="159" y2="104"/><line x1="150" y1="116" x2="159" y2="116"/>
+          <line x1="150" y1="128" x2="159" y2="128"/><line x1="150" y1="140" x2="159" y2="140"/>
+          <line x1="150" y1="152" x2="159" y2="152"/><line x1="150" y1="164" x2="159" y2="164"/>
+          <line x1="150" y1="176" x2="159" y2="176"/>
+        </g>
+        <text x="154" y="204" class="fg-s" text-anchor="middle">CD 격자</text>
+        <text x="154" y="218" class="fg-s2" text-anchor="middle">홈 1.6μm</text>
+        <line x1="159" y1="130" x2="300" y2="130" class="fg-ray0"/>
+        <text x="304" y="127" class="fg-s">0차 · 안 꺾임</text>
+        <path d="M159,130 L300,72"  stroke="#dc2626" stroke-width="2" fill="none"/>
+        <path d="M159,130 L300,96"  stroke="#22c55e" stroke-width="2" fill="none"/>
+        <path d="M159,130 L300,112" stroke="#2563eb" stroke-width="2" fill="none"/>
+        <text x="304" y="70" class="fg-s" fill="#dc2626">긴 파장 — 많이 꺾임</text>
+        <text x="304" y="112" class="fg-s" fill="#2563eb">짧은 파장 — 조금</text>
+        <path d="M182,130 A24,24 0 0,0 178,110" fill="none" stroke="var(--dim)" stroke-width="1"/>
+        <text x="190" y="118" class="fg-s2">θ</text>
+
+        <!-- 오른쪽: 사진 -->
+        <text x="440" y="18" class="fg-t">그래서 사진은 이렇게 찍힌다</text>
+        <rect x="440" y="30" width="306" height="150" rx="6" fill="#12161b" stroke="var(--line-2)"/>
+        <rect x="452" y="72" width="70" height="66" fill="url(#rbL)" opacity=".92"/>
+        <rect x="664" y="72" width="70" height="66" fill="url(#rbR)" opacity=".92"/>
+        <circle cx="593" cy="105" r="15" fill="#fff"/>
+        <circle cx="593" cy="105" r="26" fill="#fff" opacity=".22"/>
+        <text x="593" y="152" class="fg-s" fill="#e5e7eb" text-anchor="middle">0차</text>
+        <text x="487" y="64" class="fg-s" fill="#e5e7eb" text-anchor="middle">−1차</text>
+        <text x="699" y="64" class="fg-s" fill="#e5e7eb" text-anchor="middle">+1차</text>
+        <g color="#38bdf8" stroke="#38bdf8" stroke-width="1.4">
+          <line x1="593" y1="168" x2="716" y2="168" marker-end="url(#ah)"/>
+          <line x1="593" y1="168" x2="470" y2="168" marker-end="url(#ah)"/>
+        </g>
+        <text x="655" y="164" class="fg-s" fill="#38bdf8" text-anchor="middle">거리 r</text>
+        <text x="531" y="164" class="fg-s" fill="#38bdf8" text-anchor="middle">거리 r</text>
+        <text x="440" y="200" class="fg-s2">0차에서 <tspan fill="var(--accent)">멀수록 긴 파장</tspan>.
+          즉 <tspan fill="var(--accent)">거리 r 이 곧 파장</tspan>이다.</text>
+        <text x="440" y="216" class="fg-s2">양옆에 똑같은 무지개가 하나씩 생긴다.</text>
+      </svg>
+    </div>
+
+    <!-- 2 -->
+    <div class="pr-step">
+      <div class="pr-n">2</div>
+      <div class="pr-b">
+        <h4>화소의 R·G·B 세 숫자를 더해 '세기'로 삼는다</h4>
+        <p>사진의 점 하나에는 빨강·초록·파랑의 밝기가 <b>0~255</b>의 숫자로 들어 있습니다.
+           보통은 이 셋을 섞어 색을 만들지만, 여기서는 <b>색을 알아낼 필요가 없습니다.</b>
+           격자가 이미 파장별로 갈라놓았으니, 그 자리가 <b>어느 파장인지는 위치가 말해 주고</b>
+           우리는 <b>얼마나 밝은지</b>만 알면 됩니다. 그래서 R+G+B를 그 파장의 세기로 씁니다.</p>
+        <p>무지개 띠를 <b>가로질러 여러 줄을 평균</b>냅니다. 얼룩과 잡티가 줄어듭니다.</p>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="pr-step">
+      <div class="pr-n">3</div>
+      <div class="pr-b">
+        <h4>파장을 아는 빛으로 '자'를 만든다</h4>
+        <p>거리가 파장이라는 것은 알았지만, <b>몇 픽셀이 몇 nm인지</b>는 아직 모릅니다.
+           그래서 파장을 정확히 아는 빛 <b>두 가지</b>를 미리 찍어 두 지점에 눈금을 매겼습니다.</p>
+        <div class="pr-eq"><b>파장 = 527.8 + 0.4355 × (r − 995.2)</b>
+          <span>녹색 레이저 527.8 nm 와 적색 레이저 648.2 nm 로 맞춘 값</span></div>
+        <p>사진 해상도가 다르면 픽셀 수도 달라지므로, <b>긴 변을 3264픽셀로 환산</b>한 뒤 이 식을 씁니다.
+           <b>확대(줌)를 하면 안 되는 이유</b>가 여기 있습니다. 줌은 눈금 간격 자체를 바꿔 버립니다.</p>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="pr-step">
+      <div class="pr-n">4</div>
+      <div class="pr-b">
+        <h4>양옆 무지개를 모두 재서 평균낸다</h4>
+        <p>가운데 0차는 너무 밝아 사진에서 <b>하얗게 뭉개지고 별빛처럼 번집니다.</b>
+           그래서 그 한가운데가 어디인지 정확히 집기 어렵고, 사진마다 조금씩 치우칩니다.</p>
+        <p>중심이 δ만큼 치우치면 한쪽 무지개는 <b>δ만큼 멀게</b>, 반대쪽은 <b>δ만큼 가깝게</b> 나옵니다.
+           그러니 <b>양쪽에서 따로 재어 평균내면 δ가 저절로 지워집니다.</b>
+           양옆이 다 나오게 찍으라고 하는 이유입니다.</p>
+      </div>
+    </div>
+
+    <div class="pr-warn">
+      <b>솔직하게 — 세로축은 '상대 세기'입니다</b>
+      카메라는 밝기를 빛의 양에 정비례하게 기록하지 않고, 색깔마다 감도도 다릅니다.
+      그래서 봉우리의 <b>높이</b>는 서로 견주는 정도로만 쓸 수 있습니다.
+      하지만 우리가 알고 싶은 것은 봉우리의 <b>위치</b>이고, 위치는 격자의 기하학이 정하므로 믿을 수 있습니다.
+      <br><br>
+      또 <b>430 nm 아래</b>는 0차의 번진 빛에 묻히고, <b>700 nm 위</b>는 카메라의 적외선 차단 필터에 잘립니다.
+      그래프에서 이 두 구간을 회색으로 덮어 두었습니다.
+    </div>
+  </div>
+
+  <!-- ── 1단계 사진 ── -->
+  <div class="card">
+    <div class="stp"><b>1</b>사진 올리기</div>
+    <label class="up" for="sp-file">
+      <input type="file" id="sp-file" accept="image/jpeg,image/png,image/webp,image/*" hidden>
+      <span class="up-ico">＋</span>
+      <span class="up-t">사진을 고르거나 여기에 끌어다 놓으세요</span>
+      <span class="up-s">jpg · jpeg · png · webp 모두 됩니다. 사진은 이 기기 안에서만 처리되고 어디에도 올라가지 않습니다.</span>
+    </label>
+    <div class="warn" style="margin-top:12px;">
+      <p><b>촬영 규칙 — 이걸 지켜야 파장이 맞습니다.</b><br>
+      · <b>확대(줌)하지 않기.</b> 반드시 1.0배. 줌을 건드리면 자의 눈금이 달라집니다.<br>
+      · 가운데 <b>직진광(0차)</b>과 양옆의 <b>무지개 띠</b>가 <b>모두 한 화면</b>에 들어오게.<br>
+      · 어두운 곳에서, 분광기를 기기에 단단히 붙인 채로.</p>
+    </div>
+  </div>
+
+  <!-- ── 2단계 기준점 ── -->
+  <div class="card" id="sp-stage2" hidden>
+    <div class="stp"><b>2</b>기준점 두 곳 찍기</div>
+    <div class="sp-guide" id="sp-guide"></div>
+    <div class="cvwrap"><canvas id="sp-cv"></canvas></div>
+    <div class="sp-btns">
+      <button class="btn" id="sp-again">다시 찍기</button>
+      <button class="btn" id="sp-auto">가장 밝은 곳 자동으로 찾기</button>
+      <span class="nudge" id="sp-nudge" hidden>
+        노란 선 각도 <button class="btn" data-n="-1">◀</button>
+        <b id="sp-ang">0°</b>
+        <button class="btn" data-n="1">▶</button></span>
+    </div>
+  </div>
+
+  <!-- ── 3단계 그래프 ── -->
+  <div class="card" id="sp-stage3" hidden>
+    <div class="stp"><b>3</b>그래프에서 봉우리 누르기</div>
+    <p class="note" style="margin-bottom:10px;">
+      그래프를 <b>누른 채 좌우로 끌면</b> 가리키는 곳의 파장이 위쪽에 계속 뜹니다. 손을 떼면 그 자리가 표에 쌓입니다.
+      잘못 눌렀으면 표에서 지우면 됩니다.</p>
+    <div class="rd" id="sp-read">그래프를 누르거나 손가락으로 짚어 보세요.</div>
+    <div class="cvwrap"><canvas id="sp-graph"></canvas></div>
+    <label class="ck" style="margin-top:9px;"><input type="checkbox" id="sp-snap" checked>
+      <span><b>봉우리 중심으로 자동 맞춤</b> — 누른 자리 ±18nm 안에서 <b>가장 가까운</b> 봉우리를 찾아 그 중심으로 옮겨 잡습니다.
+      옮긴 자취는 그래프에 옅은 선으로 표시됩니다. 끄면 누른 자리를 그대로 기록합니다.</span></label>
+    <div class="sp-meta" id="sp-meta"></div>
+    <h3 class="sub3">내가 찾은 봉우리</h3>
+    <div id="sp-peaks"></div>
+  </div>
+
+  <!-- ── 4단계 판정 ── -->
+  <div class="card" id="sp-stage4" hidden>
+    <div class="stp"><b>4</b>어떤 종류의 스펙트럼인가</div>
+    <div class="qa-q" style="margin-bottom:10px;">
+      <span class="qa-tag">판단</span>이 광원의 스펙트럼은 셋 중 무엇입니까? 그래프의 모양을 근거로 고르세요.</div>
+    <div class="opts3" id="sp-kind"></div>
+    <div id="sp-kind-fb"></div>
+  </div>
+
+  <!-- ── 5단계 원소 ── -->
+  <div class="card" id="sp-stage5" hidden>
+    <div class="stp"><b>5</b>어떤 원소인가</div>
+    <div class="qa-q" style="margin-bottom:10px;">
+      <span class="qa-tag">판단</span>방출선이라면, 어느 원소의 지문일까요? 먼저 스스로 고른 뒤 대조해 보세요.</div>
+    <div class="opts3" id="sp-elem"></div>
+    <textarea id="sp-elem-etc" placeholder="'그 외'를 골랐다면 어떤 원소로 짐작하는지, 그렇게 본 근거는 무엇인지 쓰세요." hidden></textarea>
+    <div class="sp-btns" style="margin-top:12px;">
+      <button class="btn primary" id="sp-match">기준 파장표와 대조하기</button></div>
+    <div id="sp-match-out"></div>
+  </div>
+
+  <!-- ── 기록 ── -->
+  <div class="card" id="sp-stage6" hidden>
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">기록</span>측정한 파장과 참값이 얼마나 달랐나요? 그 차이가 생긴 까닭은 무엇이라고 생각합니까?</div>
+    <textarea id="q-spec-err" placeholder="예: Hα를 657.4nm로 쟀는데 참값은 656.28nm였다. 1.1nm 차이다. 봉우리가 넓어서 중심을 고르는 데 …"></textarea>
+  </div>
+
+  <!-- ── 고급 ── -->
+  <details class="adv">
+    <summary>자 다시 만들기 · 세부 설정</summary>
+    <div class="adv-in">
+      <p class="note">지금 쓰는 자는 <b id="cal-now"></b> 입니다.
+        선생님이 파장을 아는 레이저 사진으로 미리 맞춰 둔 값입니다.
+        분광기를 새로 만들었거나 다른 기기로 찍었다면 아래에서 다시 맞추세요.</p>
+      <ol class="how">
+        <li>파장을 아는 광원(적색·녹색 레이저 등) 사진을 위에 올리고 2단계까지 진행합니다.</li>
+        <li>그 광원의 봉우리를 그래프에서 누릅니다.</li>
+        <li>아래 칸에 그 광원의 <b>실제 파장</b>을 적고 [기준으로 등록]을 누릅니다.</li>
+        <li>서로 다른 파장으로 <b>2번</b> 반복하면 새 자가 만들어집니다.</li>
+      </ol>
+      <div class="calrow">
+        <input type="number" id="cal-lam" step="0.1" placeholder="실제 파장 (nm)">
+        <button class="btn" id="cal-add">기준으로 등록</button>
+        <button class="btn" id="cal-reset">기본값으로 되돌리기</button>
+      </div>
+      <div id="cal-list"></div>
+      <label class="ck"><input type="checkbox" id="sp-gamma" checked>
+        <span>감마 보정 — 사진 파일의 밝기값은 빛의 양에 비례하지 않습니다. 되돌려서 세기를 더 정직하게 만듭니다.</span></label>
+    </div>
+  </details>
+
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="3">3단계로 넘어가기 →</button></div>
+</div></section>
+
+<!-- ============ 3. 존재비 ============ -->
+<section class="page" id="page3"><div class="pane">
+  <h2 class="sec">어디에 무엇이 얼마나 있을까</h2>
+  <p class="sub">여섯 곳의 원소 구성입니다. 모두 <b>질량 기준 %</b>입니다. 눌러 가며 비교해 보세요.</p>
+
+  <div class="env-pick" id="env-pick"></div>
+  <div class="card">
+    <div style="font-size:.85rem;font-weight:800;margin-bottom:12px;" id="env-title">—</div>
+    <div class="bars" id="bars"></div>
+  </div>
+
+  <h2 class="sec" style="margin-top:26px;">순위를 나란히 놓으면</h2>
+  <p class="sub">1~5위만 뽑아 나란히 놓았습니다. 무엇이 이상한지 찾아보세요.</p>
+  <div class="rank-grid" id="ranks"></div>
+
+  <div class="card" style="margin-top:18px;">
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">발견</span>우주의 <em>99%가 수소와 헬륨</em>인데, 지구에는 왜 거의 없을까요?
+    </div>
+    <textarea id="q-hhe" placeholder="가벼운 기체는 지구의 중력으로 붙잡기 어렵습니다. 그리고 태양이 태어날 때…"></textarea>
+  </div>
+  <div class="card" style="margin-top:10px;">
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">발견</span>탄소는 우주 전체에 <em>0.4%밖에 없는데</em> 내 몸에는 18.5%나 있습니다. 어떻게 이런 일이 가능할까요?
+    </div>
+    <textarea id="q-c" placeholder="생명체가 특정 원소를 골라 모았다면, 그 원소는 애초에 어디서 만들어졌을까요?"></textarea>
+  </div>
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="4">4단계로 넘어가기 →</button></div>
+</div></section>
+
+<!-- ============ 3. 족보 ============ -->
+<section class="page" id="page4"><div class="pane">
+  <h2 class="sec">원소의 족보</h2>
+  <p class="sub">원소를 누르면 <b>어디에서 만들어졌는지</b> 알려 줍니다. 크게 세 곳에서 만들어졌습니다.</p>
+
+  <div class="origin-legend">
+    <span class="olg"><i style="background:var(--bang)"></i>빅뱅 — 우주가 태어난 직후</span>
+    <span class="olg"><i style="background:var(--star)"></i>별 내부 핵융합</span>
+    <span class="olg"><i style="background:var(--nova)"></i>초신성 폭발</span>
+  </div>
+
+  <div class="eltab" id="eltab"></div>
+  <div class="detail" id="detail">
+    <p style="color:var(--dim)">위에서 원소를 눌러 보세요.</p>
+  </div>
+
+  <h2 class="sec" style="margin-top:28px;">내 몸의 원소는 어디에서 왔을까</h2>
+  <p class="sub">몸무게를 넣으면 원소별 질량과 그 출생지를 계산해 줍니다.</p>
+  <div class="body-calc">
+    <div style="max-width:150px;"><label class="lbl" for="wt">몸무게 (kg)</label>
+      <input type="number" id="wt" value="60" min="1" max="200" step="0.1"></div>
+    <button class="btn primary" id="btn-calc">계산하기</button>
+  </div>
+  <div class="origin-sum" id="origin-sum"></div>
+  <div class="card" style="margin-top:14px;" id="body-detail" hidden></div>
+
+  <div class="card" style="margin-top:18px;">
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">해석</span>계산 결과를 보고, <em>"우리는 별의 먼지로 만들어졌다"</em>는 말이 무슨 뜻인지 내 말로 설명해 보세요.
+    </div>
+    <textarea id="q-dust" placeholder="내 몸의 ○○%는 …"></textarea>
+  </div>
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="5">총정리로 넘어가기 →</button></div>
+</div></section>
+
+<!-- ============ 4. 총정리 ============ -->
+<section class="page" id="page5"><div class="pane">
+  <div class="sum-hero">
+    <h1>오늘 배운 것을 한 장으로</h1>
+    <p>우리는 빛을 펼쳐 <b>어떤 원소가 있는지</b> 읽었고, 여러 곳의 원소 구성을 비교해
+       <b>지구와 내 몸의 원소가 우주와 다르다는 것</b>을 발견했으며,
+       그 차이가 <b>원소가 만들어진 장소와 시기</b> 때문임을 알았습니다.
+       지구와 생명의 역사는 우주 역사의 한 부분입니다.</p>
+  </div>
+
+  <h2 class="sec">개념 총정리</h2>
+  <p class="sub">교과서 내용을 오늘 탐구한 것과 이어서 정리했습니다.</p>
+
+  <div class="concept">
+    <div class="cc"><span class="cc-n">1</span><h4>스펙트럼의 세 가지 모습</h4>
+      <table class="ftable">
+        <tr><th>종류</th><th>모습</th><th>언제</th></tr>
+        <tr><td><b>연속</b></td><td>무지개가 이어짐</td><td>뜨거운 고체·액체</td></tr>
+        <tr><td><b>방출선</b></td><td>어두운 바탕에 밝은 줄</td><td>뜨거운 기체</td></tr>
+        <tr><td><b>흡수선</b></td><td>무지개 위 검은 줄</td><td>빛이 찬 기체를 지날 때</td></tr>
+      </table>
+      <div class="link">오늘 확인한 것 — 분광기로 형광등과 백열등을 보니 줄무늬와 무지개로 확실히 달랐습니다.</div></div>
+
+    <div class="cc"><span class="cc-n">2</span><h4>원소의 지문</h4>
+      <p>원소마다 <b>낼 수 있는 빛의 파장이 정해져 있습니다.</b>
+         그래서 선의 위치를 보면 어떤 원소인지 알 수 있습니다. 지문과 같습니다.</p>
+      <p>같은 원소는 방출선과 흡수선의 <b>위치가 정확히 같습니다.</b></p>
+      <div class="link">오늘 확인한 것 — 태양 스펙트럼의 검은 줄 자리에 수소와 나트륨의 방출선이 정확히 겹쳤습니다.</div></div>
+
+    <div class="cc"><span class="cc-n">3</span><h4>우주는 수소와 헬륨</h4>
+      <p>우주 전역의 스펙트럼을 분석한 결과, 우주 물질의 약 <b>74%가 수소, 24%가 헬륨</b>이고
+         나머지 모든 원소를 합쳐도 2%가 되지 않습니다.</p>
+      <p>이 둘은 우주가 태어나고 <b>약 3분 안에</b> 만들어졌습니다. 이것이 <b>빅뱅 우주론</b>의 강력한 증거입니다.</p>
+      <div class="link">오늘 확인한 것 — 여섯 곳 중 우주만 수소·헬륨이 1·2위였습니다.</div></div>
+
+    <div class="cc"><span class="cc-n">4</span><h4>별은 원소를 만드는 공장</h4>
+      <p>별의 중심은 온도와 압력이 매우 높아 가벼운 원자핵이 뭉쳐 무거운 원자핵이 되는
+         <b>핵융합</b>이 일어납니다.</p>
+      <p>먼저 <b>수소 → 헬륨</b>, 별이 늙으면 <b>헬륨 → 탄소</b>, 무거운 별에서는
+         <b>탄소 → 산소 → 규소 → 철</b>까지 이어집니다. 이 과정에서 줄어든 질량이 <b>에너지</b>가 되어
+         별이 스스로 빛납니다.</p>
+      <div class="link">핵융합은 <b>철에서 멈춥니다.</b> 철이 가장 안정된 원자핵이라 더 뭉쳐도 에너지가 나오지 않기 때문입니다.</div></div>
+
+    <div class="cc"><span class="cc-n">5</span><h4>철보다 무거운 원소</h4>
+      <p>철까지 만든 무거운 별은 더 이상 버티지 못하고 <b>초신성 폭발</b>을 일으킵니다.</p>
+      <p>이때 나오는 엄청난 에너지 덕분에 비로소 <b>금, 은, 납, 우라늄</b> 같은
+         철보다 무거운 원소가 만들어지고, 우주 공간으로 흩어집니다.</p>
+      <div class="link">그 흩어진 물질이 다시 뭉쳐 태양과 지구, 그리고 우리가 되었습니다.</div></div>
+
+    <div class="cc"><span class="cc-n">6</span><h4>왜 지구와 우주는 다를까</h4>
+      <p>태양계가 만들어질 때 <b>안쪽은 뜨거워서</b> 수소·헬륨 같은 가벼운 기체가 날아가고
+         무거운 물질만 남았습니다. 그래서 지구는 <b>철·산소·규소</b>가 많습니다.</p>
+      <p>생명체는 그중에서도 결합을 잘 만드는 <b>탄소</b>를 골라 씁니다.
+         그래서 내 몸에는 탄소가 우주 평균보다 훨씬 많습니다.</p>
+      <div class="link">오늘 확인한 것 — 우주 / 지구 / 내 몸의 1위 원소가 각각 수소 · 철 · 산소로 모두 달랐습니다.</div></div>
+  </div>
+
+  <h2 class="sec">한눈에 보는 흐름</h2>
+  <div class="flowbox">
+    <span class="fl bang">빅뱅 · 수소와 헬륨</span><span class="ar">→</span>
+    <span class="fl">첫 별의 탄생</span><span class="ar">→</span>
+    <span class="fl star">별 내부 핵융합 · 탄소 질소 산소 ~ 철</span><span class="ar">→</span>
+    <span class="fl nova">초신성 폭발 · 철보다 무거운 원소</span><span class="ar">→</span>
+    <span class="fl">흩어진 물질이 다시 뭉침</span><span class="ar">→</span>
+    <span class="fl good">태양계 · 지구 · 나</span>
+  </div>
+
+  <h2 class="sec" style="margin-top:30px;">스스로 점검하기</h2>
+  <p class="sub">설명할 수 있으면 표시하세요.</p>
+  <div class="chk" id="chk" style="margin-bottom:26px;">
+    <label><input type="checkbox"><span>연속·방출선·흡수선 스펙트럼을 구별하고, 각각 언제 생기는지 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>스펙트럼으로 천체의 구성 원소를 알아낼 수 있는 까닭을 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>우주의 주요 구성 원소가 수소와 헬륨임을 존재비 자료를 근거로 말할 수 있다.</span></label>
+    <label><input type="checkbox"><span>우주·지구·바다·대기·생명체의 원소 구성을 자료로 비교하고 차이를 찾아낼 수 있다.</span></label>
+    <label><input type="checkbox"><span>내 몸을 이루는 원소를 출생지(빅뱅·별 내부·초신성)별로 분류할 수 있다.</span></label>
+    <label><input type="checkbox"><span>우주·지구·생명체의 원소 구성이 왜 서로 다른지 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>지구와 생명의 역사가 우주 역사의 일부분임을 근거를 들어 설명할 수 있다.</span></label>
+  </div>
+
+  <h2 class="sec">내가 쓴 답안 모아보기</h2>
+  <div id="ans-wrap" style="margin-bottom:22px;">
+    <div class="empty">아직 쓴 답이 없습니다.</div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="who">학번 · 이름</label>
+    <input type="text" id="who" placeholder="예: 10101 홍길동" style="max-width:220px;margin-bottom:12px;">
+    <div id="ws-actions"></div>
+  </div>
+</div></section>
+</div>
+
+<script src="worksheet.js?v=7"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ===== 탭 ===== */
+function goTab(n){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===n));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  $('page'+n).classList.add('on');
+  if(n==='1') drawSpectra();
+  if(n==='4') renderAnswers();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>goTab(t.dataset.tab)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.goto)));
+
+/* ===== 파장 → 색 ===== */
+function wlRGB(wl,scale=1){
+  let r=0,g=0,b=0;
+  if(wl>=380&&wl<440){r=-(wl-440)/60;b=1;}
+  else if(wl<490){g=(wl-440)/50;b=1;}
+  else if(wl<510){g=1;b=-(wl-510)/20;}
+  else if(wl<580){r=(wl-510)/70;g=1;}
+  else if(wl<645){r=1;g=-(wl-645)/65;}
+  else if(wl<=780){r=1;}
+  let f=1;
+  if(wl>=380&&wl<420) f=.3+.7*(wl-380)/40;
+  else if(wl>700&&wl<=780) f=.3+.7*(780-wl)/80;
+  const q=x=>Math.round(255*Math.pow(Math.max(0,Math.min(1,x))*f,.8)*scale);
+  return `rgb(${q(r)},${q(g)},${q(b)})`;
+}
+
+/* ===== 원소 방출선 (nm) ===== */
+const ELEMENTS={
+  H :{nm:'수소',sym:'H', color:'#dc2626',lines:[410.2,434.0,486.1,656.3],
+      note:'발머 계열. 656.3 nm의 붉은 선이 가장 밝아 우주 어디서나 눈에 띕니다.'},
+  He:{nm:'헬륨',sym:'He',color:'#b45f06',lines:[447.1,471.3,492.2,501.6,587.6,667.8,706.5],
+      note:'1868년 태양 스펙트럼에서 먼저 발견되어 그리스어 헬리오스(태양)에서 이름을 땄습니다.'},
+  Na:{nm:'나트륨',sym:'Na',color:'#fb923c',lines:[589.0,589.6],
+      note:'노란 두 줄만 강하게 납니다. 옛 가로등의 주황빛이 이것입니다.'},
+  Hg:{nm:'수은',sym:'Hg',color:'#2563eb',lines:[404.7,435.8,546.1,577.0,579.1],
+      note:'형광등 속에 들어 있습니다. 초록(546 nm) 선이 특히 밝습니다.'},
+  Ne:{nm:'네온',sym:'Ne',color:'#f43f5e',lines:[585.2,588.2,594.5,603.0,607.4,614.3,621.7,633.4,640.2,650.7],
+      note:'빨강·주황 쪽에 선이 몰려 있어 네온사인이 붉게 보입니다.'},
+  Ca:{nm:'칼슘',sym:'Ca',color:'#7c3aed',lines:[393.4,396.8,422.7,616.2],
+      note:'보라 끝의 두 선(H·K선)이 태양 스펙트럼에서 아주 뚜렷합니다.'}
+};
+/* 태양 흡수선 — 프라운호퍼선 */
+const SUN=[
+  {wl:393.4,d:.9,t:'K · 칼슘'},{wl:396.8,d:.85,t:'H · 칼슘'},{wl:410.2,d:.4,t:'Hδ · 수소'},
+  {wl:430.8,d:.5,t:'G · 철'},{wl:434.0,d:.5,t:'Hγ · 수소'},{wl:486.1,d:.6,t:'F · Hβ 수소'},
+  {wl:518.4,d:.5,t:'b · 마그네슘'},{wl:527.0,d:.4,t:'E · 철'},
+  {wl:589.0,d:.8,t:'D₂ · 나트륨'},{wl:589.6,d:.75,t:'D₁ · 나트륨'},
+  {wl:656.3,d:.65,t:'C · Hα 수소'},{wl:686.7,d:.35,t:'B · 산소(지구 대기)'}
+];
+const WL0=380, WL1=750;
+
+function fitCv(c){
+  const r=c.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  c.width=Math.max(1,r.width*dpr); c.height=Math.max(1,r.height*dpr);
+  const x=c.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0);
+  return {x,w:r.width,h:r.height};
+}
+function drawEmission(cv,lines,glow){
+  const {x,w,h}=fitCv(cv);
+  x.fillStyle='#f8fafc'; x.fillRect(0,0,w,h);
+  lines.forEach(wl=>{
+    const px=(wl-WL0)/(WL1-WL0)*w;
+    const col=wlRGB(wl);
+    x.save(); x.shadowBlur=glow?10:6; x.shadowColor=col;
+    x.fillStyle=col; x.fillRect(px-1.4,0,2.8,h); x.restore();
+  });
+}
+function drawSun(cv){
+  const {x,w,h}=fitCv(cv);
+  for(let i=0;i<w;i++){
+    const wl=WL0+(i/w)*(WL1-WL0);
+    x.fillStyle=wlRGB(wl); x.fillRect(i,0,1.2,h);
+  }
+  x.textAlign='center'; x.font='bold 8px Pretendard';
+  SUN.forEach(s=>{
+    const px=(s.wl-WL0)/(WL1-WL0)*w;
+    x.fillStyle=`rgba(0,0,0,${s.d})`;
+    x.fillRect(px-1.3,0,2.6,h-13);
+    x.fillStyle='rgba(255,255,255,.92)';
+    x.fillText(s.t.split(' ')[0], px, h-3);
+  });
+}
+let curEl='H';
+function drawSpectra(){
+  drawEmission($('sp-emit'),ELEMENTS[curEl].lines,true);
+  drawSun($('sp-sun'));
+  QUIZ.forEach((q,i)=>{ const c=$('qcv'+i); if(c) drawEmission(c,ELEMENTS[q.ans].lines,false); });
+}
+window.addEventListener('resize',()=>{ if($('page1').classList.contains('on')) drawSpectra(); });
+
+/* 원소 버튼 */
+$('el-pick').innerHTML=Object.entries(ELEMENTS).map(([k,e])=>
+  `<button class="el-btn ${k==='H'?'on':''}" data-el="${k}"
+     style="${k==='H'?`background:${e.color};border-color:${e.color}`:''}">${e.nm} ${e.sym}</button>`).join('');
+$('el-pick').querySelectorAll('.el-btn').forEach(b=>b.addEventListener('click',()=>{
+  curEl=b.dataset.el;
+  $('el-pick').querySelectorAll('.el-btn').forEach(x=>{
+    const on=x.dataset.el===curEl;
+    x.classList.toggle('on',on);
+    x.style.background=on?ELEMENTS[curEl].color:''; x.style.borderColor=on?ELEMENTS[curEl].color:'';
+  });
+  const e=ELEMENTS[curEl];
+  $('emit-name').innerHTML=`${e.nm} (${e.sym}) <small style="color:var(--dim);font-weight:500;">${e.note}</small>`;
+  drawSpectra();
+}));
+
+/* 퀴즈 */
+const QUIZ=[
+  {ans:'Na',opts:['H','He','Na','Ne'],hint:'노란 자리에 굵은 선이 딱 두 개뿐입니다. 옛 터널 조명 색을 떠올려 보세요.'},
+  {ans:'H', opts:['H','Hg','Ca','Ne'],hint:'빨강·청록·파랑·보라에 하나씩, 모두 네 줄입니다. 우주에서 가장 흔한 원소입니다.'},
+  {ans:'Ne',opts:['He','Ne','Na','Ca'],hint:'빨강 쪽에 선이 촘촘히 몰려 있습니다. 간판 불빛의 이름이 곧 답입니다.'}
+];
+$('quiz-wrap').innerHTML=QUIZ.map((q,i)=>`
+  <div class="quiz">
+    <div class="quiz-q">문제 ${i+1}. 이 스펙트럼은 어느 원소일까요?</div>
+    <div class="spec-box"><canvas id="qcv${i}"></canvas></div>
+    <div class="quiz-opts">${q.opts.map(o=>
+      `<button class="opt" data-q="${i}" data-a="${o}">${ELEMENTS[o].nm}</button>`).join('')}</div>
+    <div class="fb" id="fb${i}"></div>
+  </div>`).join('');
+$('quiz-wrap').querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+  const i=+b.dataset.q, q=QUIZ[i], ok=b.dataset.a===q.ans, fb=$('fb'+i);
+  b.classList.add(ok?'ok':'no');
+  fb.className='fb '+(ok?'ok':'no');
+  fb.innerHTML= ok
+    ? `정답입니다. <b>${ELEMENTS[q.ans].nm}</b>입니다. ${ELEMENTS[q.ans].note}`
+    : `아직 아닙니다. ${q.hint}`;
+}));
+
+/* ===== 원소 존재비 (질량 %) ===== */
+const ENVS={
+  space:{ico:'🌌',nm:'우주 (태양)',sub:'별과 성간 물질',
+    d:{H:71.0,He:27.0,O:0.97,C:0.40,Ne:0.14,Fe:0.14,N:0.10,Si:0.07,Mg:0.06,S:0.04}},
+  earth:{ico:'🌍',nm:'지구 전체',sub:'핵과 맨틀 포함',
+    d:{Fe:32.1,O:30.1,Si:15.1,Mg:13.9,S:2.9,Ni:1.8,Ca:1.5,Al:1.4,기타:1.2}},
+  crust:{ico:'⛰️',nm:'지각',sub:'우리가 밟는 땅',
+    d:{O:46.6,Si:27.7,Al:8.1,Fe:5.0,Ca:3.6,Na:2.8,K:2.6,Mg:2.1,기타:1.5}},
+  ocean:{ico:'🌊',nm:'바닷물',sub:'수권',
+    d:{O:85.8,H:10.8,Cl:1.9,Na:1.1,Mg:0.13,S:0.09,Ca:0.04,K:0.04,기타:0.1}},
+  air:{ico:'💨',nm:'대기',sub:'기권',
+    d:{N:75.5,O:23.1,Ar:1.3,기타:0.1}},
+  body:{ico:'🧑',nm:'사람 몸',sub:'생물권',
+    d:{O:65.0,C:18.5,H:9.5,N:3.2,Ca:1.5,P:1.0,K:0.4,S:0.3,Na:0.2,Cl:0.2,Mg:0.1,기타:0.1}}
+};
+const ELCOL={H:'#dc2626',He:'#b45f06',O:'#03699f',C:'#a3a3a3',N:'#059669',Fe:'#fb923c',
+  Si:'#7c3aed',Mg:'#f472b6',S:'#9a6700',Ca:'#2563eb',Al:'#41505f',Na:'#fb7185',
+  Ne:'#f43f5e',Ni:'#0b7d73',K:'#c4b5fd',P:'#fdba74',Cl:'#10b981',Ar:'#0ea5e9',기타:'#475569'};
+const ELKO={H:'수소',He:'헬륨',O:'산소',C:'탄소',N:'질소',Fe:'철',Si:'규소',Mg:'마그네슘',
+  S:'황',Ca:'칼슘',Al:'알루미늄',Na:'나트륨',Ne:'네온',Ni:'니켈',K:'칼륨',P:'인',
+  Cl:'염소',Ar:'아르곤',기타:'기타'};
+
+let curEnv='space';
+$('env-pick').innerHTML=Object.entries(ENVS).map(([k,e])=>
+  `<button class="env ${k==='space'?'on':''}" data-env="${k}">
+     <span class="ico">${e.ico}</span><span class="nm">${e.nm}</span><span class="sub2">${e.sub}</span></button>`).join('');
+$('env-pick').querySelectorAll('.env').forEach(b=>b.addEventListener('click',()=>{
+  curEnv=b.dataset.env;
+  $('env-pick').querySelectorAll('.env').forEach(x=>x.classList.toggle('on',x.dataset.env===curEnv));
+  drawBars();
+}));
+function drawBars(){
+  const e=ENVS[curEnv];
+  $('env-title').textContent=`${e.ico} ${e.nm} — 질량 기준 구성비`;
+  const ent=Object.entries(e.d);
+  const max=Math.max(...ent.map(x=>x[1]));
+  $('bars').innerHTML=ent.map(([k,v])=>`
+    <div class="bar-row">
+      <span class="bar-nm">${ELKO[k]||k}<em>${k==='기타'?'':k}</em></span>
+      <span class="bar-track"><span class="bar-fill" style="width:${(v/max*100).toFixed(1)}%;
+        background:${ELCOL[k]||'#475569'}"></span></span>
+      <span class="bar-v">${v>=1?v.toFixed(1):v.toFixed(2)}%</span>
+    </div>`).join('');
+}
+function drawRanks(){
+  $('ranks').innerHTML=Object.entries(ENVS).map(([k,e])=>{
+    const top=Object.entries(e.d).filter(x=>x[0]!=='기타').slice(0,5);
+    return `<div class="rank-col"><h5>${e.ico} ${e.nm}</h5><ol>${
+      top.map(([s,v])=>`<li><b style="color:${ELCOL[s]||'#41505f'}">${ELKO[s]||s}</b>
+        <span>${v>=1?v.toFixed(1):v.toFixed(2)}%</span></li>`).join('')}</ol></div>`;
+  }).join('');
+}
+drawBars(); drawRanks();
+
+/* ===== 원소의 족보 ===== */
+const ORIGIN={
+  bang:{t:'빅뱅',col:'var(--bang)',bg:'rgba(251,191,36,.14)',
+        d:'우주가 태어나고 약 3분 안에 만들어졌습니다. 그 뒤로는 거의 새로 만들어지지 않았습니다.'},
+  star:{t:'별 내부 핵융합',col:'var(--star)',bg:'rgba(248,113,113,.14)',
+        d:'별의 중심에서 가벼운 원자핵이 뭉쳐 만들어졌습니다. 별이 죽으면서 우주로 흩어졌습니다.'},
+  nova:{t:'초신성 폭발',col:'var(--nova)',bg:'rgba(192,132,252,.14)',
+        d:'무거운 별이 마지막에 폭발할 때, 그 엄청난 에너지 덕분에 비로소 만들어졌습니다.'}
+};
+const ELDB=[
+  {s:'H', z:1, k:'수소',   o:'bang', x:'우주에서 가장 흔한 원소입니다. 물(H₂O)의 재료이고, 별을 빛나게 하는 연료이기도 합니다.'},
+  {s:'He',z:2, k:'헬륨',   o:'bang', x:'빅뱅 때 수소 다음으로 많이 만들어졌고, 지금도 별 속에서 계속 만들어지고 있습니다.'},
+  {s:'C', z:6, k:'탄소',   o:'star', x:'헬륨 원자핵 세 개가 뭉쳐 만들어집니다. 결합을 잘 만들어 모든 생명체의 뼈대가 됩니다.'},
+  {s:'N', z:7, k:'질소',   o:'star', x:'별 내부 핵융합의 중간 산물입니다. 단백질과 DNA에 반드시 들어갑니다. 대기의 78%입니다.'},
+  {s:'O', z:8, k:'산소',   o:'star', x:'별이 탄소를 다 쓰면 만들어집니다. 지각과 사람 몸에서 모두 1위인 원소입니다.'},
+  {s:'Ne',z:10,k:'네온',   o:'star', x:'무거운 별의 탄소 연소 단계에서 만들어집니다. 간판 불빛으로 익숙합니다.'},
+  {s:'Mg',z:12,k:'마그네슘',o:'star',x:'별 내부에서 만들어져 지구 맨틀의 주요 성분이 되었습니다.'},
+  {s:'Si',z:14,k:'규소',   o:'star', x:'산소와 결합해 규산염 광물을 만듭니다. 지각의 뼈대이자 반도체의 재료입니다.'},
+  {s:'S', z:16,k:'황',     o:'star', x:'규소 연소 단계에서 만들어집니다. 단백질에도 조금 들어 있습니다.'},
+  {s:'Ca',z:20,k:'칼슘',   o:'star', x:'무거운 별의 마지막 단계에서 만들어집니다. 우리 뼈와 석회암의 주성분입니다.'},
+  {s:'Fe',z:26,k:'철',     o:'star', x:'핵융합이 여기서 멈춥니다. 가장 안정된 원자핵이라 더 뭉쳐도 에너지가 나오지 않습니다. 지구 전체에서 가장 많은 원소이고, 우리 피 속 헤모글로빈의 중심에도 있습니다.'},
+  {s:'Cu',z:29,k:'구리',   o:'nova', x:'철보다 무겁습니다. 별 내부에서는 만들 수 없어 초신성 폭발이 필요합니다.'},
+  {s:'Ag',z:47,k:'은',     o:'nova', x:'초신성 폭발의 산물입니다. 손에 낀 은반지는 폭발한 별의 조각입니다.'},
+  {s:'Au',z:79,k:'금',     o:'nova', x:'만들기 매우 어려워 우주에도 드뭅니다. 그래서 비쌉니다.'},
+  {s:'U', z:92,k:'우라늄', o:'nova', x:'자연에 있는 가장 무거운 원소 중 하나입니다. 지구 내부를 데우는 열의 원천이기도 합니다.'}
+];
+$('eltab').innerHTML=ELDB.map((e,i)=>`
+  <button class="el" data-i="${i}" style="border-color:${ORIGIN[e.o].col};background:${ORIGIN[e.o].bg}">
+    <span class="sym" style="color:${ORIGIN[e.o].col}">${e.s}</span>
+    <span class="z">${e.z}</span><span class="kn">${e.k}</span></button>`).join('');
+$('eltab').querySelectorAll('.el').forEach(b=>b.addEventListener('click',()=>{
+  $('eltab').querySelectorAll('.el').forEach(x=>x.classList.remove('sel'));
+  b.classList.add('sel');
+  const e=ELDB[+b.dataset.i], o=ORIGIN[e.o];
+  $('detail').innerHTML=`<h3>${e.k} <span style="color:var(--dim);font-weight:600;font-size:.9rem">${e.s} · 원자번호 ${e.z}</span></h3>
+    <span class="badge" style="background:${o.bg};color:${o.col}">${o.t}</span>
+    <p>${e.x}</p><p style="color:var(--dim);margin-top:8px;">${o.d}</p>`;
+}));
+
+/* 내 몸 계산 */
+const BODY={O:65.0,C:18.5,H:9.5,N:3.2,Ca:1.5,P:1.0,K:0.4,S:0.3,Na:0.2,Cl:0.2,Mg:0.1};
+const BODY_ORIGIN={H:'bang',O:'star',C:'star',N:'star',Ca:'star',P:'star',K:'star',
+                   S:'star',Na:'star',Cl:'star',Mg:'star'};
+$('btn-calc').addEventListener('click',()=>{
+  const w=parseFloat($('wt').value)||60;
+  const g={bang:0,star:0,nova:0};
+  Object.entries(BODY).forEach(([k,v])=>g[BODY_ORIGIN[k]]+=w*v/100);
+  const tot=g.bang+g.star+g.nova;
+  bodyResult=['bang','star','nova'].map(o=>
+    [`${ORIGIN[o].t}에서 온 원소`, `${g[o].toFixed(1)} kg  (몸무게 ${w} kg의 ${(g[o]/tot*100).toFixed(1)}%)`]);
+  $('origin-sum').innerHTML=['bang','star','nova'].map(o=>{
+    const O=ORIGIN[o];
+    return `<div class="os" style="border-color:${O.col};background:${O.bg}">
+      <div class="t" style="color:${O.col}">${O.t}에서 온 원소</div>
+      <div class="v" style="color:${O.col}">${g[o].toFixed(1)}<span style="font-size:.8rem"> kg</span></div>
+      <div class="d">몸무게의 ${(g[o]/tot*100).toFixed(1)}%</div></div>`;
+  }).join('');
+  const bd=$('body-detail'); bd.hidden=false;
+  bd.innerHTML=`<div style="font-size:.82rem;font-weight:800;margin-bottom:10px;">원소별 질량 (${w} kg 기준)</div>
+    <div class="bars">${Object.entries(BODY).map(([k,v])=>{
+      const o=ORIGIN[BODY_ORIGIN[k]];
+      return `<div class="bar-row"><span class="bar-nm">${ELKO[k]||k}<em>${k}</em></span>
+        <span class="bar-track"><span class="bar-fill" style="width:${(v/65*100).toFixed(1)}%;background:${o.col}"></span></span>
+        <span class="bar-v">${(w*v/100).toFixed(2)} kg</span></div>`;}).join('')}</div>
+    <div style="margin-top:12px;padding:11px 13px;background:var(--surface-2);border-left:3px solid var(--star);
+      border-radius:0 8px 8px 0;font-size:.8rem;line-height:1.75;color:var(--mid);word-break:keep-all;">
+      몸무게의 <b style="color:var(--star)">${(g.star/tot*100).toFixed(1)}%</b>는 <b>별 속에서</b> 만들어진 원소이고,
+      <b style="color:var(--bang)">${(g.bang/tot*100).toFixed(1)}%</b>는 <b>우주가 태어난 지 3분 만에</b> 만들어진 수소입니다.
+      몸 안의 철과 미량 원소까지 따지면 <b style="color:var(--nova)">초신성 폭발</b>의 흔적도 들어 있습니다.</div>`;
+});
+
+/* ===== 관찰 기록 ===== */
+const SRC=[
+  {k:'형광등',h:'교실 천장'},{k:'백열등 · 난로',h:'뜨거운 필라멘트'},
+  {k:'LED 조명',h:'스탠드 · 스마트폰 화면'},{k:'네온사인 · 간판',h:'창밖'},
+  {k:'하늘 (해는 보지 말 것)',h:'창가의 밝은 하늘'}
+];
+$('obs-list').innerHTML=SRC.map((s,i)=>`
+  <div style="display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:center;
+       padding:8px 0;border-bottom:1px solid var(--line);">
+    <div><div style="font-size:.82rem;font-weight:700;">${s.k}</div>
+      <div style="font-size:.7rem;color:var(--dim);">${s.h}</div></div>
+    <input type="text" class="obs-in" data-k="${esc(s.k)}" placeholder="무지개가 이어졌나요? 줄이 몇 개 보였나요? 무슨 색이었나요?">
+  </div>`).join('');
+
+/* ══════════════════════════════════════════════════════════════
+   스펙트럼 분석 — 사진의 RGB 화소를 파장별 세기로 바꾼다
+
+   원리
+     CD의 홈(간격 1.6μm)이 회절격자 노릇을 한다. 빛은 파장이 길수록
+     크게 꺾이므로, 직진광(0차)에서 멀어질수록 붉은 빛이 된다.
+     따라서 "0차에서 떨어진 거리"가 곧 파장이다.
+
+   실제 사진에서 부딪히는 문제와 해결
+     ① 0차는 완전히 포화되어 별빛처럼 번진다 → 중심이 사진마다 치우친다.
+        해결: 양쪽(+1차·−1차)을 모두 재서 평균낸다. 치우침 δ가 한쪽은 +δ,
+              반대쪽은 −δ로 나타나므로 평균에서 정확히 상쇄된다.
+     ② 손으로 들고 찍어 사진마다 기기가 돌아가 있다.
+        해결: 가로 거리가 아니라 2차원 거리 √(Δx²+Δy²)를 쓴다. 회전에 불변이다.
+     ③ 사진 해상도가 다를 수 있다.
+        해결: 긴 변을 3264로 환산해 자의 눈금을 맞춘다. (배율 1.0 고정이 전제)
+   ══════════════════════════════════════════════════════════════ */
+const SPEC = (function(){
+  const REF_W = 3264;                 // 보정에 쓴 사진의 긴 변
+  const DEF   = {lam0:527.8, r0:995.2, slope:0.43549};  // 기본 자
+  let cal = Object.assign({}, DEF);
+  let calPts = [];                    // 재보정용 기준점
+
+  const S = { img:null, W:0, H:0, px:null, scale:1,
+              cx:0, cy:0, phi:0, ready:false, prof:null, both:true };
+
+  /* ── 사진 읽기 ── */
+  function setImage(img){
+    const W=img.naturalWidth, H=img.naturalHeight;
+    const c=document.createElement('canvas'); c.width=W; c.height=H;
+    c.getContext('2d',{willReadFrequently:true}).drawImage(img,0,0);
+    S.img=img; S.W=W; S.H=H;
+    S.px=c.getContext('2d',{willReadFrequently:true}).getImageData(0,0,W,H).data;
+    S.scale=REF_W/Math.max(W,H);      // 해상도 정규화 계수
+    S.ready=false; S.prof=null;
+  }
+  const lum=(i)=>S.px[i]+S.px[i+1]+S.px[i+2];
+
+  /* ── 가장 밝은(포화) 덩어리 = 0차 ── */
+  function findZero(){
+    const st=Math.max(1,Math.round(Math.max(S.W,S.H)/700));
+    let mx=0;
+    for(let y=0;y<S.H;y+=st) for(let x=0;x<S.W;x+=st){
+      const v=lum((y*S.W+x)*4); if(v>mx) mx=v;
+    }
+    const th=mx*0.94; let sx=0,sy=0,n=0;
+    for(let y=0;y<S.H;y+=st) for(let x=0;x<S.W;x+=st){
+      if(lum((y*S.W+x)*4)>=th){ sx+=x; sy+=y; n++; }
+    }
+    return n? {x:sx/n, y:sy/n} : {x:S.W/2, y:S.H/2};
+  }
+
+  /* ── 한 방향으로 훑어 프로파일 뽑기 ── */
+  function scan(cx,cy,phi,rmin,rmax,half,step){
+    const p=phi*Math.PI/180, ux=Math.cos(p), uy=Math.sin(p), vx=-uy, vy=ux;
+    const n=Math.max(2,Math.floor((rmax-rmin)/step));
+    const R=new Float64Array(n),G=new Float64Array(n),B=new Float64Array(n),T=new Float64Array(n);
+    const ts=Math.max(2, Math.round(half/28));
+    for(let i=0;i<n;i++){
+      const r=rmin+i*step; let sr=0,sg=0,sb=0,c=0;
+      for(let t=-half;t<=half;t+=ts){
+        const x=(cx+ux*r+vx*t)|0, y=(cy+uy*r+vy*t)|0;
+        if(x<0||y<0||x>=S.W||y>=S.H) continue;
+        const k=(y*S.W+x)*4; sr+=S.px[k]; sg+=S.px[k+1]; sb+=S.px[k+2]; c++;
+      }
+      if(c){ R[i]=sr/c; G[i]=sg/c; B[i]=sb/c; }
+      T[i]=R[i]+G[i]+B[i];
+    }
+    return {R,G,B,T,rmin,step,n};
+  }
+
+  /* ── 거리 → 파장 ── */
+  const lamOf=(rpx)=> cal.lam0 + cal.slope*(rpx*S.scale - cal.r0);
+  const rOf  =(lam)=> ((lam-cal.lam0)/cal.slope + cal.r0)/S.scale;
+
+  /* ── 0차 번짐 걷어내기 ──
+     직진광의 헤일로는 넓고 매끄러운 배경이다. 폭 60nm 짜리 창으로
+     '이동 최소값'을 구해 빼면, 선폭 15~20nm 인 진짜 방출선은 살아남고
+     배경만 사라진다. 봉우리 중심을 잡을 때만 쓰고, 그래프 모양(연속/방출
+     판정의 근거)은 원본을 그대로 보여 준다. */
+  function debase(lam, I, winNm){
+    const d=Math.abs(lam[1]-lam[0])||0.44;
+    let k=Math.max(3, Math.round((winNm||62)/d)); if(k%2===0) k++;
+    const h=k>>1, n=I.length, mn=new Float64Array(n);
+    for(let i=0;i<n;i++){
+      let m=Infinity;
+      for(let j=i-h;j<=i+h;j++) m=Math.min(m, I[Math.max(0,Math.min(n-1,j))]);
+      mn[i]=m;
+    }
+    const w=new Float64Array(k); let ws=0;
+    for(let i=0;i<k;i++){ w[i]=0.5-0.5*Math.cos(2*Math.PI*i/(k-1)); ws+=w[i]; }
+    const out=new Float64Array(n);
+    for(let i=0;i<n;i++){
+      let s=0;
+      for(let j=0;j<k;j++) s+=w[j]*mn[Math.max(0,Math.min(n-1,i-h+j))];
+      out[i]=Math.max(0, I[i]-s/ws);
+    }
+    let mx=0; for(let i=0;i<n;i++) mx=Math.max(mx,out[i]);
+    if(mx>0) for(let i=0;i<n;i++) out[i]/=mx;
+    return out;
+  }
+
+  /* ── 본 분석 ──
+     ±1차를 각각 따로 보관한다. 봉우리는 양쪽에서 따로 재서 평균낸다.
+     0차 중심이 δ만큼 치우쳐 있어도 한쪽은 +δ, 반대쪽은 −δ라 평균에서 상쇄된다.
+     (두 프로파일을 먼저 더해 버리면 봉우리가 둘로 갈라져 오히려 틀린다) */
+  function analyze(cx,cy,phi){
+    const D=Math.hypot(S.W,S.H);
+    const rmin=Math.round(D*0.06), rmax=Math.round(D*0.46);
+    const half=Math.max(12, Math.round(Math.min(S.W,S.H)*0.045));
+    const A =scan(cx,cy,phi,     rmin,rmax,half,1);
+    const Bv=scan(cx,cy,phi+180, rmin,rmax,half,1);
+
+    const gam=document.getElementById('sp-gamma');
+    const G=!gam||gam.checked;
+    const lin=(v)=> G? Math.pow(Math.max(v,0)/255,2.2)*255 : v;
+
+    const lam=[], iA=[], iB=[], cA=[], cB=[];
+    for(let i=0;i<Math.min(A.n,Bv.n);i++){
+      const w=lamOf(rmin+i);
+      if(w<390||w>760) continue;
+      lam.push(w);
+      iA.push(lin(A.R[i])+lin(A.G[i])+lin(A.B[i]));
+      iB.push(lin(Bv.R[i])+lin(Bv.G[i])+lin(Bv.B[i]));
+      cA.push([A.R[i],A.G[i],A.B[i]]); cB.push([Bv.R[i],Bv.G[i],Bv.B[i]]);
+    }
+    const nrm=(v)=>{ const s=[...v].sort((a,b)=>a-b);
+      const b=s[Math.floor(s.length*0.08)]||0;
+      const o=v.map(x=>Math.max(0,x-b)); const m=Math.max(...o,1e-9);
+      return o.map(x=>x/m); };
+    const PA=nrm(iA), PB=nrm(iB);
+    const eA=iA.reduce((a,b)=>a+b,0), eB=iB.reduce((a,b)=>a+b,0);
+    /* 어두운 쪽이라도 봉우리 '위치'는 멀쩡하다. 실제로 레이저 사진은 밝기비가
+       0.07 인데도 양쪽 평균이 참값과 0.1nm 밖에 차이나지 않았다.
+       그러니 여기서는 그래프 모양을 어떻게 그릴지만 정하고,
+       봉우리 측정은 peakAt 에서 양쪽 다 시도한 뒤 잡히는 것만 쓴다. */
+    const useBoth = Math.min(eA,eB) > Math.max(eA,eB)*0.05;
+
+    const I = useBoth ? PA.map((v,i)=>(v+PB[i])/2) : (eA>=eB?PA:PB);
+    const mx=Math.max(...I,1e-9);
+    const disp=I.map(v=>v/mx);
+
+    S.cx=cx; S.cy=cy; S.phi=phi; S.ready=true;
+    S.prof={ lam, I:disp, A:PA, B:PB,
+             dA:debase(lam,PA), dB:debase(lam,PB),
+             col: (eA>=eB?cA:cB), both:useBoth,
+             dir: useBoth?'both':(eA>=eB?'plus':'minus') };
+    return S.prof;
+  }
+
+  /* ── 클릭한 자리의 봉우리 중심 (양쪽에서 따로 재고 평균) ── */
+  /* 누른 자리에서 '가장 가까운 진짜 봉우리'를 고른다.
+     가장 높은 것을 고르면, 옆에 큰 봉우리가 있을 때 그리로 끌려가 버린다
+     (누른 데와 잡히는 데가 어긋나 보이는 원인). 가까운 것을 고르면
+     누른 뜻이 존중되면서도 중심은 정확히 잡힌다.
+     '진짜'의 기준: 좌우가 모두 낮아지는 꼭짓점이고, 주변보다 충분히 솟아 있을 것(돌출도). */
+  const SPAN=18, CAP=22, MINPROM=0.06;
+  function pk1(lam, I, click, span){
+    span=span||SPAN;
+    const d=Math.abs(lam[1]-lam[0])||0.44, nb=Math.max(2, Math.round(25/d));
+    let bj=-1, bd=1e9;
+    for(let i=1;i<lam.length-1;i++){
+      if(Math.abs(lam[i]-click)>span) continue;
+      if(!(I[i]>I[i-1] && I[i]>=I[i+1]) || I[i]<0.03) continue;
+      let mnL=I[i], mnR=I[i];
+      for(let k=Math.max(0,i-nb);k<=i;k++) mnL=Math.min(mnL,I[k]);
+      for(let k=i;k<=Math.min(I.length-1,i+nb);k++) mnR=Math.min(mnR,I[k]);
+      if(I[i]-Math.max(mnL,mnR) < MINPROM) continue;
+      const dist=Math.abs(lam[i]-click);
+      if(dist<bd){ bd=dist; bj=i; }
+    }
+    if(bj<0) return null;
+    const j=bj, h=I[j]/2;
+    let a=j,b=j;
+    while(a>0 && lam[j]-lam[a]<CAP && I[a]>h) a--;
+    while(b<lam.length-1 && lam[b]-lam[j]<CAP && I[b]>h) b++;
+    let sw=0,ss=0;
+    for(let k=a;k<=b;k++){ sw+=lam[k]*I[k]; ss+=I[k]; }
+    if(ss<=0) return null;
+    return {lam:sw/ss, fwhm:Math.abs(lam[b]-lam[a]), I:I[j]};
+  }
+  /* 그래프 위 임의의 자리의 세기 (마우스/손가락 안내선용) */
+  function valueAt(w){
+    const P=S.prof; if(!P) return 0;
+    let i=0,bd=1e9;
+    P.lam.forEach((x,k)=>{const d=Math.abs(x-w); if(d<bd){bd=d;i=k;}});
+    return P.I[i]||0;
+  }
+  /* snap=false 면 누른 자리를 그대로 쓴다.
+     snap=true 라도 근처에 진짜 봉우리가 없으면 끌어당기지 않고 그대로 둔다.
+     끌어당긴 경우 얼마나 옮겼는지(moved)를 함께 돌려주어 화면에 보여 준다. */
+  function peakAt(click, snap){
+    const P=S.prof; if(!P) return null;
+    const raw={lam:click, fwhm:null, I:valueAt(click), n:0, spread:null, moved:0, snapped:false};
+    if(snap===false) return raw;
+    /* 양쪽 차수를 언제나 다 시도한다. 없으면 pk1 이 null 을 돌려주므로
+       저절로 걸러진다. 밝기로 미리 가르면 멀쩡한 쪽까지 버리게 된다. */
+    let a=pk1(P.lam,P.dA,click);
+    let b=pk1(P.lam,P.dB,click);
+    /* 한쪽만 잡혔다면 — 두 상은 참값을 사이에 두고 대칭이므로
+       반대쪽이 있을 만한 자리(2×누른곳 − 잡힌곳)를 다시 짚어 본다.
+       0차 치우침이 커서 두 상이 40nm 넘게 벌어진 사진에서 결정적이다. */
+    if(a&&!b) b=pk1(P.lam,P.dB, 2*click-a.lam);
+    if(b&&!a) a=pk1(P.lam,P.dA, 2*click-b.lam);
+    const got=[a,b].filter(Boolean);
+    if(!got.length) return raw;
+    const lam=got.reduce((s,x)=>s+x.lam,0)/got.length;
+    const fw =got.reduce((s,x)=>s+x.fwhm,0)/got.length;
+    return {lam, fwhm:fw, I:valueAt(lam), n:got.length,
+            spread: got.length===2? Math.abs(a.lam-b.lam) : null,
+            moved: lam-click, snapped:true};
+  }
+
+  /* ── 보정 ── */
+  function calText(){
+    return `${cal.slope.toFixed(4)} nm/픽셀 (긴 변 ${REF_W}픽셀 기준)`;
+  }
+  function addCalPoint(lamTrue, rpx){
+    calPts.push({lam:lamTrue, r:rpx*S.scale});
+    if(calPts.length>2) calPts.shift();
+    if(calPts.length===2){
+      const [a,b]=calPts;
+      if(Math.abs(b.r-a.r)>30 && Math.abs(b.lam-a.lam)>20){
+        cal={lam0:a.lam, r0:a.r, slope:(b.lam-a.lam)/(b.r-a.r)};
+        return true;
+      }
+    }
+    return false;
+  }
+  function resetCal(){ cal=Object.assign({},DEF); calPts=[]; }
+
+  return {S, setImage, findZero, analyze, lamOf, rOf, peakAt, valueAt,
+          calText, addCalPoint, resetCal, get calPts(){return calPts;},
+          get cal(){return cal;}, REF_W};
+})();
+
+/* ===== 답안 ===== */
+const QIDS=[
+  ['q-spec','분광기로 본 광원 중 선이 보였던 것과, 짐작되는 원소'],
+  ['q-spec-err','측정한 파장과 참값의 차이, 그 차이가 생긴 까닭'],
+  ['q-hhe','우주의 99%가 수소와 헬륨인데 지구에 거의 없는 까닭'],
+  ['q-c','탄소가 우주에는 0.4%인데 내 몸에는 18.5%인 까닭'],
+  ['q-dust','"우리는 별의 먼지로 만들어졌다"의 뜻']
+];
+function renderAnswers(){
+  const A=QIDS.map(([id,q])=>({q,a:($(id).value||'').trim()}));
+  const done=A.filter(x=>x.a).length;
+  $('ans-wrap').innerHTML= done
+    ? A.map(x=>`<div class="ans-block"><div class="ans-q">${esc(x.q)}</div>
+        <div class="ans-a ${x.a?'':'none'}">${x.a?esc(x.a):'아직 쓰지 않았습니다.'}</div></div>`).join('')
+      +`<div style="font-size:.78rem;color:var(--dim);margin-top:8px;">
+         ${A.length}문항 중 <b style="color:var(--good)">${done}문항</b> 작성했습니다.</div>`
+    : '<div class="empty">아직 쓴 답이 없습니다.</div>';
+}
+
+/* ══════════════ 스펙트럼 분석 화면 ══════════════ */
+const UI = {step:0, zero:null, dir:null, phi:null, picks:[], kind:null, elem:null, calMode:false};
+
+/* 원소별 기준 파장 (NIST) — w:세기(3=매우강 2=강 1=보통) */
+const LINES={
+  H :{n:'수소 (H)',    c:'#e11d48', L:[[410.17,1],[434.05,2],[486.13,3],[656.28,3]]},
+  He:{n:'헬륨 (He)',   c:'#f59e0b', L:[[447.15,2],[471.31,1],[492.19,1],[501.57,2],[587.56,3],[667.82,2],[706.52,1]]},
+  Ne:{n:'네온 (Ne)',   c:'#f97316', L:[[585.25,3],[588.19,2],[594.48,2],[603.00,1],[607.43,1],[614.31,2],
+                                       [621.73,1],[626.65,1],[633.44,2],[638.30,2],[640.22,3],[650.65,2],
+                                       [659.90,1],[692.95,2],[703.24,2]]},
+  Ar:{n:'아르곤 (Ar)', c:'#8b5cf6', L:[[415.86,1],[419.83,2],[420.07,2],[425.94,1],[426.63,1],[427.22,1],
+                                       [430.01,1],[433.36,1],[451.07,1],[470.23,1],[696.54,2],[706.72,2],
+                                       [727.29,1],[738.40,2],[750.39,3]]},
+  Hg:{n:'수은 (Hg) · 형광등', c:'#06b6d4', L:[[404.66,1],[435.83,3],[546.07,3],[576.96,2],[579.07,2],[611.60,1]]},
+  Na:{n:'나트륨 (Na) · 가로등', c:'#eab308', L:[[589.29,3]]}
+};
+const TOL=8;   // 허용 오차 nm — 이 분광기의 선폭(약 17nm)의 절반
+
+const $$=(id)=>document.getElementById(id);
+
+/* ── 사진 올리기 ── */
+(function initUpload(){
+  const lab=document.querySelector('.up'), inp=$$('sp-file');
+  inp.addEventListener('change',e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); });
+  ['dragenter','dragover'].forEach(t=>lab.addEventListener(t,e=>{e.preventDefault();lab.classList.add('drag');}));
+  ['dragleave','drop'].forEach(t=>lab.addEventListener(t,e=>{e.preventDefault();lab.classList.remove('drag');}));
+  lab.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f) loadFile(f); });
+})();
+
+function loadFile(file){
+  if(!/^image\//.test(file.type)){ alert('사진 파일만 열 수 있습니다.'); return; }
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+  img.onload=()=>{
+    URL.revokeObjectURL(url);
+    SPEC.setImage(img);
+    UI.zero=SPEC.findZero(); UI.dir=null; UI.phi=null; UI.picks=[]; UI.kind=null; UI.elem=null;
+    $$('sp-nudge').hidden=true;
+    $$('sp-stage2').hidden=false;
+    ['sp-stage3','sp-stage4','sp-stage5','sp-stage6'].forEach(id=>$$(id).hidden=true);
+    drawPhoto(); guide();
+    $$('sp-stage2').scrollIntoView({behavior:'smooth',block:'nearest'});
+  };
+  img.onerror=()=>{ URL.revokeObjectURL(url);
+    alert('이 사진을 열 수 없습니다. jpg · png 로 저장한 뒤 다시 시도해 주세요.'); };
+  img.src=url;
+}
+
+/* ── 사진 위에 표시 ── */
+function drawPhoto(){
+  const cv=$$('sp-cv'), S=SPEC.S;
+  const w=Math.min(1000, S.W), h=Math.round(S.H*w/S.W);
+  cv.width=w; cv.height=h;
+  const g=cv.getContext('2d');
+  g.drawImage(S.img,0,0,w,h);
+  const k=w/S.W;
+  if(UI.zero){
+    const x=UI.zero.x*k, y=UI.zero.y*k;
+    g.strokeStyle='#38bdf8'; g.lineWidth=2.5;
+    g.beginPath(); g.arc(x,y,15,0,7); g.stroke();
+    g.beginPath(); g.moveTo(x-24,y); g.lineTo(x-6,y); g.moveTo(x+6,y); g.lineTo(x+24,y);
+    g.moveTo(x,y-24); g.lineTo(x,y-6); g.moveTo(x,y+6); g.lineTo(x,y+24); g.stroke();
+    lbl(g,'0차 (직진광)',x,y-30,'#38bdf8');
+  }
+  if(UI.zero&&UI.dir){
+    const p=SPEC.S.ready? SPEC.S.phi*Math.PI/180
+                        : Math.atan2(UI.dir.y-UI.zero.y, UI.dir.x-UI.zero.x);
+    const D=Math.hypot(S.W,S.H)*k;
+    const x0=UI.zero.x*k, y0=UI.zero.y*k;
+    g.strokeStyle='rgba(250,204,21,.9)'; g.lineWidth=2; g.setLineDash([7,5]);
+    g.beginPath();
+    g.moveTo(x0-Math.cos(p)*D*0.46, y0-Math.sin(p)*D*0.46);
+    g.lineTo(x0+Math.cos(p)*D*0.46, y0+Math.sin(p)*D*0.46);
+    g.stroke(); g.setLineDash([]);
+    lbl(g,'분산 방향',x0+Math.cos(p)*D*0.30, y0+Math.sin(p)*D*0.30-12,'#facc15');
+  }
+}
+function lbl(g,t,x,y,c){
+  g.font='bold 13px system-ui,sans-serif'; g.textAlign='center';
+  const w=g.measureText(t).width+12;
+  g.fillStyle='rgba(0,0,0,.66)'; g.fillRect(x-w/2,y-15,w,20);
+  g.fillStyle=c; g.fillText(t,x,y);
+}
+
+function guide(){
+  const el=$$('sp-guide');
+  if(!UI.dir) el.innerHTML=
+    '가운데 <b>가장 밝은 직진광(0차)</b>이 파란 표적 안에 들어와 있나요? '+
+    '어긋났으면 사진에서 그 자리를 <b>한 번 누르세요</b>. 맞으면 다음으로, '+
+    '<b>양옆 무지개 띠의 한가운데</b>를 누르세요.';
+  else el.innerHTML=
+    '노란 점선이 무지개 띠를 따라 지나가면 됩니다. 어긋났으면 띠의 한가운데를 다시 누르세요.';
+}
+
+$$('sp-cv').addEventListener('click',e=>{
+  const cv=$$('sp-cv'), r=cv.getBoundingClientRect();
+  const k=SPEC.S.W/cv.width;
+  const x=(e.clientX-r.left)*(cv.width/r.width)*k;
+  const y=(e.clientY-r.top )*(cv.height/r.height)*k;
+  const near = UI.zero && Math.hypot(x-UI.zero.x,y-UI.zero.y) < Math.max(SPEC.S.W,SPEC.S.H)*0.05;
+  if(!UI.dir && near){ UI.zero={x,y}; drawPhoto(); guide(); return; }
+  if(near){ UI.zero={x,y}; runAnalyze(); return; }
+  UI.dir={x,y}; UI.phi=null; runAnalyze();
+});
+$$('sp-auto').addEventListener('click',()=>{ UI.zero=SPEC.findZero(); drawPhoto();
+  if(UI.dir) runAnalyze(); else guide(); });
+$$('sp-again').addEventListener('click',()=>{ UI.dir=null; UI.picks=[]; UI.phi=null; SPEC.S.ready=false;
+  $$('sp-nudge').hidden=true;
+  ['sp-stage3','sp-stage4','sp-stage5','sp-stage6'].forEach(id=>$$(id).hidden=true);
+  drawPhoto(); guide(); });
+$$('sp-nudge').addEventListener('click',e=>{
+  const b=e.target.closest('[data-n]'); if(!b||UI.phi===null) return;
+  UI.phi+=(+b.dataset.n)*0.5; runAnalyze();
+});
+
+/* ── 분석 실행 ──
+   방향은 학생이 찍은 두 점으로 정한다. 자동 탐색은 0차 번짐과 노이즈에
+   속아 엉뚱한 각을 고르는 일이 잦아 쓰지 않는다. 대신 노란 선을 그려
+   눈으로 확인하게 하고, ±0.5° 씩 손으로 다듬을 수 있게 한다. */
+function runAnalyze(){
+  if(UI.phi===null||UI.phi===undefined)
+    UI.phi=Math.atan2(UI.dir.y-UI.zero.y, UI.dir.x-UI.zero.x)*180/Math.PI;
+  const P=SPEC.analyze(UI.zero.x, UI.zero.y, UI.phi);
+  drawPhoto(); guide();
+  $$('sp-nudge').hidden=false; $$('sp-ang').textContent=UI.phi.toFixed(1)+'°';
+  $$('sp-stage3').hidden=false; $$('sp-stage4').hidden=false;
+  drawGraph(); renderPicks(); renderMeta(P); renderKind();
+}
+function renderMeta(P){
+  const bits=[];
+  bits.push(P.both
+    ? `양옆 무지개(+1차·−1차)에서 <b>따로 재어 평균</b>냅니다. 0차 위치가 조금 어긋나도 한쪽은 크게, 반대쪽은 작게 나와 <b>오차가 상쇄</b>됩니다.`
+    : `한쪽 무지개만 썼습니다. 반대쪽이 어둡거나 화면 밖입니다 — <b>양옆이 다 나오게</b> 다시 찍으면 더 정확해집니다.`);
+  bits.push(`분산 방향 ${SPEC.S.phi.toFixed(1)}° · 사진 긴 변 ${Math.max(SPEC.S.W,SPEC.S.H)}픽셀 · 자 ${SPEC.calText()}`);
+  bits.push(`이 분광기는 선 하나가 약 <b>15~20nm 폭</b>으로 퍼집니다. 봉우리가 뚱뚱해도 <b>중심</b>은 몇 nm 정확도로 정해집니다 — 분해능과 정확도는 다른 이야기입니다.`);
+  $$('sp-meta').innerHTML=bits.map(b=>'· '+b).join('<br>');
+}
+
+/* ── 그래프 ── */
+function wl2rgb(w){
+  let r=0,g=0,b=0;
+  if(w<440){r=-(w-440)/60;b=1;} else if(w<490){g=(w-440)/50;b=1;}
+  else if(w<510){g=1;b=-(w-510)/20;} else if(w<580){r=(w-510)/70;g=1;}
+  else if(w<645){r=1;g=-(w-645)/65;} else {r=1;}
+  let f=1; if(w>700) f=.3+.7*(760-w)/60; if(w<420) f=.3+.7*(w-380)/40;
+  f=Math.max(.25,Math.min(1,f));
+  const c=v=>Math.round(255*Math.pow(Math.max(0,Math.min(1,v))*f,.8));
+  return `rgb(${c(r)},${c(g)},${c(b)})`;
+}
+const GP={pad:{l:46,r:14,t:14,b:46}, hover:null};
+function drawGraph(){
+  const cv=$$('sp-graph'), P=SPEC.S.prof; if(!P) return;
+  const W=Math.min(980, Math.max(560, cv.parentElement.clientWidth||900)), H=330;
+  cv.width=W; cv.height=H;
+  const g=cv.getContext('2d'); const {l,r,t,b}=GP.pad;
+  const pw=W-l-r, ph=H-t-b;
+  const W0=390,W1=760;
+  const X=w=>l+(w-W0)/(W1-W0)*pw, Y=v=>t+ph-v*ph;
+  g.clearRect(0,0,W,H);
+  // 색 띠
+  for(let x=0;x<pw;x++){ g.fillStyle=wl2rgb(W0+(x/pw)*(W1-W0));
+    g.globalAlpha=.30; g.fillRect(l+x,t+ph+4,1,13); }
+  g.globalAlpha=1;
+  // 격자
+  g.strokeStyle='rgba(120,140,160,.28)'; g.lineWidth=1; g.font='11px system-ui'; g.textAlign='center';
+  for(let w=400;w<=750;w+=50){
+    g.beginPath(); g.moveTo(X(w),t); g.lineTo(X(w),t+ph); g.stroke();
+    g.fillStyle='#4a5a6b'; g.fillText(w,X(w),t+ph+32);
+  }
+  g.textAlign='right';
+  for(let v=0;v<=1.0001;v+=0.25){
+    g.strokeStyle='rgba(120,140,160,.20)';
+    g.beginPath(); g.moveTo(l,Y(v)); g.lineTo(l+pw,Y(v)); g.stroke();
+    g.fillStyle='#4a5a6b'; g.fillText(v.toFixed(2),l-7,Y(v)+4);
+  }
+  g.textAlign='center'; g.fillStyle='#243141'; g.font='bold 11px system-ui';
+  g.fillText('파장 (nm)', l+pw/2, H-8);
+  g.save(); g.translate(13,t+ph/2); g.rotate(-Math.PI/2);
+  g.fillText('상대 세기 (임의 단위)',0,0); g.restore();
+  // 사용 가능 구간 밖 흐리게 — 글자는 아래쪽에 둔다 (봉우리 숫자와 겹치지 않게)
+  g.fillStyle='rgba(120,140,160,.13)';
+  g.fillRect(l,t,X(430)-l,ph); g.fillRect(X(700),t,l+pw-X(700),ph);
+  g.fillStyle='#7c8b9a'; g.font='10px system-ui'; g.textAlign='center';
+  g.fillText('0차 번짐',(l+X(430))/2,t+ph-6);
+  g.fillText('적외선 차단',(X(700)+l+pw)/2,t+ph-6);
+  // 곡선
+  g.beginPath();
+  P.lam.forEach((w,i)=>{ const x=X(w),y=Y(P.I[i]); i?g.lineTo(x,y):g.moveTo(x,y); });
+  g.lineTo(X(P.lam[P.lam.length-1]),t+ph); g.lineTo(X(P.lam[0]),t+ph); g.closePath();
+  const grd=g.createLinearGradient(l,0,l+pw,0);
+  for(let s=0;s<=10;s++) grd.addColorStop(s/10, wl2rgb(W0+(s/10)*(W1-W0)));
+  g.fillStyle=grd; g.globalAlpha=.30; g.fill(); g.globalAlpha=1;
+  g.beginPath();
+  P.lam.forEach((w,i)=>{ const x=X(w),y=Y(P.I[i]); i?g.lineTo(x,y):g.moveTo(x,y); });
+  g.strokeStyle='#0b1420'; g.lineWidth=1.6; g.stroke();
+  // 고른 봉우리 — 라벨이 서로/위 테두리와 겹치지 않게 층을 나눈다
+  const used=[];
+  UI.picks.forEach((p,i)=>{
+    const x=X(p.lam);
+    g.strokeStyle='#0369a1'; g.lineWidth=1.5; g.setLineDash([4,3]);
+    g.beginPath(); g.moveTo(x,t); g.lineTo(x,t+ph); g.stroke(); g.setLineDash([]);
+    if(p.snapped && Math.abs(p.moved)>0.6){          // 끌어당긴 자취를 보여 준다
+      const xc=X(p.lam-p.moved);
+      g.strokeStyle='rgba(3,105,161,.45)'; g.lineWidth=1; g.setLineDash([2,3]);
+      g.beginPath(); g.moveTo(xc,Y(p.I)); g.lineTo(x,Y(p.I)); g.stroke(); g.setLineDash([]);
+      g.fillStyle='rgba(3,105,161,.45)';
+      g.beginPath(); g.arc(xc,Y(p.I),2.5,0,7); g.fill();
+    }
+    g.fillStyle='#0369a1'; g.beginPath(); g.arc(x,Y(p.I),4.5,0,7); g.fill();
+    g.fillStyle='#fff'; g.font='bold 10px system-ui'; g.textAlign='center';
+    g.fillText(i+1,x,Y(p.I)+3.5);
+    let ly=Math.max(t+12, Y(p.I)-12);
+    while(used.some(u=>Math.abs(u.x-x)<44 && Math.abs(u.y-ly)<13)) ly+=14;
+    used.push({x,y:ly});
+    g.fillStyle='#0369a1'; g.font='bold 11px system-ui';
+    g.fillText(p.lam.toFixed(1), x, Math.min(t+ph-4, ly));
+  });
+  // 손가락/마우스 안내선
+  if(GP.hover!=null){
+    const x=X(GP.hover);
+    g.strokeStyle='rgba(11,20,32,.55)'; g.lineWidth=1; g.setLineDash([3,3]);
+    g.beginPath(); g.moveTo(x,t); g.lineTo(x,t+ph); g.stroke(); g.setLineDash([]);
+    const v=SPEC.valueAt(GP.hover);
+    g.fillStyle='#0b1420'; g.beginPath(); g.arc(x,Y(v),3.5,0,7); g.fill();
+    const txt=GP.hover.toFixed(1)+' nm';
+    g.font='bold 12px system-ui'; g.textAlign='center';
+    const tw=g.measureText(txt).width+14;
+    const bx=Math.max(l+tw/2, Math.min(l+pw-tw/2, x));
+    g.fillStyle='rgba(11,20,32,.92)';
+    g.beginPath(); g.roundRect? g.roundRect(bx-tw/2,t+2,tw,20,5) : g.rect(bx-tw/2,t+2,tw,20);
+    g.fill();
+    g.fillStyle='#fff'; g.fillText(txt,bx,t+16);
+  }
+  GP.X=X; GP.Y=Y; GP.W0=W0; GP.W1=W1; GP.pw=pw;
+}
+
+/* ── 그래프 조작 ──
+   태블릿에는 마우스 오버가 없다. 그래서 '눌러서 끌다가 떼면 확정'으로 만든다.
+   끄는 동안 파장이 계속 떠 있으니 어디를 고르는지 보면서 맞출 수 있다. */
+function gx2lam(e){
+  const cv=$$('sp-graph'), r=cv.getBoundingClientRect();
+  const x=(e.clientX-r.left)*(cv.width/r.width);
+  return GP.W0+(x-GP.pad.l)/GP.pw*(GP.W1-GP.W0);
+}
+(function initGraphInput(){
+  const cv=$$('sp-graph');
+  let down=false;
+  const show=(e)=>{ if(!SPEC.S.prof) return;
+    const w=gx2lam(e);
+    GP.hover=(w>=GP.W0&&w<=GP.W1)? w : null;
+    drawGraph(); readout();
+  };
+  cv.addEventListener('pointerdown',e=>{ if(!SPEC.S.prof) return;
+    down=true; cv.setPointerCapture(e.pointerId); show(e); e.preventDefault(); });
+  cv.addEventListener('pointermove',e=>{ if(!SPEC.S.prof) return;
+    if(down || e.pointerType==='mouse') show(e); });
+  cv.addEventListener('pointerup',e=>{
+    if(!down) return; down=false;
+    const w=gx2lam(e);
+    if(w>=GP.W0&&w<=GP.W1) addPick(w);
+    if(e.pointerType!=='mouse'){ GP.hover=null; }
+    drawGraph(); readout();
+  });
+  cv.addEventListener('pointercancel',()=>{ down=false; GP.hover=null; drawGraph(); });
+  cv.addEventListener('pointerleave',e=>{ if(e.pointerType==='mouse'&&!down){
+    GP.hover=null; drawGraph(); readout(); } });
+})();
+
+function addPick(w){
+  const snap=$$('sp-snap').checked;
+  const pk=SPEC.peakAt(w, snap);
+  if(!pk) return;
+  if(UI.picks.some(p=>Math.abs(p.lam-pk.lam)<2.5)) return;
+  UI.picks.push(pk);
+  UI.picks.sort((a,b)=>a.lam-b.lam);
+  drawGraph(); renderPicks();
+}
+function readout(){
+  const el=$$('sp-read');
+  if(GP.hover==null){ el.innerHTML='그래프를 누르거나 손가락으로 짚어 보세요.'; return; }
+  const w=GP.hover, v=SPEC.valueAt(w);
+  const snap=$$('sp-snap').checked;
+  const pk=SPEC.peakAt(w, snap);
+  let tail;
+  if(!snap) tail='<span class="rd-x">누른 자리를 그대로 씁니다</span>';
+  else if(pk&&pk.snapped) tail=`<span class="rd-ok">→ 봉우리 중심 <b>${pk.lam.toFixed(1)} nm</b>`+
+       (Math.abs(pk.moved)>0.6?` (${pk.moved>0?'+':''}${pk.moved.toFixed(1)} 이동)`:'')+'</span>';
+  else tail='<span class="rd-x">이 근처엔 봉우리가 없습니다 — 누르면 이 자리 그대로 기록됩니다</span>';
+  el.innerHTML=`가리키는 곳 <b>${w.toFixed(1)} nm</b> · 세기 ${v.toFixed(2)} &nbsp; ${tail}`;
+}
+window.addEventListener('resize',()=>{ if(SPEC.S.prof) drawGraph(); });
+
+function renderPicks(){
+  const el=$$('sp-peaks');
+  if(!UI.picks.length){
+    el.innerHTML='<div class="empty" style="padding:20px;">그래프의 봉우리를 눌러 보세요.</div>';
+    $$('sp-stage5').hidden=true; return;
+  }
+  el.innerHTML=`<table class="pk-t"><tr><th>#</th><th>파장</th><th>세기</th><th>선폭</th>
+      <th>누른 곳</th><th>잰 방법</th><th></th></tr>`+
+    UI.picks.map((p,i)=>`<tr>
+      <td>${i+1}</td><td class="w">${p.lam.toFixed(1)} nm</td>
+      <td>${p.I.toFixed(2)}</td><td>${p.fwhm!=null?p.fwhm.toFixed(0)+' nm':'—'}</td>
+      <td style="font-size:.73rem;color:var(--dim)">${
+        p.snapped&&Math.abs(p.moved)>0.6
+          ? `${(p.lam-p.moved).toFixed(1)} <span style="color:var(--accent)">→ ${p.moved>0?'+':''}${p.moved.toFixed(1)}</span>`
+          : '그대로'}</td>
+      <td style="font-size:.72rem;color:var(--dim)">${
+        !p.snapped ? '<span style="color:var(--warm)">직접 지정</span>'
+        : p.n===2 ? '양쪽 평균'+(p.spread!=null?` (차 ${p.spread.toFixed(0)}nm)`:'')
+        : '<span style="color:var(--warm)">한쪽만</span>'}</td>
+      <td style="text-align:right"><button data-del="${i}" title="지우기">✕</button></td></tr>`).join('')+
+    `</table>`+
+    (UI.picks.some(p=>p.snapped&&p.n===1)
+      ? `<p class="note" style="margin-top:8px;color:var(--warm)">한쪽 무지개에서만 잰 봉우리가 있습니다.
+         0차의 치우침이 상쇄되지 않아 오차가 커질 수 있습니다.</p>` : '')+
+    (UI.picks.some(p=>!p.snapped)
+      ? `<p class="note" style="margin-top:8px;color:var(--warm)">'직접 지정'은 봉우리 중심을 찾지 않고
+         누른 자리를 그대로 적은 것입니다. 파장의 근거로 쓰기에는 약합니다.</p>` : '');
+  el.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{
+    UI.picks.splice(+b.dataset.del,1); drawGraph(); renderPicks(); }));
+  if(UI.calMode||true){ /* 재보정 등록 버튼은 고급 패널에서 */ }
+  $$('sp-stage5').hidden = UI.kind!=='emit';
+}
+
+/* ── 4단계 종류 판정 ── */
+const KINDS=[
+  ['cont','연속 스펙트럼','끊긴 데 없이 모든 파장에 빛이 이어져 있다. 뜨거운 고체·액체가 낸다.'],
+  ['emit','방출(선) 스펙트럼','몇몇 파장에만 봉우리가 솟아 있고 나머지는 어둡다. 기체가 낸다.'],
+  ['abso','흡수 스펙트럼','전체는 이어져 있는데 군데군데 골이 파여 있다. 연속광이 찬 기체를 지나올 때 생긴다.']
+];
+function renderKind(){
+  $$('sp-kind').innerHTML=KINDS.map(([k,t,d])=>`
+    <label class="opt3 ${UI.kind===k?'on':''}" data-k="${k}">
+      <input type="radio" name="spk" ${UI.kind===k?'checked':''}>
+      <span><span class="t">${t}</span><span class="d">${d}</span></span></label>`).join('');
+  $$('sp-kind').querySelectorAll('.opt3').forEach(o=>o.addEventListener('click',()=>{
+    UI.kind=o.dataset.k; renderKind(); kindFeedback();
+    $$('sp-stage5').hidden = UI.kind!=='emit';
+    $$('sp-stage6').hidden = false;
+    if(UI.kind==='emit') renderElem();
+  }));
+}
+function shapeStats(){
+  const P=SPEC.S.prof; if(!P) return null;
+  const use=P.lam.map((w,i)=>({w,v:P.I[i]})).filter(o=>o.w>=435&&o.w<=695);
+  if(use.length<20) return null;
+  const v=use.map(o=>o.v);
+  const mean=v.reduce((a,b)=>a+b,0)/v.length;
+  const sd=Math.sqrt(v.reduce((a,b)=>a+(b-mean)*(b-mean),0)/v.length);
+  const lowFrac=v.filter(x=>x<0.15).length/v.length;   // 어두운 구간 비율
+  let np=0;
+  for(let i=2;i<v.length-2;i++) if(v[i]>v[i-1]&&v[i]>=v[i+1]&&v[i]>0.30) np++;
+  return {mean,sd,cv:sd/(mean||1e-9),lowFrac,np};
+}
+function kindFeedback(){
+  const s=shapeStats(); const el=$$('sp-kind-fb');
+  if(!s){ el.innerHTML=''; return; }
+  const looksEmit = s.lowFrac>0.45 && s.cv>0.55;
+  const looksCont = s.lowFrac<0.20 && s.cv<0.55;
+  const auto = looksEmit?'emit' : (looksCont?'cont':'abso');
+  const ok = UI.kind===auto;
+  const desc = `측정한 그래프에서 <b>어두운 구간이 ${(s.lowFrac*100).toFixed(0)}%</b>, `+
+               `밝기의 들쭉날쭉함(변동계수)이 <b>${s.cv.toFixed(2)}</b>, 뚜렷한 봉우리가 <b>${s.np}개</b>입니다.`;
+  const why = auto==='emit'
+      ? '대부분이 어둡고 몇 군데만 솟아 있으니 <b>방출 스펙트럼</b>의 모양입니다.'
+      : auto==='cont'
+      ? '거의 모든 파장에 빛이 고르게 있으니 <b>연속 스펙트럼</b>의 모양입니다.'
+      : '이어져 있으면서 골이 파인 <b>흡수 스펙트럼</b>일 수 있습니다. 다만 이 분광기의 흡수선 검출은 한계가 있어, 태양 흡수선처럼 가는 선은 잡히지 않습니다.';
+  el.innerHTML=`<div class="fbk ${ok?'ok':'no'}">
+     ${ok?'<b>같은 판단입니다.</b>':'<b>다시 한 번 보세요.</b>'} ${desc}<br>${why}
+     ${ok?'':'<br><span style="color:var(--dim)">그래도 자기 판단이 맞다고 생각하면 그렇게 두어도 됩니다. 근거를 아래 기록에 적어 두세요.</span>'}
+   </div>`;
+}
+
+/* ── 5단계 원소 ── */
+const ELOPT=[['H','수소 (H)'],['He','헬륨 (He)'],['Ne','네온 (Ne)'],['Ar','아르곤 (Ar)'],['etc','그 외 — 직접 쓰기']];
+function renderElem(){
+  $$('sp-elem').innerHTML=ELOPT.map(([k,t])=>`
+    <label class="opt3 ${UI.elem===k?'on':''}" data-e="${k}">
+      <input type="radio" name="spe" ${UI.elem===k?'checked':''}>
+      <span><span class="t">${t}</span></span></label>`).join('');
+  $$('sp-elem').querySelectorAll('.opt3').forEach(o=>o.addEventListener('click',()=>{
+    UI.elem=o.dataset.e; renderElem();
+    $$('sp-elem-etc').hidden = UI.elem!=='etc';
+  }));
+  $$('sp-elem-etc').hidden = UI.elem!=='etc';
+}
+function score(key){
+  const E=LINES[key], out=[];
+  let hit=0, wsum=0, whit=0;
+  UI.picks.forEach(p=>{
+    let best=null,bd=1e9;
+    E.L.forEach(([w])=>{ const d=Math.abs(p.lam-w); if(d<bd){bd=d;best=w;} });
+    const ok=bd<=TOL; if(ok) hit++;
+    out.push({meas:p.lam, ref:best, d:bd, ok});
+  });
+  E.L.forEach(([w,wt])=>{                       // 보였어야 할 강선이 있는가
+    if(w<435||w>695||wt<3) return;
+    wsum+=wt;
+    if(UI.picks.some(p=>Math.abs(p.lam-w)<=TOL)) whit+=wt;
+  });
+  const acc   = UI.picks.length? hit/UI.picks.length : 0;
+  /* 이 창(435~695nm) 안에 그 원소의 강선이 아예 없으면 '안 보인 것'을
+     근거로 삼을 수 없다. 그럴 땐 일치율만 쓴다. */
+  const cover = wsum? whit/wsum : acc;
+  return {rows:out, hit, acc, cover, s: acc*0.65+cover*0.35};
+}
+$$('sp-match').addEventListener('click',()=>{
+  if(UI.picks.length<1){ alert('먼저 그래프에서 봉우리를 하나 이상 눌러 주세요.'); return; }
+  const keys=Object.keys(LINES);
+  const R=keys.map(k=>({k, ...score(k)})).sort((a,b)=>b.s-a.s);
+  const top=R[0], second=R[1];
+  const clear = top.s-second.s > 0.12 && top.s>0.5;
+  const mine = UI.elem && UI.elem!=='etc' ? UI.elem : null;
+  let head;
+  if(!clear) head=`<div class="fbk no"><b>딱 잘라 말하기 어렵습니다.</b>
+      봉우리가 적거나, 여러 원소의 기준선이 이 분광기의 선폭(약 17nm) 안에서 겹칩니다.
+      봉우리를 더 찾아 보거나, 더 밝게 찍은 사진으로 다시 해 보세요.</div>`;
+  else if(mine===top.k) head=`<div class="fbk ok"><b>맞습니다. ${LINES[top.k].n}입니다.</b>
+      고른 봉우리 ${UI.picks.length}개 중 ${top.hit}개가 ${LINES[top.k].n}의 기준선과 ${TOL}nm 안에서 맞았습니다.</div>`;
+  else head=`<div class="fbk no"><b>측정값은 ${LINES[top.k].n} 쪽을 가리킵니다.</b>
+      ${mine?`고르신 ${LINES[mine].n}보다 `:''}봉우리 위치가 더 잘 맞습니다
+      (${top.hit}/${UI.picks.length}개 일치). 아래 표에서 어디가 어긋났는지 확인해 보세요.</div>`;
+  const tbl=`<table class="mt"><tr><th>원소</th>
+      ${UI.picks.map((p,i)=>`<th>${i+1}<br>${p.lam.toFixed(0)}nm</th>`).join('')}
+      <th>일치</th></tr>`+
+    R.map(x=>`<tr><td class="el-n" style="color:${LINES[x.k].c}">${LINES[x.k].n}</td>`+
+      x.rows.map(o=>o.ok
+        ? `<td class="hit">${o.ref.toFixed(1)}<br><span style="font-size:.9em;font-weight:400">${o.d>=0.05?(o.meas>o.ref?'+':'−'):''}${o.d.toFixed(1)}</span></td>`
+        : `<td class="miss">—</td>`).join('')+
+      `<td><b>${x.hit}/${UI.picks.length}</b></td></tr>`).join('')+`</table>`;
+  const note=`<p class="note" style="margin-top:10px;">
+     초록색은 그 원소의 기준 파장과 ${TOL}nm 안에서 맞은 것입니다. 아래 숫자는 내 측정값이 참값보다
+     얼마나 크거나 작았는지입니다. 이 차이가 곧 <b>내 측정의 오차</b>입니다.</p>`;
+  $$('sp-match-out').innerHTML=head+tbl+note;
+  $$('sp-stage6').hidden=false;
+});
+
+/* ── 고급: 재보정 ── */
+$$('cal-now').textContent=SPEC.calText();
+$$('cal-add').addEventListener('click',()=>{
+  const v=parseFloat($$('cal-lam').value);
+  if(!(v>=380&&v<=780)){ alert('380~780 사이의 파장을 적어 주세요.'); return; }
+  if(UI.picks.length!==1){ alert('보정할 때는 그래프에서 봉우리를 딱 하나만 골라 주세요.'); return; }
+  const rpx=SPEC.rOf(UI.picks[0].lam);
+  const done=SPEC.addCalPoint(v, rpx);
+  $$('cal-lam').value='';
+  renderCalList();
+  if(done){ $$('cal-now').textContent=SPEC.calText();
+    if(UI.dir) runAnalyze();
+    alert('새 자가 만들어졌습니다. 이제부터 이 값으로 파장을 잽니다.'); }
+});
+$$('cal-reset').addEventListener('click',()=>{ SPEC.resetCal();
+  $$('cal-now').textContent=SPEC.calText(); renderCalList();
+  if(UI.dir) runAnalyze(); });
+function renderCalList(){
+  const p=SPEC.calPts;
+  $$('cal-list').innerHTML = p.length
+    ? `<p class="note" style="margin-top:9px;">등록한 기준: `+
+      p.map(o=>`<b>${o.lam.toFixed(1)}nm</b>`).join(' · ')+
+      (p.length<2?' <span style="color:var(--dim)">— 하나 더 필요합니다</span>':'')+`</p>`
+    : '';
+}
+renderCalList();
+$$('sp-gamma').addEventListener('change',()=>{ if(UI.dir) runAnalyze(); });
+$$('sp-snap').addEventListener('change',readout);
+
+/* ===== 활동지 (worksheet.js) ===== */
+let bodyResult=null;
+function wsConfig(blank){
+  const who=($('who').value||'').trim();
+  const records=[
+    {h:'분광기로 본 광원',type:'kv',
+     rows:[...document.querySelectorAll('.obs-in')].map(i=>[i.dataset.k,i.value])},
+    {h:'내 몸의 원소 출생지',type:'kv',
+     rows: bodyResult ? bodyResult : [['빅뱅에서 온 원소',''],['별 내부에서 온 원소',''],['초신성에서 온 원소','']]},
+    {h:'내 사진에서 읽어낸 방출선', type:'table',
+     head:['#','측정 파장(nm)','상대 세기','선폭(nm)'],
+     rows: UI.picks.map((p,i)=>[String(i+1), p.lam.toFixed(1), p.I.toFixed(2),
+        (p.fwhm!=null? p.fwhm.toFixed(0) : '—')+(p.snapped?'':' (직접지정)')])},
+    {h:'스펙트럼 판정', type:'kv', rows:[
+      ['스펙트럼의 종류', UI.kind ? (KINDS.find(k=>k[0]===UI.kind)||[,''])[1] : '미판정'],
+      ['판단한 원소', UI.elem==='etc' ? ('그 외 — '+(($('sp-elem-etc').value||'').trim()||'미기재'))
+                     : (UI.elem ? LINES[UI.elem].n : '미판정')],
+      ['쓴 자(보정값)', SPEC.calText()]
+    ]}
+  ];
+  return {
+    blank,
+    title:'원소의 기원',
+    subtitle:'내 몸을 이루는 원소는 어디에서 왔는가 · 통합과학1 물질과 규칙성',
+    standard:'[10통과1-02-01] 천체에서 방출되는 빛의 스펙트럼을 분석하여 우주 초기에 형성된 원소와 천체의 구성 물질을 추론할 수 있다.\n'
+            +'[10통과1-02-02] 우주 초기의 원소들로부터 태양계의 재료이면서 생명체를 구성하는 원소들이 형성되는 과정을 통해 지구와 생명의 역사가 우주 역사의 일부분임을 해석할 수 있다.',
+    who, records,
+    answers: QIDS.map(([id,q])=>({q, a:$(id).value, lines:5})),
+    checks: Worksheet.collect.checks('#chk'),
+    summary: Worksheet.collect.summary('#page5 .cc')
+  };
+}
+Worksheet.mount('ws-actions', wsConfig,
+  ()=>(($('who').value||'이름없음').trim()+'_원소의기원'));
+
+/* 영상 — 누를 때만 불러온다 (자동 재생·추적 없음)
+   주의: 유튜브 임베드는 file:// 로 열면 출처가 null 이라 '플레이어 구성 오류'가 난다.
+        이 경우에는 임베드를 포기하고 새 탭으로 연다. */
+const YT_LOCAL = location.protocol === 'file:';
+(function initYT(){
+  const el=$('yt'), id=el.dataset.id;
+  if(YT_LOCAL){
+    el.querySelector('.yt-cap').innerHTML =
+      '눌러서 유튜브에서 보기 <span style="color:var(--dim);font-weight:500">(새 탭)</span>';
+    el.insertAdjacentHTML('beforeend',
+      `<div style="font-size:.7rem;color:var(--dim);text-align:center;padding:0 14px;line-height:1.5;">
+         파일로 열면 화면 안에서는 재생되지 않습니다</div>`);
+    el.addEventListener('click',()=>window.open('https://youtu.be/'+id,'_blank','noopener'));
+  }else{
+    el.addEventListener('click',function(){
+      if(this.querySelector('iframe')) return;
+      this.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?rel=0&origin=${encodeURIComponent(location.origin)}"
+        title="분광기 만드는 법" allow="accelerometer; encrypted-media; picture-in-picture"
+        allowfullscreen></iframe>`;
+    });
+  }
+})();
+
+/* 시작 */
+$('emit-name').innerHTML=`수소 (H) <small style="color:var(--dim);font-weight:500;">${ELEMENTS.H.note}</small>`;
+</script>
+</body>
+</html>

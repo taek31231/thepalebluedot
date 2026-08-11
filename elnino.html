@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>대기 대순환 · 사막화와 엘니뇨</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+:root{
+  --bg:#f5f8fc; --surface:#ffffff; --surface-2:#f1f5fa; --surface-3:#e6eef7;
+  --line:#e4eaf2; --line-2:#cfdbe8;
+  --text:#0b1420; --mid:#243141; --dim:#4a5a6b;
+  --accent:#0369a1; --warm:#9c5c00; --cool:#2563eb;
+  --good:#0b7d73; --bad:#dc2626; --violet:#7c3aed;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',-apple-system,sans-serif;}
+body{background:var(--bg);color:var(--text);-webkit-text-size-adjust:100%;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+button{font:inherit;cursor:pointer;color:var(--text);}
+select,input,textarea{font:inherit;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.topbar{flex:0 0 54px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);}
+.topbar h1{font-size:.9rem;font-weight:800;letter-spacing:-.02em;white-space:nowrap;}
+.topbar h1 span{color:var(--accent);}
+.std{font-size:.66rem;color:var(--dim);background:var(--surface-2);border:1px solid var(--line);
+  padding:3px 8px;border-radius:5px;white-space:nowrap;}
+.tabs{display:flex;gap:3px;overflow-x:auto;max-width:62vw;}
+.tabs::-webkit-scrollbar{height:0;}
+.tab{padding:7px 12px;font-size:.79rem;font-weight:700;color:var(--dim);background:transparent;
+  border:1px solid transparent;border-radius:8px;transition:.15s;white-space:nowrap;}
+.tab:hover{color:var(--mid);background:var(--surface-2);}
+.tab.on{color:#ffffff;background:var(--accent);border-color:var(--accent);}
+.tab-n{opacity:.6;margin-right:4px;}
+
+.wrap{flex:1;min-height:0;}
+.page{display:none;height:100%;}
+.page.on{display:flex;}
+.scroll{overflow-y:auto;height:100%;width:100%;}
+.pane{padding:22px;max-width:1180px;margin:0 auto;}
+
+h2.sec{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+h3.sub3{font-size:.87rem;font-weight:800;margin:20px 0 7px;}
+p.sub{font-size:.82rem;color:var(--mid);line-height:1.75;margin-bottom:16px;word-break:keep-all;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.card+.card{margin-top:14px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr;}}
+label.lbl{display:block;font-size:.75rem;font-weight:700;color:var(--mid);margin-bottom:5px;
+  word-break:keep-all;line-height:1.6;}
+input[type=text],textarea{width:100%;padding:8px 10px;background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;color:var(--text);font-size:.85rem;}
+textarea{resize:vertical;min-height:64px;line-height:1.6;}
+.btn{padding:8px 14px;border:1px solid var(--line-2);border-radius:7px;background:var(--surface-2);
+  color:var(--text);font-size:.82rem;font-weight:700;transition:.15s;display:inline-block;}
+.btn:hover{background:var(--surface-3);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#ffffff;}
+.btn.sm{padding:5px 10px;font-size:.75rem;}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.note{font-size:.76rem;color:var(--mid);line-height:1.75;word-break:keep-all;}
+.hl{color:var(--accent);font-weight:700;}
+.hl-w{color:var(--warm);font-weight:700;}
+.hl-r{color:var(--bad);font-weight:700;}
+.tagline{display:inline-block;font-size:.68rem;font-weight:800;padding:2px 7px;border-radius:5px;
+  background:var(--surface-3);color:var(--mid);border:1px solid var(--line-2);}
+
+table.dt{width:100%;border-collapse:collapse;font-size:.76rem;}
+table.dt th,table.dt td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:middle;}
+table.dt th{background:var(--surface-2);font-weight:700;color:var(--mid);white-space:nowrap;}
+table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+table.dt td.ctr{text-align:center;}
+
+.verdict{margin-top:11px;padding:11px 13px;border-radius:9px;font-size:.79rem;line-height:1.8;
+  display:none;word-break:keep-all;}
+.verdict.show{display:block;}
+.verdict.ok{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.4);}
+.verdict.no{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.4);}
+.verdict.info{background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.35);}
+.verdict.warn{background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.35);}
+
+.figbox{background:#f8fafc;border:1px solid var(--line-2);border-radius:11px;padding:6px;}
+.figbox svg{width:100%;height:auto;display:block;}
+
+/* 3D */
+#globeWrap{position:relative;background:linear-gradient(160deg,#eef7ff,#f7fbff);border:1px solid var(--line-2);
+  border-radius:11px;overflow:hidden;height:360px;}
+#globeWrap canvas{display:block;width:100%;height:100%;cursor:grab;}
+#globeWrap canvas:active{cursor:grabbing;}
+.g-hint{position:absolute;left:12px;bottom:10px;font-size:.7rem;color:var(--mid);
+  background:rgba(255,255,255,.88);border:1px solid var(--line-2);
+  padding:4px 9px;border-radius:6px;pointer-events:none;}
+.g-legend{position:absolute;right:12px;top:12px;background:rgba(255,255,255,.92);
+  border:1px solid var(--line-2);box-shadow:0 2px 10px rgba(18,33,47,.10);
+  border-radius:8px;padding:9px 11px;font-size:.7rem;line-height:1.9;
+  color:var(--mid);pointer-events:none;}
+.g-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px;}
+.g-ctl{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.gbtn{padding:6px 11px;font-size:.74rem;font-weight:700;border-radius:7px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--mid);}
+.gbtn.on{background:var(--accent);border-color:var(--accent);color:#ffffff;}
+
+/* 지도 */
+.mapbox{height:360px;border-radius:11px;border:1px solid var(--line-2);background:#f8fafc;}
+.leaflet-container{background:#f8fafc;}
+.wind-arrow{font-weight:900;line-height:1;text-shadow:0 0 4px #f5f8fc,0 0 4px #f5f8fc;}
+.dlabel{background:rgba(11,20,32,.82);border:1px solid rgba(255,255,255,.35);border-radius:5px;
+  padding:2px 6px;font-size:.68rem;font-weight:800;white-space:nowrap;color:#ffffff;}
+.badge-live{display:inline-block;font-size:.66rem;font-weight:800;padding:3px 8px;border-radius:12px;}
+.badge-live.on{background:rgba(52,211,153,.15);color:var(--good);border:1px solid rgba(52,211,153,.45);}
+.badge-live.off{background:var(--surface-2);color:var(--dim);border:1px solid var(--line-2);}
+.badge-live.load{background:rgba(56,189,248,.13);color:var(--accent);border:1px solid rgba(56,189,248,.4);}
+
+/* 히트맵 */
+.hmwrap{overflow-x:auto;}
+.hmgrid{display:grid;gap:2px;min-width:620px;}
+.hmcell{height:34px;border-radius:3px;display:grid;place-items:center;
+  font-size:.62rem;font-weight:800;color:#ffffff;}
+.hmlab{font-size:.66rem;color:var(--dim);display:grid;place-items:center;font-weight:700;}
+.hmscale{display:flex;align-items:center;gap:3px;margin-top:9px;flex-wrap:wrap;}
+.hmscale i{display:block;width:26px;height:13px;}
+.nino{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+@media(max-width:760px){.nino{grid-template-columns:1fr;}}
+.nino div{padding:12px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);text-align:center;}
+.nino .nn{font-size:.68rem;color:var(--dim);}
+.nino .nv{font-size:1.3rem;font-weight:900;letter-spacing:-.02em;margin-top:3px;}
+
+/* 슬라이더 */
+.simctl{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:11px;}
+.preset{padding:7px 13px;font-size:.78rem;font-weight:800;border-radius:8px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--mid);}
+.preset.on{color:#ffffff;}
+input[type=range]{width:100%;accent-color:var(--accent);}
+.sliderwrap{margin:10px 0 4px;}
+.slabels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--dim);font-weight:700;}
+
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px;}
+@media(max-width:820px){.statgrid{grid-template-columns:repeat(2,1fr);}}
+.stat{padding:11px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);text-align:center;}
+.stat .sn{font-size:.68rem;color:var(--dim);}
+.stat .sv{font-size:1.15rem;font-weight:900;letter-spacing:-.02em;margin-top:2px;}
+.stat .sd{font-size:.68rem;font-weight:800;margin-top:2px;}
+
+/* 분류 */
+.pool{display:flex;flex-wrap:wrap;gap:5px;padding:12px;border-radius:10px;
+  background:var(--surface-2);border:1px solid var(--line);}
+.sortwrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+@media(max-width:820px){.sortwrap{grid-template-columns:1fr;}}
+.bin{border:1px dashed var(--line-2);border-radius:10px;padding:12px;min-height:92px;background:var(--surface-2);}
+.bin h4{font-size:.8rem;font-weight:800;margin-bottom:8px;}
+.bin .items{display:flex;flex-wrap:wrap;gap:5px;}
+.itm{padding:6px 10px;font-size:.75rem;font-weight:700;border-radius:7px;
+  border:1px solid var(--line-2);background:var(--surface-3);color:var(--text);}
+.itm:hover:not(:disabled){border-color:var(--accent);}
+.itm.ok{background:var(--good);border-color:var(--good);color:#ffffff;}
+.itm.no{background:var(--bad);border-color:var(--bad);color:#ffffff;}
+.itm:disabled{cursor:default;}
+
+/* OX */
+.oxcard{border:1px solid var(--line-2);border-radius:10px;background:var(--surface-2);padding:12px;margin-bottom:10px;}
+.oxq{font-size:.81rem;font-weight:700;line-height:1.7;margin-bottom:9px;word-break:keep-all;}
+.oxbtns{display:flex;gap:6px;}
+.ox{padding:6px 18px;font-size:.82rem;font-weight:900;border-radius:7px;
+  border:1px solid var(--line-2);background:var(--surface);color:var(--mid);}
+.ox:hover:not(:disabled){background:var(--surface-3);color:var(--text);}
+.ox.ok{background:var(--good);border-color:var(--good);color:#ffffff;}
+.ox.no{background:var(--bad);border-color:var(--bad);color:#ffffff;}
+.ox:disabled{cursor:default;}
+.exp{margin-top:9px;font-size:.75rem;line-height:1.8;color:var(--mid);display:none;word-break:keep-all;
+  padding:9px;border-radius:7px;background:var(--surface);border:1px solid var(--line);}
+.exp.show{display:block;}
+
+.stepflow{display:flex;flex-direction:column;gap:8px;}
+.stepitem{display:flex;gap:11px;align-items:flex-start;padding:11px;border-radius:9px;
+  background:var(--surface-2);border:1px solid var(--line);}
+.stepitem .n{flex:0 0 26px;height:26px;border-radius:8px;display:grid;place-items:center;
+  font-size:.78rem;font-weight:900;background:var(--accent);color:#ffffff;}
+.stepitem div b{display:block;font-size:.81rem;margin-bottom:3px;}
+
+.ans-item{padding:11px 13px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);
+  margin-bottom:9px;}
+.ans-item .q{font-size:.77rem;font-weight:700;color:var(--mid);margin-bottom:5px;word-break:keep-all;}
+.ans-item .a{font-size:.81rem;line-height:1.75;white-space:pre-wrap;word-break:keep-all;}
+.ans-item .a.empty{color:var(--dim);font-style:italic;}
+.chk{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);}
+.chk:last-child{border-bottom:0;}
+.chk input{flex:0 0 auto;width:16px;height:16px;margin-top:2px;accent-color:var(--good);}
+.chk label{font-size:.8rem;line-height:1.65;word-break:keep-all;cursor:pointer;}
+.sumblk{padding:12px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);margin-bottom:10px;}
+.sumblk h4{font-size:.84rem;font-weight:800;margin-bottom:6px;color:var(--accent);}
+.sumblk p{font-size:.78rem;line-height:1.8;color:var(--mid);word-break:keep-all;margin-bottom:4px;}
+.srcs{font-size:.7rem;color:var(--mid);line-height:1.9;word-break:keep-all;}
+
+/* ═══════════ 모바일 대응 ═══════════ */
+@supports (height:100dvh){ body{height:100dvh;} }
+@media(max-width:820px){
+  .topbar{flex:0 0 auto;height:auto;flex-wrap:wrap;padding:8px 12px;gap:6px 8px;}
+  .topbar h1{font-size:.82rem;order:1;flex:1 1 auto;white-space:normal;line-height:1.35;}
+  .std{order:2;font-size:.58rem;}
+  .tabs{order:3;flex:1 1 100%;max-width:none;overflow-x:auto;scrollbar-width:none;
+        padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .tabs::-webkit-scrollbar{height:0;}
+  .tab{flex:0 0 auto;padding:8px 11px;font-size:.75rem;}
+  .pane{padding:14px 12px 34px;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+
+  table.dt{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.dt tbody{display:table;width:100%;min-width:460px;}
+  table.dt th,table.dt td{padding:5px 6px;}
+  h2.sec{font-size:.98rem;}
+  p.sub{font-size:.79rem;}
+  textarea{min-height:76px;}
+  .btn,.btn.sm{padding:8px 12px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1>🌀 사막화와 엘니뇨 <span>— 바람이 바꾸는 세계</span></h1>
+  <nav class="tabs">
+    <button class="tab on" data-tab="0"><span class="tab-n">0</span>대기 대순환</button>
+    <button class="tab" data-tab="1"><span class="tab-n">1</span>지구의 바람</button>
+    <button class="tab" data-tab="2"><span class="tab-n">2</span>사막화</button>
+    <button class="tab" data-tab="3"><span class="tab-n">3</span>평상시의 태평양</button>
+    <button class="tab" data-tab="4"><span class="tab-n">4</span>엘니뇨와 라니냐</button>
+    <button class="tab" data-tab="5"><span class="tab-n">5</span>실제 관측</button>
+    <button class="tab" data-tab="6"><span class="tab-n">6</span>총정리</button>
+  </nav>
+  <div class="std">[10통과2-02-03]</div>
+</header>
+
+<div class="wrap">
+
+<!-- ══════ 0 ══════ -->
+<section class="page on" data-page="0"><div class="scroll"><div class="pane">
+  <h2 class="sec">지구가 둥글어서 생기는 거대한 바람</h2>
+  <p class="sub">앞 단원에서 <b class="hl">위도 38°</b>를 경계로 저위도는 에너지가 남고 고위도는 모자란다는 것을 보았습니다.
+    그 불균형을 해소하려고 공기가 지구 규모로 움직이는데, 이것이 <b class="hl">대기 대순환</b>입니다.
+    사막이 어디에 생기는지, 엘니뇨가 왜 일어나는지가 모두 여기서 출발합니다.</p>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <h3 class="sub3" style="margin:0">지구 전체로 보기 (3D)</h3>
+      <span class="badge-live off" id="g3dBadge">불러오는 중…</span>
+    </div>
+    <p class="note" style="margin-bottom:10px">마우스로 <b class="hl">끌어서 돌려</b> 보세요.
+      남반구에도 대칭인 순환이 있고, 적도에는 구름 띠가 둘러 있습니다.</p>
+    <div class="g-ctl" id="g3dCtl"></div>
+    <div id="globeWrap">
+      <canvas id="globeCanvas"></canvas>
+      <div class="g-legend" id="g3dLegend"></div>
+      <div class="g-hint">끌어서 회전 · 휠로 확대</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">순환의 높이는 서로 다르다</h3>
+    <p class="note" style="margin-bottom:10px">아래 단면도는 <b class="hl">높이를 실제 비율로</b> 그린 것입니다
+      (가로는 위도, 세로는 고도 km). 세 순환은 도달하는 높이가 크게 다릅니다.
+      적도에서 대류권 계면이 가장 높고 극에서 가장 낮기 때문입니다.</p>
+    <div class="figbox" id="cellFig"></div>
+    <table class="dt" id="cellTbl" style="margin-top:12px"></table>
+    <div class="verdict info show">
+      <b>왜 해들리 순환이 가장 높을까</b> — 적도는 에너지가 가장 많이 들어오는 곳입니다.
+      데워진 공기가 세차게 올라가면서 대류권 자체를 <b class="hl">약 16~17 km</b>까지 밀어 올립니다.
+      반대로 극지방은 공기가 차서 거의 올라가지 못해 대류권이 <b class="hl">약 8 km</b>밖에 되지 않습니다.
+      <b>순환의 높이는 그 지역이 받는 에너지의 양을 그대로 보여 줍니다.</b>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">적도의 구름 띠 — ITCZ</h3>
+    <p class="note">남반구와 북반구의 무역풍이 적도 부근에서 <b class="hl">서로 만나 부딪칩니다</b>.
+      갈 곳이 없어진 공기는 위로 올라갈 수밖에 없고, 그래서 적도를 따라 길게 <b class="hl">구름 띠</b>가 생깁니다.
+      이것을 <b class="hl">열대 수렴대(ITCZ)</b>라고 합니다. 위성 사진에서 적도를 가로지르는 흰 띠가 바로 이것입니다.</p>
+    <p class="note" style="margin-top:8px">ITCZ는 태양이 수직으로 비추는 위치를 따라 <b class="hl-w">계절에 따라 남북으로 이동</b>합니다.
+      북반구 여름에는 북쪽으로, 남반구 여름에는 남쪽으로 옮겨 갑니다.
+      이 이동이 열대 지역의 우기와 건기를 만듭니다.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">순환이 만들어지는 순서</h3>
+    <div class="stepflow" id="cellSteps"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">지상에서 부는 바람</h3>
+    <table class="dt" id="windTbl"></table>
+    <div class="verdict info show">
+      <b>바람의 방향이 휘는 이유</b> — 지구가 자전하기 때문입니다.
+      위도 30°에서 적도로 곧장 남쪽으로 내려가야 할 공기가 오른쪽으로 휘어
+      <b class="hl">북동쪽에서 남서쪽으로</b> 불게 됩니다. 그래서 무역풍은 <b class="hl">동에서 서로</b> 부는 바람이 됩니다.
+      이 바람이 다음 탭에서 태평양 바닷물을 밀게 됩니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q0a">Q1. 적도에서는 공기가 올라가고 위도 30°에서는 내려옵니다.
+      이런 상승·하강이 생기는 이유를 <b>공기의 온도와 밀도</b>를 써서 설명하세요.</label>
+    <textarea id="q0a" data-q="Q1. 적도의 상승 기류와 위도 30°의 하강 기류가 생기는 이유"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 1 ══════ -->
+<section class="page" data-page="1"><div class="scroll"><div class="pane">
+  <h2 class="sec">지상과 상공, 바람이 반대로 분다</h2>
+  <p class="sub">순환은 <b class="hl">고리</b>입니다. 지상에서 한쪽으로 간 공기는 상공에서 반대쪽으로 돌아와야 합니다.
+    그래서 <b class="hl">지상과 상공의 바람 방향이 반대</b>가 됩니다. 지도에서 직접 확인해 보세요.</p>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">earth — 지금 이 순간 지구의 바람</h3>
+    <p class="note" style="margin-bottom:11px">전 세계 기상 관측 자료를 실시간으로 받아
+      <b class="hl">바람의 흐름을 선으로 그려 주는</b> 사이트입니다.
+      화면을 끌어 지구를 돌리고, 아무 곳이나 누르면 그 지점의 풍향과 풍속이 나옵니다.
+      왼쪽 아래 <b>earth</b> 글자를 누르면 높이·항목을 바꿀 수 있습니다.</p>
+    <div class="row" style="margin-bottom:12px">
+      <a class="btn primary" href="https://earth.nullschool.net/#current/wind/surface/level/equirectangular=0,0,250"
+         target="_blank" rel="noopener">earth 열기 ↗</a>
+      <button class="btn" id="btn-embed">이 화면 안에서 열기</button>
+    </div>
+    <div id="en-frame" style="display:none;margin-bottom:14px">
+      <div style="position:relative;padding-top:46%;border:1px solid var(--line);border-radius:12px;overflow:hidden">
+        <iframe id="en-if" src="" style="position:absolute;inset:0;width:100%;height:100%;border:0"
+          title="earth.nullschool.net"></iframe>
+      </div>
+      <div class="note" style="margin-top:7px">화면이 비어 있으면 사이트가 삽입을 막은 것입니다.
+        위 <b>earth 열기</b> 버튼으로 새 탭에서 여세요.</div>
+    </div>
+
+    <h3 class="sub3">바로 가기 — 눌러서 그 장면으로</h3>
+    <div class="g-ctl" id="enLinks"></div>
+    <div class="verdict info show" id="enMsg">버튼을 누르면 새 탭에서 그 장면이 바로 열립니다.</div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">네 가지 미션</h3>
+    <p class="note" style="margin-bottom:12px">각 미션마다 <b>예상을 먼저 쓰고</b> 확인하세요.
+      예상과 다른 지점이 배울 거리입니다.</p>
+    <div id="enMissions"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">세 가지 바람의 벡터</h3>
+    <table class="dt" id="vecTbl"></table>
+    <div class="verdict warn show">
+      <b>지상 바람에만 이름이 붙은 이유</b> — 사람이 사는 곳이 지상이기 때문입니다.
+      돛단배 시대에 <b class="hl-w">무역풍</b>은 대서양을 건너가는 길이었고,
+      <b class="hl-w">편서풍</b>은 돌아오는 길이었습니다. 이름 자체가 사람의 생활에서 나왔습니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q1b">Q2. earth에서 <b>지상</b>과 <b>250 hPa 상공</b>을 번갈아 보며 위도 0°~30° 구간을 비교하세요.
+      두 높이에서 바람 방향이 반대인 이유를 <b>순환의 고리</b>라는 말을 써서 설명하세요.</label>
+    <textarea id="q1b" data-q="Q2. 지상과 상공의 바람 방향이 반대인 이유"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 2 ══════ -->
+<section class="page" data-page="2"><div class="scroll"><div class="pane">
+  <h2 class="sec">사막은 왜 위도 30° 부근에 있을까</h2>
+  <p class="sub">세계의 큰 사막들은 신기하게도 <b class="hl">위도 30° 부근</b>에 몰려 있습니다.
+    사하라, 아라비아, 타르, 칼라하리, 오스트레일리아 사막이 모두 그렇습니다. 우연이 아닙니다.</p>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">하강 기류가 만드는 건조 지대</h3>
+    <div class="stepflow" id="desertSteps"></div>
+    <div class="verdict warn show">
+      정리하면 — <b class="hl-w">하강 기류 → 고기압 → 구름이 만들어지지 않음 → 강수량 &lt; 증발량 → 사막</b>입니다.
+      위도 30°의 이 고압대를 <b>중위도 고압대</b>라고 합니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <h3 class="sub3" style="margin:0">위성 사진으로 확인하기</h3>
+      <span class="badge-live off" id="desBadge">위성 영상</span>
+    </div>
+    <p class="note" style="margin-bottom:10px">실제 위성 사진 위에 <b class="hl-r">적도(0°)</b>와
+      <b class="hl-w">위도 30°</b> 선을 그렸습니다. 사막 이름을 눌러 그곳으로 이동해 보세요.
+      누런 땅이 어느 선 근처에 몰려 있는지 확인하면 됩니다.</p>
+    <div class="g-ctl" id="desBtns"></div>
+    <div class="mapbox" id="desMap"></div>
+    <div class="verdict" id="desMsg"></div>
+    <table class="dt" id="desTbl" style="margin-top:12px"></table>
+    <div class="verdict warn show">
+      <b>고비 사막은 왜 위도 43°에 있을까</b><br>
+      표를 보면 대부분의 사막이 위도 20°~32°에 몰려 있는데 <b class="hl-w">고비(43°N)와 타클라마칸(39°N)</b>만
+      한참 북쪽에 있습니다. 이 둘은 <b>중위도 고압대 때문에 생긴 사막이 아닙니다.</b><br><br>
+      ① <b>바다에서 너무 멀다</b> — 아시아 대륙 한가운데라 습기를 머금은 공기가 도달하기 전에 비를 다 뿌립니다.<br>
+      ② <b>비그늘</b> — 남쪽의 히말라야산맥이 인도양에서 오는 습한 공기를 가로막습니다.
+      산을 넘은 공기는 이미 물기를 잃고 건조해집니다.<br><br>
+      즉 사막을 만드는 길은 하나가 아닙니다. <b class="hl">하강 기류형(위도 30°)</b>과
+      <b class="hl">내륙·비그늘형(고비·타클라마칸)</b>을 구분할 수 있어야 합니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">사막이 있는 것과 사막'화'는 다르다</h3>
+    <div class="grid2">
+      <div style="padding:13px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line)">
+        <b style="font-size:.85rem">사막이 있는 것</b>
+        <p class="note" style="margin-top:6px">위도 30° 부근에 사막이 존재하는 것은 대기 대순환의 결과로,
+          <b>자연스러운 일</b>입니다. 문제가 아닙니다.</p>
+      </div>
+      <div style="padding:13px;border-radius:9px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4)">
+        <b style="font-size:.85rem;color:var(--warm)">사막화</b>
+        <p class="note" style="margin-top:6px">사막 <b>주변의 건조 지역이 넓어지며 사막이 확장되는</b> 현상입니다.
+          이것이 문제입니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">사막화의 원인 — 자연인가, 사람인가</h3>
+    <p class="note" style="margin-bottom:6px">항목을 <b>한 번 누르면 자연적 요인</b>, <b>다시 누르면 인위적 요인</b>,
+      <b>한 번 더 누르면 제자리</b>로 갑니다.</p>
+    <div class="pool" id="dcPool"></div>
+    <div class="sortwrap">
+      <div class="bin"><h4>🌍 자연적 요인</h4><div class="items" id="binNat"></div></div>
+      <div class="bin"><h4>👤 인위적 요인</h4><div class="items" id="binHum"></div></div>
+    </div>
+    <div class="row" style="margin-top:11px">
+      <button class="btn sm primary" id="dcCheck">분류 확인</button>
+      <button class="btn sm" id="dcReset">다시</button>
+    </div>
+    <div class="verdict" id="dcVerdict"></div>
+  </div>
+
+  <div class="card">
+    <div class="grid2">
+      <div>
+        <h3 class="sub3" style="margin-top:0">피해</h3>
+        <div id="dmgHost"></div>
+      </div>
+      <div>
+        <h3 class="sub3" style="margin-top:0">대책</h3>
+        <div id="cureHost"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q1a">Q3. 사막화의 원인 중에는 <b>사람이 바꿀 수 있는 것</b>과 <b>바꾸기 어려운 것</b>이 있습니다.
+      각각 예를 들고, 대책을 세울 때 어디에 힘을 써야 할지 자신의 생각을 쓰세요.</label>
+    <textarea id="q1a" data-q="Q3. 사막화 원인 중 사람이 바꿀 수 있는 것과 대책의 방향"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 2 ══════ -->
+<section class="page" data-page="3"><div class="scroll"><div class="pane">
+  <h2 class="sec">평상시의 태평양 — 바람이 바닷물을 민다</h2>
+  <p class="sub">컵에 담긴 물 위를 입으로 불면 물이 한쪽으로 쏠립니다.
+    태평양에서도 <b class="hl">무역풍</b>이 늘 같은 방향으로 불기 때문에 바닷물의 윗부분이 서쪽으로 밀립니다.
+    이 흐름을 <b class="hl">표층 해류</b>라고 합니다.</p>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">일어나는 일의 순서</h3>
+    <div class="stepflow" id="normSteps"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">평상시 태평양 단면</h3>
+    <div class="figbox" id="normFig"></div>
+    <p class="note" style="margin-top:9px">왼쪽이 <b>서태평양</b>(인도네시아·오스트레일리아 쪽), 오른쪽이
+      <b>동태평양</b>(남아메리카 쪽)입니다. 붉은 층은 따뜻한 표층 해수, 푸른 층은 차가운 심층수입니다.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">서태평양과 동태평양, 무엇이 다른가</h3>
+    <table class="dt" id="normTbl"></table>
+    <div class="verdict info show">
+      <b>용승이 핵심입니다.</b> 동태평양에서는 표층 해수가 서쪽으로 밀려 나간 자리를
+      깊은 곳의 차가운 물이 올라와 채웁니다. 이것을 <b class="hl">용승</b>이라고 합니다.
+      심층수에는 영양 염류가 풍부해서, 용승이 활발한 페루 앞바다는 세계적인 어장이 됩니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q2a">Q4. 평상시 동태평양의 수온이 서태평양보다 낮은 이유를
+      <b>무역풍 · 표층 해류 · 용승</b>이라는 말을 모두 써서 순서대로 설명하세요.</label>
+    <textarea id="q2a" data-q="Q4. 평상시 동태평양 수온이 낮은 이유 (무역풍·표층해류·용승)"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 3 ══════ -->
+<section class="page" data-page="4"><div class="scroll"><div class="pane">
+  <h2 class="sec">무역풍이 바뀌면 세계의 날씨가 바뀐다</h2>
+  <p class="sub"><b class="hl">엘니뇨</b>는 스페인어로 '아기 예수'라는 뜻입니다.
+    남아메리카 서해안에 몇 해에 한 번씩 따뜻한 바닷물이 흘러드는 일이 주로 크리스마스 무렵에 나타나
+    이런 이름이 붙었습니다. 아래 슬라이더로 <b class="hl">무역풍의 세기</b>를 바꿔 보세요.</p>
+
+  <div class="card">
+    <div class="simctl">
+      <button class="preset" data-t="-1">엘니뇨 (무역풍 약함)</button>
+      <button class="preset on" data-t="0">평상시</button>
+      <button class="preset" data-t="1">라니냐 (무역풍 강함)</button>
+    </div>
+    <div class="sliderwrap">
+      <input type="range" id="tSlider" min="-1" max="1" step="0.05" value="0">
+      <div class="slabels"><span>◀ 무역풍 약해짐</span><span>평상시</span><span>무역풍 강해짐 ▶</span></div>
+    </div>
+    <div class="figbox" id="simFig"></div>
+    <div class="statgrid" id="simStats"></div>
+    <div class="verdict info show" id="simMsg"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">세 상태 비교</h3>
+    <table class="dt" id="cmpTbl"></table>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">가장 많이 틀리는 다섯 문제</h3>
+    <p class="note" style="margin-bottom:11px">위 슬라이더를 움직여 확인하면서 답해 보세요.</p>
+    <div id="oxHost"></div>
+    <div class="row" style="margin-top:6px">
+      <button class="btn sm" id="oxReset">다시 풀기</button>
+      <span class="tagline">정답</span>
+      <b id="oxScore" style="font-size:.9rem;color:var(--accent)">0 / 5</b>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">엘니뇨는 태평양만의 일이 아니다</h3>
+    <p class="note">엘니뇨가 일어나면 열대 태평양의 상승 기류 위치가 통째로 옮겨 갑니다.
+      상승 기류가 옮겨지면 그와 연결된 대기 순환 전체가 흔들리고,
+      그 여파가 <b class="hl">아프리카의 가뭄, 북아메리카의 겨울 날씨, 아시아의 장마</b>까지 이어집니다.
+      바다 한쪽의 수온 변화가 <b class="hl">전 지구의 기후</b>를 바꾸는 것입니다.</p>
+    <div class="verdict warn show">
+      <b>사막화와도 이어집니다.</b> 엘니뇨·라니냐로 인한 <b>장기 가뭄</b>은
+      1번 탭에서 본 사막화의 <b class="hl-w">자연적 요인</b> 가운데 하나였습니다.
+      대기 대순환 → 무역풍 → 엘니뇨 → 가뭄 → 사막화로 이어지는 하나의 사슬입니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q3a">Q5. 엘니뇨가 일어나면 페루 앞바다의 어획량이 크게 줄어듭니다.
+      <b>용승</b>과 <b>영양 염류</b>를 써서 그 이유를 설명하세요.</label>
+    <textarea id="q3a" data-q="Q5. 엘니뇨 때 페루 앞바다 어획량이 줄어드는 이유"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q3b">Q6. 엘니뇨 시기에 동태평양의 수온이 '높아진다'고 말할 때,
+      무엇과 비교해서 높아진다는 뜻인지 정확하게 쓰세요. 그리고 흔한 오해가 무엇인지도 함께 쓰세요.</label>
+    <textarea id="q3b" data-q="Q6. 엘니뇨 때 '수온이 높아진다'의 정확한 의미와 흔한 오해"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 5 ══════ -->
+<section class="page" data-page="5"><div class="scroll"><div class="pane">
+  <h2 class="sec">지금은 어떤 상태일까 — 실제 바다를 재어 보자</h2>
+  <p class="sub">앞에서는 슬라이더로 가상의 태평양을 움직여 봤습니다.
+    이제 <b class="hl">진짜 바다의 수온</b>을 불러와 지금이 엘니뇨인지 라니냐인지 직접 판정해 봅시다.</p>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">과학자들은 어디를 재는가 — NINO 3.4 구역</h3>
+    <p class="note">태평양은 아주 넓지만, 엘니뇨를 판정할 때는 <b class="hl">한 구역만</b> 봅니다.
+      적도 태평양 한가운데의 <b class="hl">NINO 3.4 구역</b>입니다.</p>
+    <table class="dt" style="margin-top:10px">
+      <tr><th style="width:130px">구역 범위</th><td>북위 5° ~ 남위 5°, 서경 170° ~ 서경 120°</td></tr>
+      <tr><th>재는 값</th><td>이 구역의 해수면 온도가 <b>평년보다 몇 도 높거나 낮은가</b> (온도 편차)</td></tr>
+      <tr><th>엘니뇨 판정</th><td>편차가 <b class="hl-r">+0.5 ℃ 이상</b>인 상태가 이어질 때</td></tr>
+      <tr><th>라니냐 판정</th><td>편차가 <b class="hl">−0.5 ℃ 이하</b>인 상태가 이어질 때</td></tr>
+    </table>
+    <div class="verdict info show">
+      <b>왜 하필 이 구역일까</b> — 엘니뇨의 핵심은 <b>따뜻한 물이 서쪽에서 동쪽으로 옮겨 가는 것</b>입니다.
+      태평양 한가운데인 이곳이 그 변화를 가장 민감하게 보여 줍니다.
+      너무 서쪽이면 늘 따뜻해서 변화가 잘 안 보이고, 너무 동쪽이면 해안 지형의 영향을 받습니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <h3 class="sub3" style="margin:0">적도 태평양 해수면 온도</h3>
+      <span class="badge-live off" id="sstBadge">자료 없음</span>
+    </div>
+    <p class="note" style="margin-bottom:10px">아래 버튼을 누르면 적도 태평양 곳곳의 해수면 온도를 실제로 불러와
+      <b class="hl">히트맵</b>으로 그립니다. 붉을수록 따뜻한 바다입니다.
+      <b>서쪽(왼쪽)과 동쪽(오른쪽) 중 어디가 더 붉은지</b> 보세요.</p>
+    <div class="g-ctl">
+      <button class="btn sm primary" id="sstBtn">실제 해수면 온도 불러오기</button>
+      <button class="btn sm" id="sstDemo">예시 자료로 보기</button>
+    </div>
+    <div class="hmwrap"><div id="sstHeat"></div></div>
+    <div id="sstScale"></div>
+    <div class="nino" id="ninoBox"></div>
+    <div class="verdict" id="sstMsg"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">판정할 때 조심할 점</h3>
+    <div class="stepflow" id="cautionHost"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">공식 발표와 맞춰 보기 — 기상청 엘니뇨·라니냐 감시</h3>
+    <p class="note" style="margin-bottom:11px">우리가 방금 한 것은 <b>하루치 자료로 해 본 간이 판정</b>이었습니다.
+      기상청은 같은 NINO 3.4 구역을 <b class="hl">3개월 평균</b>으로 계속 감시하고,
+      앞으로 몇 달의 전망까지 발표합니다. 아래에서 <b>지금 공식 상태가 무엇인지</b> 확인하고
+      내 판정과 비교해 보세요.</p>
+    <div class="row" style="margin-bottom:12px">
+      <a class="btn primary" href="https://www.weather.go.kr/w/climate/prediction/el-la.do"
+         target="_blank" rel="noopener">기상청 엘니뇨·라니냐 전망 열기 ↗</a>
+      <button class="btn" id="btn-kma">이 화면 안에서 열기</button>
+    </div>
+    <div id="kma-frame" style="display:none;margin-bottom:14px">
+      <div style="position:relative;padding-top:52%;border:1px solid var(--line);border-radius:12px;overflow:hidden">
+        <iframe id="kma-if" src="" style="position:absolute;inset:0;width:100%;height:100%;border:0"
+          title="기상청 엘니뇨·라니냐 전망"></iframe>
+      </div>
+      <div class="note" style="margin-top:7px">화면이 비어 있으면 사이트가 삽입을 막은 것입니다.
+        위 <b>열기</b> 버튼으로 새 탭에서 여세요.</div>
+    </div>
+    <h3 class="sub3">그 페이지에서 찾을 것</h3>
+    <div id="kmaHost"></div>
+    <div style="margin-top:12px">
+      <label class="lbl" for="q5c">기상청이 발표한 <b>현재 상태</b>와 <b>NINO 3.4 지수 값</b>을 적고,
+        위에서 내가 한 간이 판정과 같았는지 다녔는지 쓰세요. 달랐다면 그 까닭도 생각해 보세요.</label>
+      <textarea id="q5c" data-q="기상청 공식 발표와 내 간이 판정 비교"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q5a">Q7. 히트맵에서 서태평양과 동태평양의 색을 비교하고,
+      <b>동서 수온 차</b>가 몇 도인지 읽어 쓰세요. 그리고 그 값이 평상시(약 6 ℃)와 비교해
+      어떤 상태를 뜻하는지 판단하세요.</label>
+    <textarea id="q5a" data-q="Q7. 히트맵에서 읽은 동서 수온 차와 그 해석"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q5b">Q8. 공식 엘니뇨 판정은 <b>3개월 평균값이 5번 연속</b>으로
+      기준을 넘어야 합니다. 하루치 값만으로 판정하지 않는 이유는 무엇일까요?</label>
+    <textarea id="q5b" data-q="Q8. 하루치 값이 아니라 3개월 평균을 5번 연속 보는 이유"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 6 ══════ -->
+<section class="page" data-page="6"><div class="scroll"><div class="pane">
+  <h2 class="sec">활동 총정리</h2>
+  <p class="sub">작성한 답안과 활동 결과를 모았습니다. 확인한 뒤 학습지로 저장하거나 인쇄하세요.</p>
+  <div class="card"><h3 class="sub3" style="margin-top:0">활동 기록</h3><table class="dt" id="scoretbl"></table></div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">내가 쓴 답안</h3><div id="anshost"></div></div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">스스로 점검</h3><div id="chkhost"></div></div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">핵심 정리</h3><div id="summaryhost"></div></div>
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">학습지 저장 · 인쇄</h3>
+    <div style="max-width:280px;margin-bottom:12px">
+      <label class="lbl" for="whoName">학번 · 이름</label>
+      <input type="text" id="whoName" placeholder="예: 10512 김지구">
+    </div>
+    <div id="ws-actions"></div>
+  </div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">자료 출처</h3>
+    <div class="srcs">
+      · 사막화 대응 — 유엔 사막화 방지 협약(UNCCD)<br>
+      · 수온 값은 열대 태평양의 대표적인 범위를 바탕으로 한 <b>모식적인 수치</b>입니다. 실제 관측값은 해마다 다릅니다.
+    </div>
+  </div>
+</div></div></section>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="worksheet.js?v=7"></script>
+<script>
+const esc=s=>String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    document.querySelector('.page[data-page="'+t.dataset.tab+'"]').classList.add('on');
+    const tb=t.dataset.tab;
+    if(tb==='2'){ initDesMap(); if(desMap) setTimeout(()=>desMap.invalidateSize(),60); }
+    if(tb==='6') renderSummaryTab();
+  });
+});
+function arw(x1,y1,x2,y2,col,w,head){
+  head=head||8;
+  const dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy)||1;
+  const ux=dx/L, uy=dy/L;
+  const bx=x2-ux*head, by=y2-uy*head;
+  const px=-uy*head*0.55, py=ux*head*0.55;
+  return '<line x1="'+x1+'" y1="'+y1+'" x2="'+bx+'" y2="'+by+'" stroke="'+col+
+    '" stroke-width="'+w+'" stroke-linecap="round"/>'+
+    '<path d="M'+(bx+px)+','+(by+py)+' L'+x2+','+y2+' L'+(bx-px)+','+(by-py)+' Z" fill="'+col+'"/>';
+}
+function txt(x,y,t,col,size,anchor,bold){
+  return '<text x="'+x+'" y="'+y+'" text-anchor="'+(anchor||'middle')+'" font-size="'+(size||11)+
+    '" font-weight="'+(bold===false?'600':'800')+'" fill="'+col+'">'+t+'</text>';
+}
+function chip(x,y,t,col){
+  const w=t.length*8.5+16;
+  return '<rect x="'+(x-w/2)+'" y="'+(y-11)+'" width="'+w+'" height="22" rx="6" fill="#f5f8fc" stroke="'+col+'"/>'+
+    txt(x,y+5,t,col,12);
+}
+
+/* ══════════════ 탭 0 : 3D 지구 ══════════════ */
+/* 대류권 계면 높이(km) — 위도에 따라 달라진다 */
+const TROPO=[[0,17],[10,16.5],[20,15.5],[30,13],[40,11.5],[50,10.5],[60,9.5],[70,9],[80,8.3],[90,8]];
+const tropoAt=la=>{
+  la=Math.abs(la);
+  for(let i=0;i<TROPO.length-1;i++){
+    if(la<=TROPO[i+1][0]){
+      const [a,ha]=TROPO[i], [b,hb]=TROPO[i+1];
+      return ha+(hb-ha)*(la-a)/(b-a);
+    }
+  }
+  return 8;
+};
+const CELLS=[
+ {n:'해들리 순환', a:0,  b:30, top:16, c:0xf59e0b, cs:'#9c5c00'},
+ {n:'페렐 순환',   a:30, b:60, top:11, c:0x34d399, cs:'#0b7d73'},
+ {n:'극 순환',     a:60, b:90, top:8,  c:0x60a5fa, cs:'#2563eb'}
+];
+
+/* 기후 평균 동서 바람 (u>0 서풍=동쪽으로 붊, u<0 동풍=서쪽으로 붊) 단위 m/s */
+const CLIMO={
+ sfc:  [[-80,-4],[-70,-3],[-60,6],[-50,9],[-40,6],[-30,-2],[-20,-7],[-10,-6],
+        [0,-3],[10,-6],[20,-7],[30,-2],[40,6],[50,9],[60,6],[70,-3],[80,-4]],
+ upper:[[-80,4],[-70,8],[-60,15],[-50,25],[-40,30],[-30,25],[-20,6],[-10,-5],
+        [0,-8],[10,-5],[20,6],[30,25],[40,30],[50,25],[60,15],[70,8],[80,4]]
+};
+function climoU(lat,lv){
+  const A=CLIMO[lv];
+  if(lat<=A[0][0]) return A[0][1];
+  for(let i=0;i<A.length-1;i++){
+    if(lat<=A[i+1][0]){
+      const a=A[i][0], ua=A[i][1], b=A[i+1][0], ub=A[i+1][1];
+      return ua+(ub-ua)*(lat-a)/(b-a);
+    }
+  }
+  return A[A.length-1][1];
+}
+
+/* 이상적인 대기 대순환 속도장 — 입자를 실제로 흘려보낸다 */
+function cellOf(lat){
+  const a=Math.abs(lat);
+  return a<30?0 : a<60?1 : 2;
+}
+/* 각 셀의 (상승 위도, 하강 위도) — 북반구 기준, 남반구는 부호 대칭 */
+function cellEnds(ci,sign){
+  if(ci===0) return [0*sign, 30*sign];      // 해들리: 적도 상승 → 30° 하강
+  if(ci===1) return [60*sign, 30*sign];     // 페렐  : 60° 상승 → 30° 하강
+  return [60*sign, 90*sign];                // 극    : 60° 상승 → 90° 하강
+}
+/* 유선함수 ψ = sin(πs)sin(πζ) 에서 얻은 비발산 순환장 */
+function circVel(lat,h){
+  const sign = lat>=0?1:-1;
+  const ci=cellOf(lat);
+  const [a,b]=cellEnds(ci,sign);
+  const top=CELLS[ci].top;
+  let s=(lat-a)/(b-a);
+  let z=h/top;
+  s=Math.max(0,Math.min(1,s)); z=Math.max(0,Math.min(1,z));
+  const us = -Math.PI*Math.sin(Math.PI*s)*Math.cos(Math.PI*z);   // s 방향
+  const uz =  Math.PI*Math.cos(Math.PI*s)*Math.sin(Math.PI*z);   // ζ 방향
+  return {
+    dlat: us*(b-a),        // °/단위시간
+    dh:   uz*top,          // km/단위시간
+    ci:ci, z:z, top:top
+  };
+}
+/* 동서 바람 — 지상과 상공을 높이로 보간 */
+function zonalU(lat,z){
+  const s=climoU(lat,'sfc'), u=climoU(lat,'upper');
+  return s+(u-s)*Math.min(1,Math.max(0,z));
+}
+
+let g3d=null, g3dMode='all';
+function initGlobe(){
+  const badge=document.getElementById('g3dBadge');
+  if(typeof THREE==='undefined'){
+    badge.className='badge-live off'; badge.textContent='3D를 불러오지 못함';
+    document.getElementById('globeWrap').innerHTML=
+      '<div style="padding:24px" class="note">3D 지구를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.<br>'+
+      '아래 <b>단면도</b>만으로도 세 순환의 높이 차이를 확인할 수 있습니다.</div>';
+    return;
+  }
+  const cv=document.getElementById('globeCanvas');
+  const wrap=document.getElementById('globeWrap');
+  let W=wrap.clientWidth||820, H=wrap.clientHeight||440;
+  const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  renderer.setSize(W,H,false);
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(42,W/H,0.1,100);
+  scene.add(new THREE.AmbientLight(0xffffff,0.9));
+  const dl=new THREE.DirectionalLight(0xffffff,0.55); dl.position.set(3,2,4); scene.add(dl);
+
+  /* 위도대 텍스처를 직접 그린다 (외부 이미지 없이 동작) */
+  const tex=document.createElement('canvas'); tex.width=1024; tex.height=512;
+  const g=tex.getContext('2d');
+  const zone=la=>{const a=Math.abs(la);
+    return a<=23.44?'#bbf7d0':a<=35?'#fde9b8':a<=60?'#cfe6f7':'#eef6fb';};
+  for(let y=0;y<512;y++){ g.fillStyle=zone(90-(y/512)*180); g.fillRect(0,y,1024,1); }
+  g.strokeStyle='rgba(30,50,70,.22)'; g.lineWidth=1;
+  [30,60,-30,-60].forEach(la=>{const y=(90-la)/180*512;
+    g.beginPath(); g.moveTo(0,y); g.lineTo(1024,y); g.stroke();});
+  g.strokeStyle='#dc2626'; g.lineWidth=3;
+  g.beginPath(); g.moveTo(0,256); g.lineTo(1024,256); g.stroke();
+  const earth=new THREE.Mesh(new THREE.SphereGeometry(1,64,48),
+    new THREE.MeshLambertMaterial({map:new THREE.CanvasTexture(tex)}));
+  scene.add(earth);
+
+  const root=new THREE.Group(); scene.add(root);
+  const KM=0.0135;                       /* 1 km → 반지름 단위 (과장) */
+  const toVec=(la,lo,h,out)=>{
+    const p=(90-la)*Math.PI/180, t=(lo+180)*Math.PI/180, r=1+h*KM;
+    out[0]=-r*Math.sin(p)*Math.cos(t); out[1]=r*Math.cos(p); out[2]=r*Math.sin(p)*Math.sin(t);
+  };
+
+  /* ── 바람 입자 ── */
+  const N=2600;
+  const pos=new Float32Array(N*3), col=new Float32Array(N*3);
+  const pLat=new Float32Array(N), pLon=new Float32Array(N), pH=new Float32Array(N);
+  const pAge=new Float32Array(N), pCell=new Uint8Array(N);
+  const CCOL=[[0.85,0.42,0.04],[0.03,0.55,0.45],[0.11,0.35,0.83]];
+  function spawn(i,fresh){
+    pLat[i]=Math.asin(Math.random()*2-1)*180/Math.PI;
+    pLon[i]=Math.random()*360-180;
+    const ci=cellOf(pLat[i]);
+    pH[i]=Math.random()*CELLS[ci].top*0.98+0.15;
+    pCell[i]=ci;
+    pAge[i]=fresh?Math.random()*260:0;
+  }
+  for(let i=0;i<N;i++) spawn(i,true);
+  const pg=new THREE.BufferGeometry();
+  pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  pg.setAttribute('color',new THREE.BufferAttribute(col,3));
+  const pts=new THREE.Points(pg,new THREE.PointsMaterial({
+    size:0.021,vertexColors:true,transparent:true,opacity:.95,
+    sizeAttenuation:true,depthWrite:false}));
+  root.add(pts);
+
+  /* ── 지상 바람 벡터 (굵은 화살표, 방향 강조용) ── */
+  const windObjs=[];
+  function tube(pts3,c,r){
+    const m=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts3),24,r,6,false),
+      new THREE.MeshBasicMaterial({color:c}));
+    root.add(m); return m;
+  }
+  function cone(p,dir,c,s){
+    const m=new THREE.Mesh(new THREE.ConeGeometry(s,s*2.4,10),new THREE.MeshBasicMaterial({color:c}));
+    m.position.copy(p);
+    m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.clone().normalize());
+    root.add(m); return m;
+  }
+  const V=(la,lo,h)=>{const o=[0,0,0]; toVec(la,lo,h,o); return new THREE.Vector3(o[0],o[1],o[2]);};
+  [{la:15,c:0xfbbf24},{la:-15,c:0xfbbf24},{la:45,c:0x34d399},{la:-45,c:0x34d399},
+   {la:75,c:0x60a5fa},{la:-75,c:0x60a5fa}].forEach(w=>{
+    const dir = climoU(w.la,'sfc')>=0 ? 1 : -1;
+    for(let lo=-180;lo<180;lo+=45){
+      const p1=V(w.la,lo,1.6), p2=V(w.la,lo+dir*22,1.6);
+      windObjs.push(tube([p1,V(w.la,lo+dir*11,1.6),p2],w.c,0.0055));
+      windObjs.push(cone(p2,p2.clone().sub(p1),w.c,0.017));
+    }
+  });
+
+  /* ── ITCZ 구름 띠 ── */
+  const itczObjs=[];
+  for(let lo=-180;lo<180;lo+=9){
+    const m=new THREE.Mesh(new THREE.SphereGeometry(0.05,10,8),
+      new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.8}));
+    m.position.copy(V(Math.sin(lo/38)*3.5,lo,4.2));
+    root.add(m); itczObjs.push(m);
+  }
+
+  /* ── 조작 ── */
+  let rotY=0.4, rotX=0.30, drag=false, lx=0, ly=0, dist=3.5, auto=true, speed=1;
+  cv.addEventListener('pointerdown',e=>{drag=true;auto=false;lx=e.clientX;ly=e.clientY;});
+  window.addEventListener('pointerup',()=>drag=false);
+  window.addEventListener('pointermove',e=>{
+    if(!drag) return;
+    rotY+=(e.clientX-lx)*0.006; rotX+=(e.clientY-ly)*0.006;
+    rotX=Math.max(-1.2,Math.min(1.2,rotX)); lx=e.clientX; ly=e.clientY;
+  });
+  cv.addEventListener('wheel',e=>{e.preventDefault();
+    dist=Math.max(2.0,Math.min(6,dist+e.deltaY*0.0022));},{passive:false});
+
+  function step(){
+    const DT=0.0016*speed;
+    for(let i=0;i<N;i++){
+      const v=circVel(pLat[i],pH[i]);
+      pLat[i]+=v.dlat*DT;
+      pH[i]  +=v.dh*DT;
+      pLon[i]+=zonalU(pLat[i],v.z)*DT*3.4;
+      if(pLon[i]>180) pLon[i]-=360; if(pLon[i]<-180) pLon[i]+=360;
+      pAge[i]+=1;
+      const ci=cellOf(pLat[i]);
+      if(pH[i]<0.08||pH[i]>CELLS[ci].top*1.02||pAge[i]>300||Math.abs(pLat[i])>89.5) spawn(i,false);
+      pCell[i]=cellOf(pLat[i]);
+      const o=[0,0,0]; toVec(pLat[i],pLon[i],pH[i],o);
+      pos[i*3]=o[0]; pos[i*3+1]=o[1]; pos[i*3+2]=o[2];
+      const c=CCOL[pCell[i]];
+      const fade=Math.min(1,pAge[i]/25)*Math.min(1,(300-pAge[i])/45);
+      const lift=0.45+0.55*Math.min(1,pH[i]/CELLS[pCell[i]].top);
+      const on = (g3dMode==='all'||g3dMode==='cell'||g3dMode==='c'+pCell[i]) ? 1 : 0;
+      const k=fade*lift*on;
+      /* 밝은 배경이므로 흰색 쪽으로 사라지게 한다 */
+      col[i*3]=1-k*(1-c[0]); col[i*3+1]=1-k*(1-c[1]); col[i*3+2]=1-k*(1-c[2]);
+    }
+    pg.attributes.position.needsUpdate=true;
+    pg.attributes.color.needsUpdate=true;
+  }
+  function apply(){
+    windObjs.forEach(o=>o.visible = g3dMode==='all'||g3dMode==='wind');
+    itczObjs.forEach(o=>o.visible = g3dMode==='all'||g3dMode==='itcz');
+  }
+  function loop(){
+    if(auto) rotY+=0.0012;
+    step();
+    earth.rotation.set(rotX,rotY,0); root.rotation.set(rotX,rotY,0);
+    cam.position.set(0,dist*0.26,dist); cam.lookAt(0,0,0);
+    renderer.render(scene,cam);
+    requestAnimationFrame(loop);
+  }
+  window.addEventListener('resize',()=>{
+    W=wrap.clientWidth||820; H=wrap.clientHeight||440;
+    cam.aspect=W/H; cam.updateProjectionMatrix(); renderer.setSize(W,H,false);
+  });
+  g3d={apply:apply, setSpeed:v=>{speed=v;}, resetView:()=>{auto=true;rotX=0.30;dist=3.5;}};
+  apply(); loop();
+  badge.className='badge-live on'; badge.textContent='입자 '+N.toLocaleString()+'개 실시간 계산';
+}
+document.getElementById('g3dCtl').innerHTML=
+  [['all','전체'],['c0','해들리 순환'],['c1','페렐 순환'],['c2','극 순환'],
+   ['wind','지상 바람 화살표'],['itcz','ITCZ']]
+  .map(([k,t])=>'<button class="gbtn'+(k==='all'?' on':'')+'" data-g="'+k+'">'+t+'</button>').join('')+
+  '<button class="gbtn" data-sp="0.4">느리게</button>'+
+  '<button class="gbtn on" data-sp="1">보통</button>'+
+  '<button class="gbtn" data-sp="2.4">빠르게</button>'+
+  '<button class="gbtn" data-rv="1">시점 되돌리기</button>';
+document.getElementById('g3dCtl').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.g){
+    g3dMode=b.dataset.g;
+    document.querySelectorAll('#g3dCtl [data-g]').forEach(x=>x.classList.toggle('on',x===b));
+    if(g3d) g3d.apply();
+  } else if(b.dataset.sp){
+    document.querySelectorAll('#g3dCtl [data-sp]').forEach(x=>x.classList.toggle('on',x===b));
+    if(g3d) g3d.setSpeed(+b.dataset.sp);
+  } else if(b.dataset.rv && g3d) g3d.resetView();
+});
+document.getElementById('g3dLegend').innerHTML=
+  CELLS.map(c=>'<div><i style="background:'+c.cs+'"></i>'+c.n+' · 최고 '+c.top+' km</div>').join('')+
+  '<div><i style="background:#ffffff"></i>ITCZ (적도 구름 띠)</div>'+
+  '<div style="color:#4a5a6b;margin-top:5px;max-width:170px;line-height:1.6">'+
+  '입자가 <b>밝을수록 높은 곳</b>에 있습니다. 적도에서 솟아올라 30°에서 내려오는 흐름을 따라가 보세요.</div>';
+if(document.readyState==='complete') initGlobe();
+else window.addEventListener('load',initGlobe);
+/* ── 자오면 단면도 (높이 실제 비율) ── */
+(function(){
+  const W=860,H=420,L=64,R=118,T=26,B=62;
+  const MAXH=20;                                   // km
+  const X=la=>L+(la+90)/180*(W-L-R);
+  const Y=h=>T+(1-h/MAXH)*(H-T-B);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">';
+  s+='<rect x="'+L+'" y="'+T+'" width="'+(W-L-R)+'" height="'+(H-T-B)+'" fill="#eef5fc" stroke="#cfdbe8"/>';
+
+  /* 성층권 (대류권 계면 위) */
+  let tp='';
+  for(let la=-90;la<=90;la+=2) tp+=X(la)+','+Y(tropoAt(la))+' ';
+  s+='<polygon points="'+L+','+T+' '+tp+(W-R)+','+T+'" fill="#dbeafe" opacity=".75"/>';
+  s+='<polyline points="'+tp+'" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="6 4"/>';
+  s+=txt(X(0),Y(18.4),'대류권 계면','#2563eb',11);
+
+  /* 고도 눈금 */
+  [0,5,10,15,20].forEach(h=>{
+    s+='<line x1="'+L+'" y1="'+Y(h)+'" x2="'+(W-R)+'" y2="'+Y(h)+'" stroke="#e4eaf2"/>';
+    s+=txt(L-10,Y(h)+4,h+' km','#4a5a6b',10.5,'end',false);
+  });
+  /* 위도 눈금 */
+  [-90,-60,-30,0,30,60,90].forEach(la=>{
+    s+='<line x1="'+X(la)+'" y1="'+T+'" x2="'+X(la)+'" y2="'+(H-B)+'" stroke="#e4eaf2" stroke-dasharray="3 4"/>';
+    s+=txt(X(la),H-B+17,(la===0?'적도':(la>0?la+'°N':(-la)+'°S')),'#243141',10.5);
+  });
+  s+='<rect x="'+L+'" y="'+(H-B)+'" width="'+(W-L-R)+'" height="14" fill="#5c6b52"/>';
+  s+=txt((L+W-R)/2,H-8,'위도','#243141',11.5);
+
+  /* 순환 셀 */
+  CELLS.forEach(c=>{
+    [1,-1].forEach(hemi=>{
+      const a=c.a*hemi, b=c.b*hemi;
+      const rise = (c.n==='페렐 순환') ? b : a;
+      const fall = (c.n==='페렐 순환') ? a : b;
+      const x1=X(Math.min(a,b)), x2=X(Math.max(a,b));
+      s+='<rect x="'+x1+'" y="'+Y(c.top)+'" width="'+(x2-x1)+'" height="'+(Y(0)-Y(c.top))+
+         '" fill="'+c.cs+'" opacity=".10"/>';
+      s+='<line x1="'+x1+'" y1="'+Y(c.top)+'" x2="'+x2+'" y2="'+Y(c.top)+
+         '" stroke="'+c.cs+'" stroke-width="1.5" stroke-dasharray="4 3"/>';
+      /* 상승 · 상층 · 하강 · 지상 */
+      s+=arw(X(rise),Y(0.4),X(rise),Y(c.top*0.95),c.cs,3.2,8);
+      s+=arw(X(rise)+(fall>rise?10:-10),Y(c.top*0.92),X(fall)+(fall>rise?-10:10),Y(c.top*0.92),c.cs,2.6,8);
+      s+=arw(X(fall),Y(c.top*0.95),X(fall),Y(0.4),c.cs,3.2,8);
+      s+=arw(X(fall)+(rise>fall?10:-10),Y(0.9),X(rise)+(rise>fall?-10:10),Y(0.9),c.cs,2.6,8);
+      if(hemi===1) s+=txt((x1+x2)/2,Y(c.top)-8,c.n,c.cs,11.5);
+      else s+=txt((x1+x2)/2,Y(c.top)-8,c.top+' km',c.cs,10.5);
+    });
+  });
+
+  /* ITCZ */
+  s+='<rect x="'+(X(-4))+'" y="'+Y(17)+'" width="'+(X(4)-X(-4))+'" height="'+(Y(0)-Y(17))+
+     '" fill="#ffffff" opacity=".13"/>';
+  s+=txt(X(0),Y(19.3),'ITCZ','#ffffff',11);
+
+  /* 범례 */
+  const lx=W-R+10;
+  s+=txt(lx,T+14,'순환의 높이','#0b1420',11.5,'start');
+  CELLS.forEach((c,i)=>{
+    const y=T+36+i*30;
+    s+='<rect x="'+lx+'" y="'+(y-9)+'" width="12" height="12" rx="3" fill="'+c.cs+'"/>';
+    s+=txt(lx+18,y+1,c.n,c.cs,10.5,'start');
+    s+=txt(lx+18,y+14,c.top+' km까지','#243141',10,'start',false);
+  });
+  s+='</svg>';
+  document.getElementById('cellFig').innerHTML=s;
+
+  document.getElementById('cellTbl').innerHTML=
+   '<tr><th>순환</th><th>위도 범위</th><th>도달 높이</th><th>상승하는 곳</th><th>하강하는 곳</th><th>지상 바람</th></tr>'+
+   [['해들리 순환','0° ~ 30°','약 16 km','적도 (ITCZ)','위도 30°','무역풍 (동 → 서)'],
+    ['페렐 순환','30° ~ 60°','약 11 km','위도 60°','위도 30°','편서풍 (서 → 동)'],
+    ['극 순환','60° ~ 90°','약 8 km','위도 60°','극 (90°)','극동풍 (동 → 서)']]
+   .map((r,i)=>'<tr><td style="font-weight:700;color:'+CELLS[i].cs+'">'+r[0]+'</td>'+
+     r.slice(1).map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('');
+})();
+
+document.getElementById('cellSteps').innerHTML=[
+ {h:'적도의 공기가 데워져 올라간다',d:'적도는 태양 에너지를 수직으로 받아 에너지가 남습니다. 데워진 공기는 <b>가벼워져 상승</b>합니다. 그래서 적도는 저기압대이고 비가 많습니다.'},
+ {h:'위도 30°에서 식어 내려온다',d:'상승한 공기는 높은 하늘을 따라 고위도로 흐르다가 <b>식으면서 무거워져</b> 위도 30° 부근에서 하강합니다. 여기에 <b>중위도 고압대</b>가 만들어집니다.'},
+ {h:'지상에서 적도로 되돌아간다 — 무역풍',d:'내려온 공기는 지표를 따라 다시 적도로 흐릅니다. 그런데 지구가 자전하므로 진행 방향이 휘어 <b>동에서 서로</b> 부는 바람이 됩니다. 이것이 <b>무역풍</b>입니다.'},
+ {h:'극에서도 같은 일이 일어난다',d:'극지방은 에너지가 적어 공기가 차갑고 무거워 하강합니다. 이 공기가 위도 60° 부근까지 흐르다가 따뜻해져 상승합니다.'},
+ {h:'결국 세 개의 순환이 생긴다',d:'적도~30°는 <b>해들리 순환</b>, 30°~60°는 <b>페렐 순환</b>, 60°~90°는 <b>극 순환</b>입니다. 이 순환들이 저위도의 남는 열을 고위도로 나릅니다.'}
+].map((s,i)=>'<div class="stepitem"><span class="n">'+(i+1)+'</span><div><b>'+s.h+'</b>'+
+  '<span class="note">'+s.d+'</span></div></div>').join('');
+
+document.getElementById('windTbl').innerHTML=
+ '<tr><th>이름</th><th>부는 위도</th><th>방향</th><th>특징</th></tr>'+
+ [['무역풍','0° ~ 30°','동 → 서','늘 같은 방향으로 불어 태평양 표층 해류를 만든다'],
+  ['편서풍','30° ~ 60°','서 → 동','우리나라 날씨가 서쪽에서 동쪽으로 이동하는 이유'],
+  ['극동풍','60° ~ 90°','동 → 서','차가운 극지방 공기를 실어 나른다']]
+ .map(r=>'<tr>'+r.map((c,i)=>'<td'+(i===0?' style="font-weight:700"':'')+'>'+c+'</td>').join('')+'</tr>').join('');
+
+/* ══════════════ 공통 : 네트워크 ══════════════ */
+function fetchT(url,ms){
+  return new Promise((res,rej)=>{
+    const t=setTimeout(()=>rej(new Error('timeout')),ms);
+    fetch(url).then(r=>{clearTimeout(t); r.ok?res(r.json()):rej(new Error('HTTP '+r.status));})
+              .catch(e=>{clearTimeout(t); rej(e);});
+  });
+}
+function tileLayer(map,url,attr,maxZ){
+  const l=L.tileLayer(url,{attribution:attr,maxZoom:maxZ||8,crossOrigin:true});
+  l.addTo(map); return l;
+}
+
+/* ══════════════ 탭 1 : earth.nullschool 연동 ══════════════ */
+const EN='https://earth.nullschool.net/#current/';
+const EN_LINKS=[
+ {n:'지상 바람 (전 지구)', u:EN+'wind/surface/level/equirectangular=0,0,250',
+  d:'가장 기본 화면입니다. 적도 부근에서 선이 <b>왼쪽(서쪽)</b>으로 흐르는 것이 무역풍입니다.'},
+ {n:'상공 250 hPa 바람', u:EN+'wind/isobaric/250hPa/equirectangular=0,0,250',
+  d:'약 10 km 상공입니다. 같은 적도 부근이 지상과 <b>반대 방향</b>으로 흐르는지 확인하세요. 중위도의 굵고 빠른 띠가 제트 기류입니다.'},
+ {n:'태평양 무역풍 (지구본)', u:EN+'wind/surface/level/orthographic=-160,0,320',
+  d:'태평양을 정면으로 본 지구본입니다. 무역풍이 동에서 서로 부는 모습을 한눈에 볼 수 있습니다.'},
+ {n:'해수면 온도', u:EN+'wind/surface/level/overlay=sea_surface_temp/orthographic=-160,0,320',
+  d:'바람 위에 해수면 온도를 겹쳤습니다. 서태평양이 붉고 동태평양이 푸른 모습을 확인하세요.'},
+ {n:'표층 해류', u:EN+'ocean/surface/currents/orthographic=-160,0,320',
+  d:'바람이 만든 바닷물의 흐름입니다. 적도를 따라 서쪽으로 흐르는 해류를 찾아보세요.'},
+ {n:'상공 제트 기류 (극지방)', u:EN+'wind/isobaric/250hPa/orthographic=127,60,330',
+  d:'북극 위에서 내려다본 모습입니다. 편서풍이 극을 둘러싸고 도는 것이 보입니다.'}
+];
+document.getElementById('enLinks').innerHTML=EN_LINKS.map((l,i)=>
+  '<a class="gbtn" href="'+l.u+'" target="_blank" rel="noopener" data-e="'+i+'">'+l.n+' ↗</a>').join('');
+document.getElementById('enLinks').addEventListener('mouseover',e=>{
+  const b=e.target.closest('[data-e]'); if(!b) return;
+  const l=EN_LINKS[+b.dataset.e];
+  document.getElementById('enMsg').innerHTML='<b>'+l.n+'</b><br>'+l.d;
+});
+document.getElementById('enLinks').addEventListener('click',e=>{
+  const b=e.target.closest('[data-e]'); if(!b) return;
+  const l=EN_LINKS[+b.dataset.e];
+  document.getElementById('enMsg').innerHTML='<b>'+l.n+'</b> — 새 탭에서 열었습니다.<br>'+l.d;
+});
+document.getElementById('btn-embed').addEventListener('click',()=>{
+  const f=document.getElementById('en-frame');
+  const on=f.style.display==='none';
+  f.style.display=on?'block':'none';
+  if(on) document.getElementById('en-if').src=EN_LINKS[0].u;
+  else document.getElementById('en-if').src='';
+  document.getElementById('btn-embed').textContent=on?'화면 안 보기 닫기':'이 화면 안에서 열기';
+});
+
+const EN_MISSIONS=[
+ {n:'미션 1', t:'무역풍을 눈으로 확인하기',
+  how:'<b>지상 바람 (전 지구)</b>를 엽니다. 적도와 위도 30° 사이의 태평양·대서양을 보세요.',
+  q:'선들이 어느 쪽으로 흐르나요? 아무 지점이나 눌러 풍향(°)과 풍속(m/s)을 적어 보세요.'},
+ {n:'미션 2', t:'지상과 상공을 비교하기',
+  how:'같은 지점을 <b>지상</b>과 <b>상공 250 hPa</b>에서 각각 확인합니다. 화면 왼쪽 아래 earth → Height에서 바꿀 수 있습니다.',
+  q:'같은 위도에서 두 높이의 바람 방향이 어떻게 달랐나요? 왜 그럴까요?'},
+ {n:'미션 3', t:'제트 기류 찾기',
+  how:'<b>상공 250 hPa</b> 화면에서 위도 30°~50° 부근을 봅니다. 선이 유난히 빠르고 굵은 띠가 있습니다.',
+  q:'가장 빠른 곳의 풍속은 몇 m/s인가요? 우리나라 상공에서는 어느 쪽으로 흐르나요?'},
+ {n:'미션 4', t:'적도의 무풍대 찾기',
+  how:'<b>지상 바람</b>에서 적도 바로 위를 자세히 봅니다. 남북 무역풍이 만나는 곳입니다.',
+  q:'적도 부근의 풍속은 다른 곳과 비교해 어떤가요? 그 이유를 ITCZ와 연결해 설명해 보세요.'}
+];
+document.getElementById('enMissions').innerHTML=EN_MISSIONS.map((m,i)=>
+ '<div class="oxcard"><div class="oxq"><span style="color:var(--accent)">'+m.n+'</span> · '+m.t+'</div>'+
+ '<div class="note" style="margin-bottom:8px"><b>어떻게</b> — '+m.how+'</div>'+
+ '<label class="lbl" for="en'+i+'">'+m.q+'</label>'+
+ '<textarea id="en'+i+'" data-q="'+m.n+'. '+m.t+' — '+m.q.replace(/"/g,'')+'"></textarea></div>').join('');
+
+document.getElementById('vecTbl').innerHTML=
+ '<tr><th>바람</th><th>위도</th><th>지상 방향</th><th>상공(250 hPa) 방향</th><th>대략적인 풍속</th></tr>'+
+ [['무역풍','0° ~ 30°','<b class="hl-w">동 → 서</b>','서 → 동','지상 약 6~7 m/s'],
+  ['편서풍','30° ~ 60°','<b class="hl">서 → 동</b>','서 → 동 (제트 기류)','지상 약 6~9 m/s · 상공 25~40 m/s'],
+  ['극동풍','60° ~ 90°','<b class="hl">동 → 서</b>','서 → 동','지상 약 3~4 m/s']]
+ .map(r=>'<tr>'+r.map((c,i)=>'<td'+(i===0?' style="font-weight:700"':'')+'>'+c+'</td>').join('')+'</tr>').join('');
+
+/* ══════════════ 탭 2 : 사막 위성 지도 ══════════════ */
+const DESERTS=[
+ {n:'사하라',        la:23.0,  lo:13.0,  z:4, k:'hp', c:'아프리카 북부'},
+ {n:'아라비아',      la:23.0,  lo:45.0,  z:5, k:'hp', c:'아라비아반도'},
+ {n:'타르',          la:27.0,  lo:71.5,  z:6, k:'hp', c:'인도·파키스탄'},
+ {n:'칼라하리',      la:-23.0, lo:22.0,  z:5, k:'hp', c:'아프리카 남부'},
+ {n:'나미브',        la:-24.5, lo:15.3,  z:6, k:'hp', c:'아프리카 남서 해안'},
+ {n:'아타카마',      la:-24.0, lo:-69.3, z:6, k:'hp', c:'칠레'},
+ {n:'그레이트빅토리아',la:-29.0, lo:128.0, z:5, k:'hp', c:'오스트레일리아'},
+ {n:'소노란',        la:32.0,  lo:-112.5,z:6, k:'hp', c:'미국·멕시코'},
+ {n:'고비',          la:43.0,  lo:105.0, z:5, k:'in', c:'몽골·중국'},
+ {n:'타클라마칸',    la:39.0,  lo:83.0,  z:5, k:'in', c:'중국 서부'}
+];
+let desMap=null, desSat=null;
+function initDesMap(){
+  if(desMap || typeof L==='undefined') return;
+  desMap=L.map('desMap',{worldCopyJump:false,minZoom:1,maxZoom:9,attributionControl:false})
+    .setView([15,30],2);
+  desSat=tileLayer(desMap,
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    'Esri World Imagery',9);
+  desSat.on('tileerror',()=>{
+    const b=document.getElementById('desBadge');
+    b.className='badge-live off'; b.textContent='위성 영상 일부 실패';
+  });
+  desSat.on('load',()=>{
+    const b=document.getElementById('desBadge');
+    b.className='badge-live on'; b.textContent='Esri 위성 영상';
+  });
+  /* 위도선 */
+  L.polyline([[0,-180],[0,180]],{color:'#dc2626',weight:3,interactive:false}).addTo(desMap);
+  L.marker([0,-150],{icon:L.divIcon({html:'<span class="dlabel" style="color:#dc2626">적도 0°</span>',
+    className:''}),interactive:false}).addTo(desMap);
+  [[30,'30°N'],[-30,'30°S']].forEach(([la,lb])=>{
+    L.polyline([[la,-180],[la,180]],{color:'#b45f06',weight:2.5,dashArray:'8 6',interactive:false}).addTo(desMap);
+    L.marker([la,-150],{icon:L.divIcon({html:'<span class="dlabel" style="color:#b45f06">'+lb+'</span>',
+      className:''}),interactive:false}).addTo(desMap);
+  });
+  [[23.44,'북회귀선 23.4°N'],[-23.44,'남회귀선 23.4°S']].forEach(([la,lb])=>{
+    L.polyline([[la,-180],[la,180]],{color:'#41505f',weight:1,dashArray:'3 5',interactive:false}).addTo(desMap);
+  });
+  DESERTS.forEach(d=>{
+    const col = d.k==='hp' ? '#b45f06' : '#7c3aed';
+    L.circleMarker([d.la,d.lo],{radius:7,color:col,weight:2,fillColor:col,fillOpacity:.45})
+      .bindTooltip(d.n+' 사막 · 위도 '+Math.abs(d.la).toFixed(0)+'°'+(d.la>0?'N':'S'),{direction:'top'})
+      .addTo(desMap);
+  });
+  setTimeout(()=>desMap.invalidateSize(),80);
+}
+document.getElementById('desBtns').innerHTML=
+  '<button class="gbtn on" data-d="-1">전체 보기</button>'+
+  DESERTS.map((d,i)=>'<button class="gbtn" data-d="'+i+'" style="'+
+    (d.k==='in'?'border-color:#7c3aed;color:#7c3aed':'')+'">'+d.n+'</button>').join('');
+document.getElementById('desBtns').addEventListener('click',e=>{
+  const b=e.target.closest('[data-d]'); if(!b) return;
+  document.querySelectorAll('#desBtns .gbtn').forEach(x=>x.classList.toggle('on',x===b));
+  initDesMap(); if(!desMap) return;
+  const i=+b.dataset.d, m=document.getElementById('desMsg');
+  if(i<0){ desMap.setView([15,30],2); m.className='verdict'; return; }
+  const d=DESERTS[i];
+  desMap.setView([d.la,d.lo],d.z);
+  m.className='verdict '+(d.k==='hp'?'warn':'info')+' show';
+  m.innerHTML='<b>'+d.n+' 사막</b> · '+d.c+' · 위도 <b>'+Math.abs(d.la).toFixed(0)+'°'+(d.la>0?'N':'S')+'</b><br>'+
+    (d.k==='hp'
+      ? '위도 30° 선 부근에 있습니다. <b class="hl-w">중위도 고압대의 하강 기류</b>가 만든 전형적인 사막입니다.'
+      : '위도 30°에서 한참 벗어나 있습니다. <b class="hl">내륙 깊숙한 위치</b>와 <b class="hl">산맥의 비그늘</b> 때문에 생긴 사막입니다.');
+});
+document.getElementById('desTbl').innerHTML=
+ '<tr><th>사막</th><th>위치</th><th>위도</th><th>생긴 까닭</th></tr>'+
+ DESERTS.slice().sort((a,b)=>Math.abs(a.la)-Math.abs(b.la)).map(d=>
+  '<tr'+(d.k==='in'?' style="background:rgba(192,132,252,.09)"':'')+'>'+
+  '<td style="font-weight:700">'+d.n+'</td><td>'+d.c+'</td>'+
+  '<td class="num">'+Math.abs(d.la).toFixed(0)+'°'+(d.la>0?'N':'S')+'</td>'+
+  '<td>'+(d.k==='hp'?'중위도 고압대의 하강 기류':'<b style="color:#7c3aed">내륙성 · 비그늘</b>')+'</td></tr>').join('');
+
+/* ══════════════ 탭 1 : 사막화 ══════════════ */
+document.getElementById('desertSteps').innerHTML=[
+ {h:'위도 30°에 하강 기류가 있다',d:'대기 대순환의 결과로 위도 30° 부근에서는 공기가 계속 <b>내려옵니다</b>.'},
+ {h:'내려온 공기가 눌러 고기압이 된다',d:'공기가 내리누르면서 <b>중위도 고압대</b>가 만들어집니다.'},
+ {h:'구름이 만들어지지 않는다',d:'구름은 공기가 <b>올라가며 팽창하고 식어야</b> 생깁니다. 하강 기류에서는 그 반대이므로 구름이 잘 생기지 않습니다.'},
+ {h:'비가 적고 증발은 많다',d:'구름이 없으니 강수량이 적고, 햇빛이 강해 증발량은 많습니다. <b>강수량 &lt; 증발량</b>이 이어지면 땅이 마릅니다.'},
+ {h:'사막이 만들어진다',d:'그래서 사하라, 아라비아, 칼라하리, 오스트레일리아 사막이 모두 <b>위도 30° 부근</b>에 있습니다. 남반구도 마찬가지입니다.'}
+].map((s,i)=>'<div class="stepitem"><span class="n">'+(i+1)+'</span><div><b>'+s.h+'</b>'+
+  '<span class="note">'+s.d+'</span></div></div>').join('');
+
+const DCAUSE=[
+ {t:'대기 대순환의 변동',        k:'nat'},
+ {t:'엘니뇨·라니냐로 인한 장기 가뭄', k:'nat'},
+ {t:'지하수 고갈과 지표수 감소',   k:'nat'},
+ {t:'과잉 경작',                k:'hum'},
+ {t:'과잉 방목',                k:'hum'},
+ {t:'무분별한 삼림 벌채',        k:'hum'},
+ {t:'토지 개간',                k:'hum'},
+ {t:'지하수 남용',              k:'hum'}
+];
+let dcPlaced={}, dcScore=0;
+function drawDC(done){
+  document.getElementById('dcPool').innerHTML=DCAUSE.map((f,i)=>dcPlaced[i]?'':
+    '<button class="itm" data-i="'+i+'">'+f.t+'</button>').join('')||'<span class="note">모두 분류했습니다.</span>';
+  [['nat','binNat'],['hum','binHum']].forEach(([k,id])=>{
+    document.getElementById(id).innerHTML=DCAUSE.map((f,i)=>{
+      if(dcPlaced[i]!==k) return '';
+      let c='itm'; if(done) c+=(f.k===k?' ok':' no');
+      return '<button class="'+c+'" data-i="'+i+'"'+(done?' disabled':'')+'>'+f.t+'</button>';
+    }).join('');
+  });
+}
+function dcMove(i,to){
+  if(to) dcPlaced[i]=to; else delete dcPlaced[i];
+  document.getElementById('dcVerdict').className='verdict'; drawDC(false);
+}
+document.getElementById('dcPool').addEventListener('click',e=>{
+  const b=e.target.closest('.itm'); if(b) dcMove(+b.dataset.i,'nat');
+});
+document.getElementById('binNat').addEventListener('click',e=>{
+  const b=e.target.closest('.itm'); if(b&&!b.disabled) dcMove(+b.dataset.i,'hum');
+});
+document.getElementById('binHum').addEventListener('click',e=>{
+  const b=e.target.closest('.itm'); if(b&&!b.disabled) dcMove(+b.dataset.i,null);
+});
+document.getElementById('dcCheck').addEventListener('click',()=>{
+  const v=document.getElementById('dcVerdict');
+  const placed=Object.keys(dcPlaced).length;
+  if(placed<DCAUSE.length){
+    v.className='verdict no show';
+    v.innerHTML='아직 <b>'+(DCAUSE.length-placed)+'개</b>가 남았습니다.'; return;
+  }
+  drawDC(true);
+  const wrong=DCAUSE.filter((f,i)=>dcPlaced[i]!==f.k);
+  dcScore=wrong.length===0?1:0;
+  v.className='verdict '+(wrong.length?'no':'ok')+' show';
+  v.innerHTML=(wrong.length?'<b>'+wrong.length+'개가 틀렸습니다.</b>':'<b>모두 맞혔습니다.</b>')+'<br><br>'+
+    '<b>자연적 요인</b>은 대기 대순환이 변하거나 엘니뇨·라니냐 같은 기후 이상이 생겨 <b>가뭄이 오래 이어지는</b> 경우입니다. '+
+    '사람이 직접 손대기 어렵습니다.<br><br>'+
+    '<b>인위적 요인</b>은 사람이 땅을 지나치게 쓰거나 훼손하는 활동입니다. '+
+    '한 땅에서 계속 농사를 지어 수분과 영양분을 고갈시키고(<b>과잉 경작</b>), '+
+    '가축을 너무 많이 풀어 풀이 자라지 못하게 하며(<b>과잉 방목</b>), '+
+    '숲을 베어 토양이 쉽게 깎이게 만들고(<b>삼림 벌채·토지 개간</b>), '+
+    '지하수를 필요 이상으로 끌어올려 땅을 마르게 합니다(<b>지하수 남용</b>).<br><br>'+
+    '<b class="hl">대책이 인위적 요인에 집중되는 이유</b>가 여기 있습니다. 우리가 바꿀 수 있는 쪽이기 때문입니다.';
+});
+document.getElementById('dcReset').addEventListener('click',()=>{
+  dcPlaced={}; dcScore=0; document.getElementById('dcVerdict').className='verdict'; drawDC(false);
+});
+drawDC(false);
+
+function listCard(arr,col){
+  return arr.map(x=>'<div style="padding:10px;border-radius:8px;background:var(--surface-2);'+
+    'border:1px solid var(--line);border-left:3px solid '+col+';margin-bottom:7px">'+
+    '<b style="font-size:.78rem">'+x.h+'</b><div class="note" style="margin-top:3px">'+x.d+'</div></div>').join('');
+}
+document.getElementById('dmgHost').innerHTML=listCard([
+ {h:'식량 부족',d:'농사지을 땅이 줄고 토양의 영양분이 사라져 곡물 생산이 줄어듭니다.'},
+ {h:'물 부족 심화',d:'지하수와 지표수가 마르면서 마실 물조차 모자라게 됩니다.'},
+ {h:'황사·먼지폭풍 빈발',d:'식생이 사라진 마른 흙이 바람에 날려 멀리까지 퍼집니다. 우리나라의 봄철 황사도 이와 관련됩니다.'},
+ {h:'생물다양성 감소',d:'서식지가 사라져 그곳에 살던 생물이 함께 사라집니다.'}
+],'#dc2626');
+document.getElementById('cureHost').innerHTML=listCard([
+ {h:'숲을 되살린다',d:'삼림 벌채를 줄이고 나무를 심어 토양이 물을 머금고 바람에 깎이지 않게 합니다.'},
+ {h:'방목을 조절한다',d:'가축 수를 조절해 풀이 다시 자랄 시간을 줍니다.'},
+ {h:'지속 가능한 경작법',d:'돌려짓기 등으로 땅이 회복할 시간을 주고, 지하수를 아껴 씁니다.'},
+ {h:'국제 협력',d:'사막화는 국경을 넘는 문제입니다. <b>유엔 사막화 방지 협약(UNCCD)</b> 등을 통해 함께 대응합니다.'}
+],'#0b7d73');
+
+/* ══════════════ 태평양 단면 (탭 2·3 공용) ══════════════ */
+/* t : -1 엘니뇨  ·  0 평상시  ·  +1 라니냐 */
+function pacState(t){
+  return {
+    t:t,
+    wind: 1+t,                       // 무역풍 세기 (0 ~ 2)
+    Tw: 29 + 1.0*t,                  // 서태평양 수온
+    Te: 23 - 2.5*t,                  // 동태평양 수온
+    dW: 95 + 40*t,                   // 서쪽 난수층 깊이(px)
+    dE: 35 - 20*t,                   // 동쪽 난수층 깊이(px)
+    lean: 6*(1+t),                   // 서쪽 해수면이 높은 정도(px)
+    up: Math.max(0, 1+t),            // 용승 세기
+    riseW: 0.75 + 0.25*t,            // 서쪽 상승 기류
+    riseE: Math.max(0, 0.15 - 0.45*t) // 동쪽 상승 기류
+  };
+}
+function drawPacific(hostId, t, showLabels){
+  const S=pacState(t);
+  const W=820,H=400, SEA=170, BOT=340;
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">';
+  s+='<rect width="'+W+'" height="'+SEA+'" fill="#e0f2fe"/>';
+  s+='<rect x="0" y="'+SEA+'" width="'+W+'" height="'+(BOT-SEA)+'" fill="#bfdbfe"/>';
+  s+='<rect x="0" y="'+BOT+'" width="'+W+'" height="'+(H-BOT)+'" fill="#3d3529"/>';
+  /* 육지 */
+  s+='<path d="M0,'+SEA+' L0,'+(SEA-46)+' L64,'+(SEA-30)+' L96,'+SEA+' Z" fill="#4a5c3a"/>';
+  s+='<path d="M'+W+','+SEA+' L'+W+','+(SEA-70)+' L'+(W-72)+','+(SEA-40)+' L'+(W-104)+','+SEA+' Z" fill="#6b5540"/>';
+  s+=txt(50,SEA-52,'서태평양','#3f6b34',12)+txt(50,SEA-38,'인도네시아·호주','#4d7a42',9.5,'middle',false);
+  s+=txt(W-56,SEA-76,'동태평양','#8a6a4a',12)+txt(W-56,SEA-62,'남아메리카','#8a6a4a',9.5,'middle',false);
+
+  /* 난수층 (따뜻한 표층) */
+  const yW=SEA-S.lean, yE=SEA-2;
+  s+='<path d="M96,'+yW+' Q'+(W/2)+','+(SEA-S.lean*0.5)+' '+(W-104)+','+yE+
+     ' L'+(W-104)+','+(yE+S.dE)+' Q'+(W/2)+','+(SEA+(S.dW+S.dE)/2)+' 96,'+(yW+S.dW)+' Z" '+
+     'fill="url(#warmg)"/>';
+  s+='<defs><linearGradient id="warmg" x1="0" y1="0" x2="1" y2="0">'+
+     '<stop offset="0" stop-color="#e8623c"/><stop offset="1" stop-color="#e8a03c"/></linearGradient></defs>';
+  s+='<path d="M96,'+(yW+S.dW)+' Q'+(W/2)+','+(SEA+(S.dW+S.dE)/2)+' '+(W-104)+','+(yE+S.dE)+
+     '" fill="none" stroke="#b45309" stroke-width="2" stroke-dasharray="6 4"/>';
+  s+=txt(W/2, SEA+(S.dW+S.dE)/2+18,'수온 약층 (따뜻한 물과 찬물의 경계)','#b45309',10,'middle',false);
+  s+=txt(120, SEA+S.dW+30,'차가운 심층수','#2563eb',11,'start',false);
+
+  /* 해수면 */
+  s+='<path d="M96,'+yW+' Q'+(W/2)+','+(SEA-S.lean*0.5)+' '+(W-104)+','+yE+'" fill="none" stroke="#1d4ed8" stroke-width="2.5"/>';
+
+  /* 무역풍 */
+  if(S.wind>0.08){
+    const wlen=60+130*S.wind;
+    s+=arw(560+wlen*0.35, 52, 560-wlen*0.65, 52, '#b45f06', 3+3*S.wind, 10+3*S.wind);
+    s+=chip(560, 30, '무역풍 (동 → 서)', '#b45f06');
+  } else {
+    s+=chip(560, 40, '무역풍 거의 멈춤', '#dc2626');
+  }
+
+  /* 표층 해류 */
+  if(S.wind>0.08){
+    s+=arw(600, SEA+16, 600-40-60*S.wind, SEA+16, '#b45309', 2+2*S.wind, 9);
+    s+=txt(600, SEA+34,'표층 해류','#b45309',10,'middle',false);
+  }
+
+  /* 용승 */
+  if(S.up>0.12){
+    const uh=30+40*S.up;
+    s+=arw(W-150, SEA+S.dE+uh+34, W-150, SEA+S.dE+6, '#03699f', 2.5+3*S.up, 9+3*S.up);
+    s+=chip(W-150, SEA+S.dE+uh+52, '용승', '#03699f');
+  } else {
+    s+=chip(W-150, SEA+70, '용승 억제됨', '#dc2626');
+  }
+
+  /* 기류 · 구름 · 비 */
+  function weather(cx, r, label){
+    let o='';
+    if(r>0.28){
+      o+=arw(cx, SEA-52, cx, 74, '#dc2626', 2+4*r, 9);
+      const cw=34+52*r;
+      o+='<ellipse cx="'+cx+'" cy="66" rx="'+cw+'" ry="'+(15+9*r)+'" fill="#5a6a7a" opacity="'+(0.5+0.45*r)+'"/>';
+      const n=Math.round(3+7*r);
+      for(let i=0;i<n;i++){
+        const rx=cx-cw*0.8+ (i/(n-1||1))*cw*1.6;
+        o+='<line x1="'+rx+'" y1="86" x2="'+(rx-4)+'" y2="'+(104+18*r)+'" stroke="#03699f" stroke-width="2" stroke-linecap="round"/>';
+      }
+      o+=chip(cx, 132+18*r, label+' · 저기압 · 비 많음', '#03699f');
+    } else {
+      o+=arw(cx, 80, cx, SEA-52, '#2563eb', 3, 9);
+      o+='<circle cx="'+(cx-26)+'" cy="64" r="11" fill="#b45f06" opacity=".85"/>';
+      o+=chip(cx+16, 118, label+' · 고기압 · 맑고 건조', '#b45f06');
+    }
+    return o;
+  }
+  s+=weather(215, S.riseW, '서태평양');
+  s+=weather(610, S.riseE, '동태평양');
+
+  if(showLabels!==false){
+    s+=chip(215, SEA+S.dW+70, S.Tw.toFixed(1)+' ℃', '#c2410c');
+    s+=chip(W-215, SEA+S.dE+96, S.Te.toFixed(1)+' ℃', '#03699f');
+  }
+  s+='</svg>';
+  document.getElementById(hostId).innerHTML=s;
+  return S;
+}
+
+/* ══════════════ 탭 2 ══════════════ */
+document.getElementById('normSteps').innerHTML=[
+ {h:'무역풍이 동에서 서로 분다',d:'대기 대순환 때문에 열대 태평양에는 늘 <b>동 → 서</b> 방향의 무역풍이 붑니다.'},
+ {h:'표층 해수가 서쪽으로 밀린다',d:'바람이 바닷물 표면을 계속 밀어 <b>표층 해류</b>가 생깁니다. 따뜻한 표층수가 서쪽으로 모입니다.'},
+ {h:'서태평양은 따뜻하고 해수면이 높아진다',d:'따뜻한 물이 쌓여 <b>수온이 높고 해수면도 조금 더 높습니다</b>. 따뜻한 물의 층도 두꺼워집니다.'},
+ {h:'동태평양에서는 용승이 일어난다',d:'표층수가 빠져나간 자리를 아래의 차가운 물이 올라와 채웁니다. 이것이 <b>용승</b>이며, 그래서 동태평양은 <b>수온이 낮습니다</b>.'},
+ {h:'기압과 강수가 갈린다',d:'수온이 높은 서태평양은 공기가 데워져 <b>상승 기류(저기압)</b>가 생겨 비가 많고, 수온이 낮은 동태평양은 <b>하강 기류(고기압)</b>가 생겨 맑고 건조합니다.'}
+].map((s,i)=>'<div class="stepitem"><span class="n">'+(i+1)+'</span><div><b>'+s.h+'</b>'+
+  '<span class="note">'+s.d+'</span></div></div>').join('');
+drawPacific('normFig', 0);
+document.getElementById('normTbl').innerHTML=
+ '<tr><th>항목</th><th>서태평양 (인도네시아 쪽)</th><th>동태평양 (남아메리카 쪽)</th></tr>'+
+ [['따뜻한 표층수','바람에 밀려 <b>모임</b> — 두껍다','밀려 <b>나감</b> — 얇다'],
+  ['용승','거의 없음','<b>활발</b>'],
+  ['수온','<b class="hl-r">높음</b> (약 29 ℃)','<b class="hl">낮음</b> (약 23 ℃)'],
+  ['해수면 높이','조금 <b>높음</b>','조금 낮음'],
+  ['기류','<b>상승</b> 기류','<b>하강</b> 기류'],
+  ['기압','저기압','고기압'],
+  ['날씨','구름 많고 <b>비가 많음</b>','맑고 <b>건조함</b>'],
+  ['어장','—','용승으로 영양 염류 풍부 → <b>세계적 어장</b>']]
+ .map(r=>'<tr>'+r.map((c,i)=>'<td'+(i===0?' style="font-weight:700"':'')+'>'+c+'</td>').join('')+'</tr>').join('');
+
+/* ══════════════ 탭 3 : 시뮬레이션 ══════════════ */
+let simT=0;
+function updateSim(){
+  const S=drawPacific('simFig', simT);
+  const dTw=S.Tw-29, dTe=S.Te-23;
+  function stat(n,v,d,unit){
+    const col = d>0.05?'#dc2626' : d<-0.05?'#2563eb' : '#4a5a6b';
+    return '<div class="stat"><div class="sn">'+n+'</div>'+
+      '<div class="sv">'+v+'</div>'+
+      '<div class="sd" style="color:'+col+'">'+(d===null?'':(d>0.05?'▲ +':d<-0.05?'▼ ':'— ')+
+        (d===0?'평년과 같음':Math.abs(d).toFixed(1)+unit))+'</div></div>';
+  }
+  document.getElementById('simStats').innerHTML=
+    stat('무역풍 세기', S.wind<0.1?'거의 없음':(S.wind<0.75?'약함':S.wind<1.3?'보통':'강함'), S.wind-1, ' 단계')+
+    stat('서태평양 수온', S.Tw.toFixed(1)+' ℃', dTw, ' ℃')+
+    stat('동태평양 수온', S.Te.toFixed(1)+' ℃', dTe, ' ℃')+
+    stat('동서 수온 차', (S.Tw-S.Te).toFixed(1)+' ℃', (S.Tw-S.Te)-6, ' ℃');
+
+  const m=document.getElementById('simMsg');
+  let name, body;
+  if(simT<-0.35){
+    name='엘니뇨';
+    body='무역풍이 약해져 따뜻한 물을 서쪽으로 밀어 주는 힘이 줄었습니다. '+
+      '서쪽에 쌓여 있던 따뜻한 물이 <b class="hl-w">동쪽으로 흘러가고</b>, 동태평양의 <b class="hl-w">용승이 억제</b>됩니다.<br>'+
+      '· 동태평양 — 평년보다 수온이 <b class="hl-r">높아지고</b> 강수량이 늘어 <b>폭우·홍수</b> 위험이 커집니다.<br>'+
+      '· 서태평양 — 평년보다 수온이 <b class="hl">낮아지고</b> 강수량이 줄어 <b>가뭄·산불</b> 위험이 커집니다.<br>'+
+      '· 페루 앞바다는 용승이 막혀 영양 염류가 줄고 <b>어획량이 급감</b>합니다.';
+  } else if(simT>0.35){
+    name='라니냐';
+    body='무역풍이 평소보다 <b>강해져</b> 따뜻한 물을 서쪽으로 더 세게 밀어냅니다. '+
+      '동태평양의 <b class="hl">용승이 더 활발</b>해집니다.<br>'+
+      '· 동태평양 — 평년보다 수온이 <b class="hl">더 낮아지고</b> 더 건조해집니다.<br>'+
+      '· 서태평양 — 평년보다 수온이 <b class="hl-r">더 높아지고</b> 비가 더 많아져 홍수 위험이 커집니다.<br>'+
+      '· 평상시의 특징이 <b>과장되어 나타나는</b> 상태라고 보면 됩니다.';
+  } else {
+    name='평상시';
+    body='무역풍이 동에서 서로 꾸준히 불어 따뜻한 표층수를 서쪽으로 모읍니다. '+
+      '동태평양에서는 용승이 일어나 수온이 낮고, 서태평양은 수온이 높습니다.<br>'+
+      '· 서태평양 — 상승 기류(저기압), 비가 많음<br>'+
+      '· 동태평양 — 하강 기류(고기압), 맑고 건조함';
+  }
+  m.className='verdict '+(simT<-0.35?'warn':simT>0.35?'info':'ok')+' show';
+  m.innerHTML='<b style="font-size:.9rem">'+name+'</b><br>'+body+
+    '<br><br><b class="hl">중요 —</b> 어느 상태에서도 <b>서태평양이 동태평양보다 수온이 높습니다</b>('+
+    S.Tw.toFixed(1)+' ℃ &gt; '+S.Te.toFixed(1)+' ℃). '+
+    '엘니뇨 때 "동태평양이 따뜻해진다"는 말은 <b>동태평양의 평년값과 비교해서</b> 그렇다는 뜻입니다.';
+
+  document.querySelectorAll('.preset').forEach(b=>{
+    const on = Math.abs(simT-(+b.dataset.t))<0.35;
+    b.classList.toggle('on', on);
+    b.style.background = on ? (b.dataset.t==='-1'?'#9c5c00':b.dataset.t==='1'?'#2563eb':'#0b7d73') : '';
+    b.style.borderColor = on ? (b.dataset.t==='-1'?'#9c5c00':b.dataset.t==='1'?'#2563eb':'#0b7d73') : '';
+  });
+}
+document.getElementById('tSlider').addEventListener('input',e=>{ simT=+e.target.value; updateSim(); });
+document.querySelectorAll('.preset').forEach(b=>b.addEventListener('click',()=>{
+  simT=+b.dataset.t; document.getElementById('tSlider').value=simT; updateSim();
+}));
+updateSim();
+
+(function(){
+  const A=pacState(-1), N=pacState(0), B=pacState(1);
+  const R=[
+   ['무역풍','약해짐 (또는 역방향)','보통','강해짐'],
+   ['따뜻한 표층수','동쪽으로 이동','서쪽에 모임','서쪽에 더 많이 모임'],
+   ['동태평양 용승','<b class="hl-r">억제됨</b>','활발','<b class="hl">더 활발</b>'],
+   ['동태평양 수온','평년보다 <b class="hl-r">높음</b> ('+A.Te.toFixed(1)+' ℃)','기준 ('+N.Te.toFixed(1)+' ℃)','평년보다 <b class="hl">낮음</b> ('+B.Te.toFixed(1)+' ℃)'],
+   ['서태평양 수온','평년보다 <b class="hl">낮음</b> ('+A.Tw.toFixed(1)+' ℃)','기준 ('+N.Tw.toFixed(1)+' ℃)','평년보다 <b class="hl-r">높음</b> ('+B.Tw.toFixed(1)+' ℃)'],
+   ['동서 수온 차','작아짐 ('+(A.Tw-A.Te).toFixed(1)+' ℃)',(N.Tw-N.Te).toFixed(1)+' ℃','커짐 ('+(B.Tw-B.Te).toFixed(1)+' ℃)'],
+   ['동태평양 날씨','강수량 증가 · <b>폭우·홍수</b>','건조','더 건조 · 가뭄'],
+   ['서태평양 날씨','강수량 감소 · <b>가뭄·산불</b>','비 많음','비 더 많음 · 홍수'],
+   ['페루 어획량','<b class="hl-r">급감</b>','풍부','더 풍부']
+  ];
+  document.getElementById('cmpTbl').innerHTML=
+   '<tr><th>항목</th><th style="color:#9c5c00">엘니뇨</th><th style="color:#0b7d73">평상시</th><th style="color:#2563eb">라니냐</th></tr>'+
+   R.map(r=>'<tr>'+r.map((c,i)=>'<td'+(i===0?' style="font-weight:700"':'')+'>'+c+'</td>').join('')+'</tr>').join('');
+})();
+
+const OX=[
+ {q:'엘니뇨 시기에는 동태평양의 수온이 서태평양보다 높아진다.', a:false,
+  w:'가장 흔한 오해입니다. 엘니뇨 때 동태평양 수온이 올라가는 것은 맞지만, <b>그 지역의 평년값과 비교해서</b> 높아지는 것입니다. 슬라이더를 끝까지 왼쪽으로 옮겨 보세요. 그래도 서태평양(28.0 ℃)이 동태평양(25.5 ℃)보다 여전히 높습니다. <b>동서 수온 차가 줄어들 뿐, 역전되지는 않습니다.</b>'},
+ {q:'엘니뇨는 무역풍이 약해지면서 시작된다.', a:true,
+  w:'맞습니다. 무역풍이 약해지면 따뜻한 물을 서쪽으로 미는 힘이 줄고, 서쪽에 쌓여 있던 따뜻한 물이 동쪽으로 흘러갑니다. 그 결과 동태평양의 용승이 억제됩니다. <b>모든 변화의 출발점은 바람</b>입니다.'},
+ {q:'엘니뇨 시기에 서태평양은 강수량이 늘어 홍수 위험이 커진다.', a:false,
+  w:'반대입니다. 엘니뇨 때 <b>서태평양</b>은 수온이 평년보다 낮아져 상승 기류가 약해지고, 강수량이 <b>줄어 가뭄</b> 위험이 커집니다. 홍수 위험이 커지는 쪽은 <b>동태평양</b>입니다. 인도네시아·오스트레일리아의 가뭄과 산불이 엘니뇨와 함께 자주 보도되는 이유입니다.'},
+ {q:'라니냐는 평상시의 특징이 더 뚜렷해진 상태로 볼 수 있다.', a:true,
+  w:'맞습니다. 라니냐는 무역풍이 평소보다 <b>강해진</b> 상태입니다. 서쪽은 더 따뜻하고 비가 더 많아지며, 동쪽은 용승이 더 활발해져 더 차갑고 건조해집니다. 즉 평상시의 동서 차이가 <b>과장되어</b> 나타납니다.'},
+ {q:'엘니뇨는 열대 태평양의 날씨만 바꾸는 국지적인 현상이다.', a:false,
+  w:'엘니뇨는 <b>전 지구적인 현상</b>입니다. 열대 태평양의 상승 기류 위치가 통째로 옮겨지면 그와 연결된 대기 순환 전체가 흔들려, 아프리카의 가뭄, 북아메리카의 겨울 날씨, 아시아의 장마까지 영향을 받습니다. 게다가 엘니뇨로 인한 장기 가뭄은 <b>사막화의 자연적 요인</b>이 되기도 합니다.'}
+];
+let oxAns={};
+function drawOX(){
+  document.getElementById('oxHost').innerHTML=OX.map((o,i)=>{
+    const a=oxAns[i];
+    return '<div class="oxcard"><div class="oxq">'+(i+1)+'. '+o.q+'</div>'+
+      '<div class="oxbtns" data-i="'+i+'">'+
+      [['O',true],['X',false]].map(([lb,val])=>{
+        let c='ox';
+        if(a!==undefined){ if(a===val) c+=(val===o.a?' ok':' no'); else if(val===o.a) c+=' ok'; }
+        return '<button class="'+c+'" data-v="'+val+'"'+(a!==undefined?' disabled':'')+'>'+lb+'</button>';
+      }).join('')+'</div>'+
+      (a!==undefined?'<div class="exp show"><b>'+(a===o.a?'맞습니다.':'정답은 '+(o.a?'O':'X')+'입니다.')+'</b> '+o.w+'</div>':'')+
+      '</div>';
+  }).join('');
+  document.getElementById('oxScore').textContent=
+    OX.filter((o,i)=>oxAns[i]===o.a).length+' / '+OX.length;
+}
+drawOX();
+document.getElementById('oxHost').addEventListener('click',e=>{
+  const b=e.target.closest('.ox'); if(!b||b.disabled) return;
+  oxAns[+b.parentElement.dataset.i] = b.dataset.v==='true'; drawOX();
+});
+document.getElementById('oxReset').addEventListener('click',()=>{ oxAns={}; drawOX(); });
+
+/* ══════════════ 탭 5 : 실제 해수면 온도 ══════════════ */
+const SLONS=[130,145,160,175,-170,-155,-140,-125,-110,-95];
+const SLATS=[4,0,-4];
+/* NINO 3.4 = 5°N~5°S, 170°W~120°W → 아래 경도들이 구역 안에 든다 */
+const NINO_LON=[-170,-155,-140,-125];
+/* NINO 3.4 월별 평년값(℃, 대략) — 판정의 기준선 */
+const NINO_CLIM=[26.6,26.8,27.3,27.7,27.9,27.7,27.3,26.9,26.7,26.7,26.7,26.6];
+const DEMO_SST={};
+(function(){
+  /* 서(130°E)에서 동(95°W)까지 0 → 1 로 놓는다. 전체 폭은 135° */
+  const XS=lo=>((lo>0 ? lo-130 : lo+230)/135);
+  const shape=(lo,la)=>6.5*Math.pow(XS(lo),1.5)+Math.abs(la)*0.04;
+  /* NINO 3.4 평균이 그 달 평년값 +0.05 ℃가 되도록 맞춘 '평상시' 예시 */
+  let s=0,n=0;
+  NINO_LON.forEach(lo=>SLATS.forEach(la=>{ s+=shape(lo,la); n++; }));
+  const base=NINO_CLIM[new Date().getMonth()]+0.05+s/n;
+  SLONS.forEach(lo=>SLATS.forEach(la=>{ DEMO_SST[la+'|'+lo]=base-shape(lo,la); }));
+})();
+let sstData=null, sstIsDemo=false;
+
+function sstColor(t){
+  const stops=[[20,'#2c5fa8'],[22,'#3f8fc4'],[24,'#63b8b0'],[26,'#c9c96b'],
+               [27,'#e8a84c'],[28,'#e8763c'],[29,'#e0472f'],[30.5,'#b81d2a']];
+  if(t<=stops[0][0]) return stops[0][1];
+  for(let i=0;i<stops.length-1;i++){
+    if(t<=stops[i+1][0]){
+      const [a,ca]=stops[i],[b,cb]=stops[i+1], f=(t-a)/(b-a);
+      const h=c=>[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)];
+      const A=h(ca),B=h(cb);
+      return 'rgb('+A.map((v,i)=>Math.round(v+(B[i]-v)*f)).join(',')+')';
+    }
+  }
+  return stops[stops.length-1][1];
+}
+function lonLabel(lo){ return lo>0 ? lo+'°E' : (-lo)+'°W'; }
+
+function drawSST(){
+  const host=document.getElementById('sstHeat');
+  if(!sstData){ host.innerHTML='<div class="note">아직 자료를 불러오지 않았습니다.</div>';
+    document.getElementById('sstScale').innerHTML='';
+    document.getElementById('ninoBox').innerHTML=''; return; }
+  let h='<div class="hmgrid" style="grid-template-columns:52px repeat('+SLONS.length+',1fr)">';
+  h+='<div class="hmlab"></div>'+SLONS.map(lo=>
+    '<div class="hmlab" style="font-size:.6rem">'+lonLabel(lo)+'</div>').join('');
+  SLATS.forEach(la=>{
+    h+='<div class="hmlab">'+(la===0?'적도':(la>0?la+'°N':(-la)+'°S'))+'</div>';
+    SLONS.forEach(lo=>{
+      const t=sstData[la+'|'+lo];
+      const inNino = NINO_LON.indexOf(lo)>=0 && Math.abs(la)<=5;
+      h+='<div class="hmcell" style="background:'+(t==null?'#e4eaf2':sstColor(t))+
+         (inNino?';outline:3px solid #0f172a;outline-offset:-3px;font-weight:900':'')+'">'+
+         (t==null?'—':t.toFixed(1))+'</div>';
+    });
+  });
+  h+='</div>';
+  host.innerHTML=h;
+
+  document.getElementById('sstScale').innerHTML=
+    '<div class="hmscale"><span class="note">차가움</span>'+
+    [20,22,24,26,27,28,29,30].map(t=>'<i style="background:'+sstColor(t)+'"></i>').join('')+
+    '<span class="note">따뜻함</span>'+
+    '<span class="note" style="margin-left:10px">단위 ℃ · '+'<b style="display:inline-block;width:15px;height:15px;vertical-align:-3px;border:3px solid #0f172a;border-radius:3px;background:#e8a84c"></b>'+' 짙은 테두리 = NINO 3.4 구역</span></div>';
+
+  /* 통계 */
+  const vals=k=>Object.keys(sstData).filter(k2=>k2.split('|')[0]===k)
+    .map(k2=>sstData[k2]).filter(v=>v!=null);
+  const west=[], east=[], nino=[];
+  SLATS.forEach(la=>SLONS.forEach(lo=>{
+    const t=sstData[la+'|'+lo]; if(t==null) return;
+    if(lo>=130&&lo<=160) west.push(t);
+    if(lo<=-95&&lo>=-110) east.push(t);
+    if(NINO_LON.indexOf(lo)>=0 && Math.abs(la)<=5) nino.push(t);
+  }));
+  const avg=a=>a.length? a.reduce((s,v)=>s+v,0)/a.length : null;
+  const W=avg(west), E=avg(east), N=avg(nino);
+  const diff = (W!=null&&E!=null)? W-E : null;
+  const clim = NINO_CLIM[new Date().getMonth()];
+  const anom = N!=null ? N-clim : null;
+
+  let judge, jc, jw;
+  if(anom==null){ judge='판정 불가'; jc='#4a5a6b'; jw=''; }
+  else if(anom>=0.5){ judge='엘니뇨 쪽'; jc='#9c5c00';
+    jw='NINO 3.4 구역이 평년보다 <b>'+anom.toFixed(2)+' ℃ 높습니다</b>. 엘니뇨 기준(+0.5 ℃)을 넘었습니다.'; }
+  else if(anom<=-0.5){ judge='라니냐 쪽'; jc='#2563eb';
+    jw='NINO 3.4 구역이 평년보다 <b>'+Math.abs(anom).toFixed(2)+' ℃ 낮습니다</b>. 라니냐 기준(−0.5 ℃)을 넘었습니다.'; }
+  else { judge='평상시'; jc='#0b7d73';
+    jw='NINO 3.4 구역의 편차가 <b>'+(anom>0?'+':'')+anom.toFixed(2)+' ℃</b>로 ±0.5 ℃ 안에 있습니다.'; }
+
+  document.getElementById('ninoBox').innerHTML=
+    '<div><div class="nn">NINO 3.4 평균 수온</div><div class="nv" style="color:'+sstColor(N||26)+'">'+
+      (N==null?'—':N.toFixed(2)+' ℃')+'</div><div class="note">평년값 '+clim.toFixed(1)+' ℃</div></div>'+
+    '<div><div class="nn">평년 대비 편차</div><div class="nv" style="color:'+jc+'">'+
+      (anom==null?'—':(anom>0?'+':'')+anom.toFixed(2)+' ℃')+'</div><div class="note">엘니뇨 +0.5 / 라니냐 −0.5</div></div>'+
+    '<div><div class="nn">동서 수온 차</div><div class="nv" style="color:'+
+      (diff==null?'#4a5a6b':diff<4?'#9c5c00':diff>7?'#2563eb':'#0b7d73')+'">'+
+      (diff==null?'—':diff.toFixed(2)+' ℃')+'</div><div class="note">평상시 약 6 ℃</div></div>';
+
+  const m=document.getElementById('sstMsg');
+  m.className='verdict '+(judge==='평상시'?'ok':judge==='판정 불가'?'no':'warn')+' show';
+  m.innerHTML='<b style="font-size:.92rem">간이 판정 — '+judge+'</b><br>'+jw+
+    (diff!=null?'<br>동서 수온 차는 <b>'+diff.toFixed(2)+' ℃</b>입니다. '+
+      (diff<4?'평상시(약 6 ℃)보다 <b class="hl-w">작습니다</b>. 따뜻한 물이 동쪽으로 퍼졌다는 뜻입니다.'
+       :diff>7?'평상시보다 <b class="hl">큽니다</b>. 무역풍이 강해 동서 대비가 뚜렷합니다.'
+       :'평상시와 비슷합니다.'):'')+
+    '<br><br><b class="hl-r">주의</b> — 이것은 <b>오늘 하루치 자료로 해 본 간이 판정</b>입니다. '+
+    '공식 판정은 <b>3개월 이동평균</b>을 <b>5번 연속</b> 확인하고, 여러 해 관측을 정밀 보정한 자료를 씁니다. '+
+    '그래서 이 결과가 뉴스에 나오는 공식 발표와 다를 수 있습니다.'+
+    (sstIsDemo?'<br><span class="note">지금은 <b>예시 자료</b>입니다.</span>':'');
+}
+drawSST();
+
+document.getElementById('sstDemo').addEventListener('click',()=>{
+  sstData=Object.assign({},DEMO_SST); sstIsDemo=true;
+  const b=document.getElementById('sstBadge');
+  b.className='badge-live off'; b.textContent='예시 자료';
+  drawSST();
+});
+document.getElementById('sstBtn').addEventListener('click',async()=>{
+  const b=document.getElementById('sstBadge'), btn=document.getElementById('sstBtn');
+  b.className='badge-live load'; b.textContent='불러오는 중…'; btn.disabled=true;
+  const lats=[], lons=[];
+  SLATS.forEach(la=>SLONS.forEach(lo=>{lats.push(la); lons.push(lo);}));
+  const url='https://marine-api.open-meteo.com/v1/marine?latitude='+lats.join(',')+
+    '&longitude='+lons.join(',')+'&hourly=sea_surface_temperature&forecast_days=1&timezone=UTC';
+  try{
+    const j=await fetchT(url,20000);
+    const arr=Array.isArray(j)?j:[j];
+    const out={}; let n=0;
+    arr.forEach((r,i)=>{
+      const h=r&&r.hourly&&r.hourly.sea_surface_temperature;
+      if(!h) return;
+      const v=h.find(x=>x!=null);
+      if(v!=null){ out[lats[i]+'|'+lons[i]]=v; n++; }
+    });
+    if(n<12) throw new Error('too few');
+    sstData=out; sstIsDemo=false;
+    b.className='badge-live on'; b.textContent='실제 관측 예보값';
+    drawSST();
+  }catch(e){
+    b.className='badge-live off'; b.textContent='불러오기 실패';
+    sstData=Object.assign({},DEMO_SST); sstIsDemo=true;
+    drawSST();
+    document.getElementById('sstMsg').innerHTML=
+      '<b>실제 해수면 온도를 불러오지 못했습니다.</b> 대신 <b>예시 자료</b>를 표시했습니다.<br>'+
+      '예시 자료는 <b>평상시</b>에 가까운 상태입니다. 서쪽이 붉고 동쪽이 푸른 모습을 확인해 보세요.';
+    document.getElementById('sstMsg').className='verdict no show';
+  }
+  btn.disabled=false;
+});
+document.getElementById('cautionHost').innerHTML=[
+ {h:'한 지점이 아니라 넓은 구역의 평균을 쓴다',d:'바다 한 곳의 수온은 바람이나 구름에 따라 하루에도 크게 흔들립니다. 그래서 <b>NINO 3.4 구역 전체를 평균</b>냅니다.'},
+ {h:'절대 온도가 아니라 평년과의 차이를 본다',d:'적도 바다는 원래 따뜻합니다. 27 ℃라는 숫자만으로는 아무것도 알 수 없습니다. <b>그 달의 평년값보다 높은지 낮은지</b>가 중요합니다.'},
+ {h:'3개월 평균을 쓴다',d:'한두 주의 변덕을 걸러 내기 위해서입니다. 짧은 기간의 오르내림은 엘니뇨가 아니라 그냥 날씨입니다.'},
+ {h:'5번 연속 기준을 넘어야 인정한다',d:'엘니뇨는 <b>몇 달 이상 이어지는 상태</b>입니다. 잠깐 넘었다가 돌아오면 엘니뇨라고 부르지 않습니다.'},
+ {h:'그래서 오늘 하루 값으로는 단정할 수 없다',d:'이 활동의 판정은 <b>원리를 이해하기 위한 간이 판정</b>입니다. 공식 발표와 다를 수 있다는 점을 꼭 기억하세요.'}
+].map((s,i)=>'<div class="stepitem"><span class="n">'+(i+1)+'</span><div><b>'+s.h+'</b>'+
+  '<span class="note">'+s.d+'</span></div></div>').join('');
+
+document.getElementById('kmaHost').innerHTML=[
+ {h:'현재 상태',d:'"현재 엘니뇨 상태입니다" 또는 "평상시 상태입니다" 같은 문장을 찾으세요. 우리가 히트맵으로 내린 판정과 같은지 비교합니다.'},
+ {h:'NINO 3.4 지수 값',d:'숫자로 된 편차가 나옵니다. 우리가 구한 편차와 비교해 보세요. 값이 다르면 <b>3개월 평균</b>과 <b>하루치</b>의 차이 때문입니다.'},
+ {h:'앞으로의 전망',d:'몇 달 뒤까지 엘니뇨가 이어질지, 평상시로 돌아갈지 확률로 표시됩니다. 예측에는 늘 <b>불확실성</b>이 따른다는 것을 확인할 수 있습니다.'},
+ {h:'우리나라에 미치는 영향',d:'엘니뇨·라니냐가 우리나라의 여름 강수나 겨울 기온에 어떤 경향을 주는지 나옵니다. 태평양 한가운데의 수온이 왜 우리 날씨와 관련되는지 생각해 보세요.'}
+].map((x,i)=>'<div style="padding:10px;border-radius:8px;background:var(--surface-2);'+
+ 'border:1px solid var(--line);border-left:3px solid var(--accent);margin-bottom:7px">'+
+ '<b style="font-size:.79rem">'+(i+1)+'. '+x.h+'</b>'+
+ '<div class="note" style="margin-top:3px">'+x.d+'</div></div>').join('');
+document.getElementById('btn-kma').addEventListener('click',()=>{
+  const f=document.getElementById('kma-frame');
+  const on=f.style.display==='none';
+  f.style.display=on?'block':'none';
+  document.getElementById('kma-if').src = on ? 'https://www.weather.go.kr/w/climate/prediction/el-la.do' : '';
+  document.getElementById('btn-kma').textContent = on ? '화면 안 보기 닫기' : '이 화면 안에서 열기';
+});
+
+/* ══════════════ 탭 6 ══════════════ */
+const QIDS=['q0a','q1b','en0','en1','en2','en3','q1a','q2a','q3a','q3b','q5a','q5b','q5c'];
+const CHECKS=[
+ '대기 대순환이 위도별 에너지 불균형 때문에 생긴다는 것을 설명할 수 있다.',
+ '해들리 · 페렐 · 극 순환의 위치와 상승·하강 위도를 말할 수 있다.',
+ '세 순환의 도달 높이가 다른 까닭을 대류권 계면의 높이와 연결해 설명할 수 있다.',
+ 'ITCZ가 무엇이며 왜 적도에 구름 띠가 생기는지 설명할 수 있다.',
+ '무역풍 · 편서풍 · 극동풍의 위도와 방향을 말할 수 있다.',
+ '지상과 상공의 바람 방향이 반대인 까닭을 순환의 고리로 설명할 수 있다.',
+ '주요 사막이 위도 30° 부근에 몰려 있음을 지도에서 확인할 수 있다.',
+ '고비·타클라마칸처럼 내륙성·비그늘로 생긴 사막이 있음을 안다.',
+ '위도 30° 부근에 사막이 생기는 이유를 하강 기류와 연결해 설명할 수 있다.',
+ '사막이 있는 것과 사막화가 다르다는 것을 구분할 수 있다.',
+ '사막화의 자연적 요인과 인위적 요인을 구분하고 대책을 말할 수 있다.',
+ '무역풍 → 표층 해류 → 용승으로 이어지는 순서를 설명할 수 있다.',
+ '평상시 서태평양과 동태평양의 수온·기압·강수 차이를 설명할 수 있다.',
+ '엘니뇨가 무역풍 약화에서 시작된다는 것을 설명할 수 있다.',
+ '엘니뇨 때 동태평양의 수온이 "평년보다" 높아지는 것이지 서태평양보다 높아지는 것이 아님을 안다.',
+ '라니냐가 평상시의 특징이 강해진 상태임을 설명할 수 있다.',
+ '엘니뇨가 전 지구의 기후에 영향을 준다는 것을 안다.',
+ 'NINO 3.4 구역이 어디이며 왜 그곳을 재는지 설명할 수 있다.',
+ '엘니뇨 판정이 절대 온도가 아니라 평년과의 편차로 이루어짐을 안다.',
+ '공식 판정이 3개월 이동평균을 5번 연속 확인하는 까닭을 설명할 수 있다.'
+];
+let chkState={};
+function collectAnswers(){
+  return QIDS.map(id=>{const el=document.getElementById(id);
+    return {q:el.dataset.q, a:el.value.trim(), lines:4};});
+}
+function scoreRows(){
+  return [
+   ['사막화 원인 분류', dcScore?'완료 (모두 정답)':'미완료'],
+   ['엘니뇨 O·X 문제', OX.filter((o,i)=>oxAns[i]===o.a).length+' / '+OX.length]
+  ];
+}
+const SUMMARY=[
+ {h:'1. 대기 대순환',
+  body:['지구가 둥글어 생기는 <b>위도별 에너지 불균형</b>을 해소하기 위해 공기가 지구 규모로 순환합니다.',
+        '적도에서 데워진 공기가 상승해 위도 30°에서 하강하고(해들리 순환), 극에서 하강한 공기가 위도 60°에서 상승합니다(극 순환). 그 사이에 페렐 순환이 있습니다.',
+        '지표에서는 지구 자전 때문에 바람이 휘어 붑니다.'],
+  table:[['바람','위도','방향'],
+         ['무역풍','0° ~ 30°','동 → 서'],
+         ['편서풍','30° ~ 60°','서 → 동'],
+         ['극동풍','60° ~ 90°','동 → 서']]},
+ {h:'2. 사막화',
+  body:['위도 30° 부근은 <b>하강 기류</b>가 발달해 <b>중위도 고압대</b>가 만들어집니다. 구름이 생기지 않아 강수량보다 증발량이 많고, 그래서 사하라·아라비아·칼라하리 등 큰 사막이 이 위도에 있습니다.',
+        '사막이 존재하는 것은 자연스러운 일입니다. 문제는 <b>사막 주변의 건조 지역이 넓어지는 사막화</b>입니다.',
+        '자연적 요인 — 대기 대순환의 변동, 엘니뇨·라니냐로 인한 장기 가뭄, 지하수 고갈과 지표수 감소.',
+        '인위적 요인 — 과잉 경작, 과잉 방목, 무분별한 삼림 벌채, 토지 개간, 지하수 남용.',
+        '피해 — 식량 부족, 물 부족 심화, 황사·먼지폭풍 빈발, 생물다양성 감소. 대책 — 조림, 방목 조절, 지속 가능한 경작, 유엔 사막화 방지 협약(UNCCD) 같은 국제 협력.']},
+ {h:'3. 평상시의 태평양',
+  body:['무역풍이 동에서 서로 불어 따뜻한 표층수를 서쪽으로 밉니다. 이 흐름이 <b>표층 해류</b>입니다.',
+        '서태평양은 따뜻한 물이 쌓여 수온이 높고 해수면도 조금 높습니다. 동태평양은 표층수가 빠져나간 자리를 차가운 심층수가 채우는 <b>용승</b>이 일어나 수온이 낮습니다.',
+        '수온이 높은 서태평양은 상승 기류(저기압)로 비가 많고, 수온이 낮은 동태평양은 하강 기류(고기압)로 맑고 건조합니다. 용승 덕분에 영양 염류가 풍부한 페루 앞바다는 세계적인 어장이 됩니다.']},
+ {h:'4. 엘니뇨와 라니냐',
+  body:['<b>엘니뇨</b>는 <b>무역풍이 약해지면서</b> 시작됩니다. 따뜻한 물을 서쪽으로 미는 힘이 줄어 서쪽에 쌓였던 물이 동쪽으로 흐르고, 동태평양의 용승이 억제됩니다.',
+        '<b>라니냐</b>는 반대로 무역풍이 강해진 상태로, 평상시의 특징이 더 뚜렷해집니다.',
+        '<b>가장 조심할 점</b> — 엘니뇨 때 동태평양 수온이 "높아진다"는 말은 <b>그 지역의 평년값과 비교해서</b>입니다. 어느 때에도 서태평양이 동태평양보다 수온이 높습니다. 동서 수온 차가 <b>줄어들 뿐 역전되지는 않습니다</b>.',
+        '엘니뇨는 열대 태평양만의 일이 아니라 전 지구의 대기·해양 순환을 바꾸는 <b>글로벌 현상</b>이며, 그로 인한 장기 가뭄은 사막화의 원인이 되기도 합니다.'],
+  table:[['항목','엘니뇨','평상시','라니냐'],
+         ['무역풍','약함','보통','강함'],
+         ['동태평양 용승','억제','활발','더 활발'],
+         ['동태평양 수온','평년보다 높음','기준','평년보다 낮음'],
+         ['서태평양 수온','평년보다 낮음','기준','평년보다 높음'],
+         ['동태평양 날씨','폭우·홍수','건조','더 건조'],
+         ['서태평양 날씨','가뭄·산불','비 많음','홍수']]}
+];
+function renderSummaryTab(){
+  document.getElementById('scoretbl').innerHTML='<tr><th>활동</th><th>결과</th></tr>'+
+    scoreRows().map(r=>'<tr><td>'+r[0]+'</td><td class="num"><b>'+r[1]+'</b></td></tr>').join('');
+  document.getElementById('anshost').innerHTML=collectAnswers().map(x=>
+    '<div class="ans-item"><div class="q">'+x.q+'</div><div class="a'+(x.a?'':' empty')+'">'+
+    (x.a?esc(x.a):'아직 작성하지 않았습니다.')+'</div></div>').join('');
+  document.getElementById('chkhost').innerHTML=CHECKS.map((t,i)=>
+    '<div class="chk"><input type="checkbox" id="ck'+i+'" data-i="'+i+'"'+(chkState[i]?' checked':'')+'>'+
+    '<label for="ck'+i+'">'+t+'</label></div>').join('');
+  document.getElementById('summaryhost').innerHTML=SUMMARY.map(s=>
+    '<div class="sumblk"><h4>'+s.h+'</h4>'+s.body.map(p=>'<p>'+p+'</p>').join('')+
+    (s.table?'<table class="dt" style="margin-top:7px">'+s.table.map((row,ri)=>
+      '<tr>'+row.map(c=>ri===0?'<th>'+c+'</th>':'<td>'+c+'</td>').join('')+'</tr>').join('')+'</table>':'')+
+    '</div>').join('');
+}
+document.getElementById('chkhost').addEventListener('change',e=>{
+  if(e.target.type==='checkbox') chkState[+e.target.dataset.i]=e.target.checked;
+});
+function wsConfig(blank){
+  const who=(document.getElementById('whoName').value||'').trim();
+  return {
+    blank:!!blank, who:who,
+    title:'대기 대순환 · 사막화와 엘니뇨',
+    subtitle:'통합과학2 「환경과 에너지」 · 대기와 해양의 상호작용',
+    standard:'[10통과2-02-03] 온실효과 강화로 인한 지구 온난화의 메커니즘을 이해하고, 엘니뇨, 사막화 등과 같은 현상이 지구 환경과 인간 생활에 미치는 영향과 대처 방안을 분석할 수 있다.',
+    records:[
+      {type:'table', h:'활동 기록', head:['활동','결과'], rows:scoreRows()},
+      {type:'table', h:'엘니뇨 · 평상시 · 라니냐 비교',
+       head:['항목','엘니뇨','평상시','라니냐'],
+       rows:[['무역풍','약함','보통','강함'],
+             ['동태평양 용승','억제','활발','더 활발'],
+             ['동태평양 수온','평년보다 높음','기준','평년보다 낮음'],
+             ['서태평양 수온','평년보다 낮음','기준','평년보다 높음'],
+             ['동태평양 날씨','폭우·홍수','건조','더 건조'],
+             ['서태평양 날씨','가뭄·산불','비 많음','홍수']]}
+    ],
+    answers:collectAnswers(),
+    checks:CHECKS.map((t,i)=>({t:t, ok:!!chkState[i]})),
+    summary:SUMMARY.map(s=>({h:s.h, body:s.body.map(p=>p.replace(/<[^>]+>/g,'')), table:s.table}))
+  };
+}
+if(window.Worksheet){
+  window.Worksheet.mount('ws-actions', wsConfig, ()=>{
+    const who=(document.getElementById('whoName').value||'').trim();
+    return (who?who+'_':'')+'사막화와엘니뇨';
+  });
+}else{
+  document.getElementById('ws-actions').innerHTML=
+    '<div class="note">worksheet.js를 불러오지 못했습니다. 이 파일이 다른 활동 파일과 같은 폴더에 있는지 확인해 주세요.</div>';
+}
+</script>
+</body>
+</html>

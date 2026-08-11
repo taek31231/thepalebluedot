@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <title>통합과학 - 별의 내부 핵융합 시뮬레이터</title>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #1e293b;
+            padding: 15px 20px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            color: #f1f5f9;
+        }
+
+        .main-wrapper {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 220px); /* 하단 원리 요약 공간 확보 */
+            overflow: hidden;
+        }
+
+        /* 1. 왼쪽 제어 패널 */
+        .sidebar-left {
+            width: 320px;
+            background-color: #1e293b;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border-right: 1px solid #334155;
+            overflow-y: auto;
+        }
+
+        .control-group {
+            background-color: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #94a3b8;
+        }
+
+        .slider {
+            width: 100%;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        .status-box {
+            min-height: 80px;
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: 0.2s;
+        }
+        .btn:hover:not(:disabled) { background-color: #2563eb; }
+        .btn:disabled { background-color: #475569; cursor: not-allowed; color: #94a3b8; }
+
+        /* 2. 중앙 메인 시뮬레이션 영역 (Canvas) */
+        .canvas-container {
+            flex: 1;
+            background-color: #020617;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        canvas {
+            background-color: #090d16;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+        }
+
+        /* 3. 오른쪽 교과 고찰 문제 패널 */
+        .sidebar-right {
+            width: 360px;
+            background-color: #1e293b;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border-left: 1px solid #334155;
+            overflow-y: auto;
+        }
+
+        .sidebar-right h3 {
+            font-size: 15px;
+            color: #3b82f6;
+            border-left: 3px solid #3b82f6;
+            padding-left: 8px;
+            margin-bottom: 5px;
+        }
+
+        .quiz-card {
+            background-color: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        .quiz-question {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            color: #f1f5f9;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-btn {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            padding: 8px 12px;
+            text-align: left;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.15s;
+        }
+        .option-btn:hover { background-color: #334155; color: #fff; }
+        .option-btn.correct { background-color: #065f46; border-color: #059669; color: #a7f3d0; }
+        .option-btn.wrong { background-color: #7f1d1d; border-color: #dc2626; color: #fca5a5; }
+
+        .quiz-feedback {
+            margin-top: 10px;
+            font-size: 12.5px;
+            line-height: 1.4;
+            color: #38bdf8;
+            display: none;
+        }
+
+        /* 4. 하단 핵심 과학 원리 요약 바 */
+        .summary-section {
+            height: 150px;
+            background-color: #0f172a;
+            border-top: 1px solid #334155;
+            padding: 15px 25px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .summary-card {
+            background-color: #1e293b;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+        }
+
+        .summary-card h4 {
+            font-size: 13.5px;
+            color: #f59e0b;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .summary-card p {
+            font-size: 12.5px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <body>
+
+    <div class="header" style="background-color: #1e293b; padding: 15px 20px; border-bottom: 1px solid #334155;">
+        <h1 style="font-size: 18px; color: #f1f5f9; font-weight: bold; margin: 0;">✨ [통합과학] 주계열성 내부 수소 핵융합(p-p 반응) 시뮬레이션</h1>
+    </div>
+
+    <div class="main-wrapper" style="display: flex; flex: 1; height: calc(100vh - 220px); overflow: hidden; background-color: #0b0f19;">
+        
+        <div class="sidebar-left" style="width: 350px; min-width: 350px; background-color: #1e293b; padding: 16px; display: flex; flex-direction: column; gap: 12px; border-right: 1px solid #334155; overflow-y: auto; height: 100%;">
+            
+            <div class="control-group" style="background-color: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+                <label for="tempSlider" style="display: block; font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #94a3b8;">🪐 중심부 온도 제어</label>
+                <input type="range" id="tempSlider" class="slider" min="500" max="2000" value="700" style="width: 100%; cursor: pointer;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 6px;">
+                    <span id="tempValue" style="color: #3b82f6; font-weight: bold;">700만 K</span>
+                    <span style="color: #ef4444; font-weight: bold;">임계점: 1000만 K</span>
+                </div>
+            </div>
+
+            <div class="control-group" style="background-color: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+                <label style="display: block; font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #94a3b8;">📋 실시간 핵 내부 상태</label>
+                <div id="statusText" class="status-box" style="font-size: 12px; line-height: 1.5; color: #cbd5e1; min-height: 54px;">
+                    현재 온도가 낮아 양성자들이 전하에 의한 전기적 척력(쿨롱 장벽)을 극복하지 못하고 서로 비껴갑니다.
+                </div>
+            </div>
+
+            <div class="control-group" style="background-color: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+                <h4 style="font-size: 13px; color: #38bdf8; margin-bottom: 8px; font-weight: 600;">📊 실시간 성분 질량비 (H : He)</h4>
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px; color: #cbd5e1;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                            <span>수소(H) 질량비</span>
+                            <span id="ratioH" style="color: #f87171; font-weight: bold;">100.0%</span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden;">
+                            <div id="barH" style="width: 100%; height: 100%; background: #f87171; transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                            <span>헬륨(He) 질량비</span>
+                            <span id="ratioHe" style="color: #60a5fa; font-weight: bold;">0.0%</span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden;">
+                            <div id="barHe" style="width: 0%; height: 100%; background: #60a5fa; transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group" style="background-color: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+                <h4 style="font-size: 13px; color: #f59e0b; margin-bottom: 8px; font-weight: 600;">🔬 p-p 반응 입자 및 단계 가이드</h4>
+                <div style="font-size: 11px; line-height: 1.6; color: #cbd5e1; display: flex; flex-direction: column; gap: 3px;">
+                    <p>• 🔴 <b>빨간 공:</b> 양성자 (수소 핵, ¹H)</p>
+                    <p>• 🔴⚪ <b>클러스터:</b> 중수소 및 헬륨 원자핵</p>
+                    <hr style="border-color: #1e293b; margin: 6px 0;">
+                    <p><b>1단계:</b> 🔴 + 🔴 → 🔴⚪ (중수소 형성)</p>
+                    <p><b>2단계:</b> 🔴⚪ + 🔴 → 🔴🔴⚪ (헬륨-3 형성)</p>
+                    <p><b>3단계:</b> 🔴🔴⚪ + 🔴🔴⚪ → 🔴🔴⚪⚪ (헬륨-4 형성) + 🔴 + 🔴</p>
+                </div>
+            </div>
+
+            <div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px;">
+                <button id="triggerFusion" class="btn" disabled style="width: 100%; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer;">⚡ 헬륨-3 충돌 하이라이트 관측</button>
+                <button id="resetSystem" class="btn" style="background-color: #475569; color: white; width: 100%; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none;">🔄 시스템 초기화</button>
+            </div>
+        </div>
+
+        <div class="canvas-container" style="flex: 1; display: flex; justify-content: center; align-items: center; background-color: #020617; padding: 15px; height: 100%;">
+            <canvas id="fusionCanvas" width="720" height="560" style="background-color: #040814; border-radius: 8px; border: 1px solid #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-width: 100%; max-height: 100%;"></canvas>
+        </div>
+
+        <div class="sidebar-right" style="width: 360px; min-width: 360px; background-color: #1e293b; padding: 16px; border-left: 1px solid #334155; overflow-y: auto; height: 100%;">
+            <h3 style="font-size: 15px; color: #f1f5f9; font-weight: bold; margin-bottom: 12px; border-bottom: 2px solid #475569; padding-bottom: 6px;">🧐 관찰 후 생각해보기</h3>
+            
+            <div class="quiz-card" id="q1" style="background-color: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 12px;">
+                <div class="quiz-question" style="font-size: 12px; font-weight: bold; color: #f8fafc; line-height: 1.5; margin-bottom: 8px;">Q1. 온도를 1000만 K 이상으로 올렸을 때 입자들의 운동 변화와 핵융합 성공률의 관계를 올바르게 해석한 것은?</div>
+                <div class="quiz-options" style="display: flex; flex-direction: column; gap: 6px;">
+                    <button class="option-btn" onclick="checkAnswer('q1', 0, false)" style="text-align: left; font-size: 11px; padding: 6px; background: #1e293b; color: #cbd5e1; border: 1px solid #475569; border-radius: 4px; cursor: pointer;">① 온도가 올라가면 입자 크기가 작아져 충돌 확률이 감소한다.</button>
+                    <button class="option-btn" onclick="checkAnswer('q1', 1, true)" style="text-align: left; font-size: 11px; padding: 6px; background: #1e293b; color: #cbd5e1; border: 1px solid #475569; border-radius: 4px; cursor: pointer;">② 평균 운동 속도가 증가하여 전기적 반발력을 이겨내고 충돌한다.</button>
+                    <button class="option-btn" onclick="checkAnswer('q1', 2, false)" style="text-align: left; font-size: 11px; padding: 6px; background: #1e293b; color: #cbd5e1; border: 1px solid #475569; border-radius: 4px; cursor: pointer;">③ 입자의 총 개수가 증가하므로 밀도가 낮아진다.</button>
+                </div>
+                <div class="quiz-feedback" id="q1-fb" style="display: none; margin-top: 8px; font-size: 11px; color: #10b981; line-height: 1.4;">정답입니다! 주계열성의 중심핵 온도가 1,000만 K에 도달하면 양성자들이 전기적 척력을 이겨낼 만큼 빠른 속도(큰 운동에너지)를 얻게 됩니다.</div>
+            </div>
+
+            <div class="quiz-card" id="q2" style="background-color: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+                <div class="quiz-question" style="font-size: 12px; font-weight: bold; color: #f8fafc; line-height: 1.5; margin-bottom: 8px;">Q2. 시뮬레이션 하이라이트에서 2개의 헬륨-3이 충돌한 후 생성되는 최종 안정된 원자핵의 종류는 무엇인가요?</div>
+                <div class="quiz-options" style="display: flex; flex-direction: column; gap: 6px;">
+                    <button class="option-btn" onclick="checkAnswer('q2', 0, false)" style="text-align: left; font-size: 11px; padding: 6px; background: #1e293b; color: #cbd5e1; border: 1px solid #475569; border-radius: 4px; cursor: pointer;">① 중수소 원자핵</button>
+                    <button class="option-btn" onclick="checkAnswer('q2', 1, false)" style="text-align: left; font-size: 11px; padding: 6px; background: #1e293b; color: #cbd5e1; border: 1px solid #475569; border-radius: 4px; cursor: pointer;">② 탄소 원자핵</button>
+                    <button class="option-btn" onclick="checkAnswer('q2', 2, true)" style="text-align: left; font-size: 11px; padding: 6px; background: #1e293b; color: #cbd5e1; border: 1px solid #475569; border-radius: 4px; cursor: pointer;">③ 헬륨-4 원자핵</button>
+                </div>
+                <div class="quiz-feedback" id="q2-fb" style="display: none; margin-top: 8px; font-size: 11px; color: #10b981; line-height: 1.4;">정답입니다! 헬륨-3 두 개가 결합하여 헬륨-4 핵 1개를 만들고, 나머지 수소 원자핵(양성자) 2개는 다시 방출되어 연쇄 반응을 이어갑니다.</div>
+            </div>
+        </div>
+
+    </div> <div class="summary-section" style="display: flex; padding: 15px 20px; gap: 15px; background-color: #0f172a; border-top: 1px solid #334155; height: 160px;">
+        <div class="summary-card" style="flex: 1; background: #1e293b; padding: 12px; border-radius: 6px; border: 1px solid #334155; overflow-y: auto;">
+            <h4 style="font-size: 13px; color: #f59e0b; margin-bottom: 4px; font-weight: bold;">💡 1. 주계열성의 정의와 조건</h4>
+            <p style="font-size: 11px; line-height: 1.5; color: #94a3b8; margin: 0;">중심핵에서 <b>수소 핵융합 반응</b>을 통해 에너지를 스스로 방출하는 별을 주계열성이라고 합니다. 이 반응이 시작되기 위한 최소 임계 온도는 <b>1,000만 K</b>이며, 별의 일생 중 약 90%를 이 단계에서 안정적으로 보냅니다.</p>
+        </div>
+        <div class="summary-card" style="flex: 1; background: #1e293b; padding: 12px; border-radius: 6px; border: 1px solid #334155; overflow-y: auto;">
+            <h4 style="font-size: 13px; color: #f59e0b; margin-bottom: 4px; font-weight: bold;">⚛️ 2. p-p 반응(수소 연쇄 반응)의 세계</h4>
+            <p style="font-size: 11px; line-height: 1.5; color: #94a3b8; margin: 0;">4개의 수소 원자핵(양성자)이 여러 단계의 무작위 충돌 과정을 거쳐 최종적으로 1개의 헬륨-4 원자핵으로 결합하는 과정입니다. 이 과정에서 일부 양성자가 중성자로 변환되는 물리적 상호작용이 일어납니다.</p>
+        </div>
+        <div class="summary-card" style="flex: 1; background: #1e293b; padding: 12px; border-radius: 6px; border: 1px solid #334155; overflow-y: auto;">
+            <h4 style="font-size: 13px; color: #f59e0b; margin-bottom: 4px; font-weight: bold;">🔥 3. 질량 결손과 에너지</h4>
+            <p style="font-size: 11px; line-height: 1.5; color: #94a3b8; margin: 0;">반응 후 생성된 헬륨-4 원자핵 1개의 질량은 반응 전 수소 원자핵 4개의 질량의 합보다 미세하게 작습니다. 이 줄어든 <b>질량 결손</b>이 Einstein의 E=mc^2 공식에 의해 거대한 빛과 열에너지로 전환됩니다.</p>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('fusionCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const tempSlider = document.getElementById('tempSlider');
+    const tempValue = document.getElementById('tempValue');
+    const statusText = document.getElementById('statusText');
+    const triggerFusionBtn = document.getElementById('triggerFusion');
+    const resetSystemBtn = document.getElementById('resetSystem');
+
+    let temperature = 700; 
+    let particles = [];
+    let energyEffects = [];
+
+    class Particle {
+        constructor(x, y, type) {
+            this.x = x;
+            this.y = y;
+            this.type = type; // 'pro'(양성자), 'deu'(중수소), 'he3'(헬륨3), 'he4'(안정헬륨)
+            this.radius = typeRadius(this.type);
+            this.setSpeed();
+        }
+
+        setSpeed() {
+            // 기체 분자 운동론: 고온일수록 속도가 빠르게 증가하도록 매핑
+            const speedFactor = (temperature / 500) * 1.6;
+            const angle = Math.random() * Math.PI * 2;
+            this.vx = Math.cos(angle) * speedFactor;
+            this.vy = Math.sin(angle) * speedFactor;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // 벽면 충돌 제어
+            if (this.x - this.radius < 0) { this.x = this.radius; this.vx *= -1; }
+            if (this.x + this.radius > canvas.width) { this.x = canvas.width - this.radius; this.vx *= -1; }
+            if (this.y - this.radius < 0) { this.y = this.radius; this.vy *= -1; }
+            if (this.y + this.radius > canvas.height) { this.y = canvas.height - this.radius; this.vy *= -1; }
+        }
+
+        draw() {
+            if (this.type === 'pro') {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#f87171'; // 양성자: 붉은색 계열
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#ef4444';
+                ctx.fill();
+            } else if (this.type === 'deu') {
+                drawCluster(this.x, this.y, 1, 1); // 양성자 2, 중성자 1
+            } else if (this.type === 'he3') {
+                drawCluster(this.x, this.y, 2, 1); // 양성자 2, 중성자 1
+            } else if (this.type === 'he4') {
+                drawCluster(this.x, this.y, 2, 2); // 알파 입자형 커널: 양성자 2, 중성자 2
+            }
+            ctx.shadowBlur = 0; // 초기화
+        }
+    }
+
+    function typeRadius(type) {
+        if (type === 'pro' || type === 'deu') return 9;
+        if (type === 'he3') return 16;
+        if (type === 'he4') return 20;
+        return 9;
+    }
+
+    // 미시 세계 다핵종 구형 군집 드로잉 고증 함수
+    function drawCluster(cx, cy, proCount, neuCount) {
+        const offsets = [
+            {dx: -5, dy: -5}, {dx: 5, dy: -5},
+            {dx: -5, dy: 5}, {dx: 5, dy: 5}
+        ];
+        let pDrawn = 0;
+        for (let i = 0; i < (proCount + neuCount); i++) {
+            ctx.beginPath();
+            ctx.arc(cx + offsets[i].dx, cy + offsets[i].dy, 8, 0, Math.PI * 2);
+            if (pDrawn < proCount) {
+                ctx.fillStyle = '#f87171';
+                pDrawn++;
+            } else {
+                ctx.fillStyle = '#94a3b8';
+            }
+            ctx.fill();
+        }
+    }
+
+    // 질량 결손 에너지 섬광 확산 효과
+    class EnergyEffect {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.alpha = 1.0;
+            this.radius = 8;
+        }
+        update() {
+            this.radius += 2.5;
+            this.alpha -= 0.03;
+        }
+        draw() {
+            ctx.save();
+            ctx.globalAlpha = this.alpha;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        energyEffects = [];
+        for (let i = 0; i < 150; i++) {
+            particles.push(new Particle(
+                Math.random() * (canvas.width - 50) + 25,
+                Math.random() * (canvas.height - 50) + 25,
+                'pro'
+            ));
+        }
+    }
+
+    // 무작위 운동 입자 탄성 충돌 및 핵융합 결합 트리거 루틴
+    function checkCollisions() {
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                let p1 = particles[i];
+                let p2 = particles[j];
+
+                let dx = p2.x - p1.x;
+                let dy = p2.y - p1.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                let minDist = p1.radius + p2.radius;
+
+                if (dist < minDist) {
+                    // 위치 보정 (겹침 현상 방지)
+                    let angle = Math.atan2(dy, dx);
+                    let overlap = minDist - dist;
+                    p1.x -= Math.cos(angle) * overlap * 0.5;
+                    p1.y -= Math.sin(angle) * overlap * 0.5;
+                    p2.x += Math.cos(angle) * overlap * 0.5;
+                    p2.y += Math.sin(angle) * overlap * 0.5;
+
+                    // 핵융합 변환 조건 연산 (임계 기저 온도 1000만 K 충족 시)
+                    if (temperature >= 1000 && Math.random() < 0.18) {
+                        handleFusionReaction(i, j, p1, p2);
+                        return;
+                    } else {
+                        // 반발력에 의한 단순 튕김
+                        p1.vx *= -1; p1.vy *= -1;
+                        p2.vx *= -1; p2.vy *= -1;
+                    }
+                }
+            }
+        }
+    }
+
+    function handleFusionReaction(idx1, idx2, p1, p2) {
+        // [1단계] 양성자 + 양성자 -> 중수소화 구조 형성 (교과 수준에서 양성자+중성자로 모사)
+        if (p1.type === 'pro' && p2.type === 'pro') {
+            energyEffects.push(new EnergyEffect((p1.x + p2.x)/2, (p1.y + p2.y)/2));
+            p1.type = 'neu'; 
+            particles.splice(idx2, 1);
+            statusText.innerHTML = "💥 <b>[1단계 성공]</b> 양성자끼리 격렬히 충돌하여 쿨롱 장벽을 뚫었습니다! 하나가 <b>중성자</b>로 변환되며 강하게 결합합니다.";
+        }
+        // [2단계] 중수소 구조 + 양성자 -> 헬륨-3
+        else if ((p1.type === 'neu' && p2.type === 'pro') || (p1.type === 'pro' && p2.type === 'neu')) {
+            energyEffects.push(new EnergyEffect((p1.x + p2.x)/2, (p1.y + p2.y)/2));
+            p1.type = 'he3';
+            p1.radius = typeRadius('he3');
+            particles.splice(idx2, 1);
+            statusText.innerHTML = "☀️ <b>[2단계 성공]</b> 결합된 원자핵이 또 다른 양성자와 만나 <b>헬륨-3</b> 원자핵을 완성하고 감마선을 내뿜습니다.";
+        }
+        // [3단계] 헬륨-3 + 헬륨-3 -> 정상 헬륨-4 + 양성자 2개 방출
+        else if (p1.type === 'he3' && p2.type === 'he3') {
+            energyEffects.push(new EnergyEffect((p1.x + p2.x)/2, (p1.y + p2.y)/2));
+            p1.type = 'he4';
+            p1.radius = typeRadius('he4');
+            particles.splice(idx2, 1);
+            
+            // 재방출되는 양성자 2개 추가 생성
+            particles.push(new Particle(p1.x + 25, p1.y, 'pro'));
+            particles.push(new Particle(p1.x - 25, p1.y, 'pro'));
+            statusText.innerHTML = "👑 <b>[최종 단계 완료]</b> 헬륨-3 원자핵 2개가 결합해 <b>헬륨-4</b> 핵이 생성되었습니다! 남은 양성자 2개는 다시 튕겨나갑니다.";
+        }
+    }
+
+    // 하이라이트 정면 대충돌 강제 매핑 함수
+    triggerFusionBtn.addEventListener('click', () => {
+        particles = [
+            new Particle(220, 280, 'he3'),
+            new Particle(500, 280, 'he3')
+        ];
+        particles[0].vx = 3.5; particles[0].vy = 0;
+        particles[1].vx = -3.5; particles[1].vy = 0;
+        statusText.innerHTML = "⚡ 탐구를 돕기 위해 헬륨-3 두 개의 정면 가속 충돌 시나리오를 강제 작동합니다.";
+    });
+
+    // 슬라이더 인터페이스 리스너
+    tempSlider.addEventListener('input', (e) => {
+        temperature = parseInt(e.target.value);
+        tempValue.innerText = temperature + "만 K";
+
+        if (temperature < 1000) {
+            statusText.innerHTML = "현재 온도가 낮아 양성자들이 전하에 의한 전기적 척력을 극복하지 못합니다.";
+            triggerFusionBtn.disabled = true;
+        } else {
+            statusText.innerHTML = "🔥 <b>임계점 돌파!</b> 입자들의 속도가 매우 빨라져 격렬한 충돌 및 핵융합 연쇄 반응 주기가 형성됩니다.";
+            triggerFusionBtn.disabled = false;
+        }
+
+        particles.forEach(p => p.setSpeed());
+    });
+
+    // 리셋 버튼 기능
+    resetSystemBtn.addEventListener('click', () => {
+        temperature = 700;
+        tempSlider.value = 700;
+        tempValue.innerText = "700만 K";
+        statusText.innerHTML = "현재 온도가 낮아 양성자들이 전하에 의한 전기적 척력을 극복하지 못하고 서로 비껴갑니다.";
+        triggerFusionBtn.disabled = true;
+        
+        // 문제 선택 상태 초기화
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.className = 'option-btn';
+        });
+        document.querySelectorAll('.quiz-feedback').forEach(fb => {
+            fb.style.display = 'none';
+        });
+
+        initParticles();
+    });
+
+    // 문제 정답 검증 인터랙션 함수
+    function checkAnswer(quizId, optionIdx, isCorrect) {
+        const card = document.getElementById(quizId);
+        const buttons = card.querySelectorAll('.option-btn');
+        const feedback = document.getElementById(quizId + '-fb');
+
+        buttons.forEach((btn, idx) => {
+            btn.className = 'option-btn'; // 클래스 초기화
+            if (idx === optionIdx) {
+                if (isCorrect) {
+                    btn.classList.add('correct');
+                    feedback.style.display = 'block';
+                } else {
+                    btn.classList.add('wrong');
+                }
+            }
+        });
+    }
+
+    function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 그리드 가이드라인 그리기 (공간감 연출)
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1;
+        for(let i=40; i<canvas.width; i+=40) {
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+        }
+        for(let j=40; j<canvas.height; j+=40) {
+            ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
+        }
+
+        // 입자 제어 루프
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+
+        // 충돌 및 핵융합 물리 엔진 가동
+        checkCollisions();
+
+        // 📊 [실시간 성분 질량비 연동 시스템 추가]
+        if (typeof particles !== 'undefined' && particles.length > 0) {
+            let totalMass = 0;
+            let hydrogenMass = 0;
+            let heliumMass = 0;
+
+            particles.forEach(p => {
+                // p-p 반응 각 단계별 질량수 고증 매핑
+                if (p.type === 'pro') {
+                    hydrogenMass += 1; // 단독 양성자 (질량수 1)
+                    totalMass += 1;
+                } else if (p.type === 'neu') {
+                    hydrogenMass += 2; // 우리가 교정한 '중수소' (질량수 2 - 수소 원소에 포함)
+                    totalMass += 2;
+                } else if (p.type === 'he3') {
+                    heliumMass += 3;   // 헬륨-3 (질량수 3)
+                    totalMass += 3;
+                } else if (p.type === 'he4') {
+                    heliumMass += 4;   // 최종 안정된 헬륨-4 (질량수 4)
+                    totalMass += 4;
+                }
+            });
+
+            if (totalMass > 0) {
+                // 백분율 계산 및 소수점 첫째 자리 반올림
+                const hPercent = ((hydrogenMass / totalMass) * 100).toFixed(1);
+                const hePercent = ((heliumMass / totalMass) * 100).toFixed(1);
+
+                // HTML 눈금판 UI 요소와 실시간 동기화 매핑
+                const ratioHElem = document.getElementById('ratioH');
+                const ratioHeElem = document.getElementById('ratioHe');
+                const barHElem = document.getElementById('barH');
+                const barHeElem = document.getElementById('barHe');
+
+                if (ratioHElem) ratioHElem.innerText = `${hPercent}%`;
+                if (ratioHeElem) ratioHeElem.innerText = `${hePercent}%`;
+                if (barHElem) barHElem.style.width = `${hPercent}%`;
+                if (barHeElem) barHeElem.style.width = `${hePercent}%`;
+            }
+        }
+
+        // 섬광 이펙트 갱신
+        energyEffects.forEach((eff, idx) => {
+            eff.update();
+            eff.draw();
+            if (eff.alpha <= 0) energyEffects.splice(idx, 1);
+        });
+
+        requestAnimationFrame(loop);
+    }
+
+    // 시스템 가동
+    initParticles();
+    loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>우주의 원소 공장 — 어떤 별이 어디까지 만들 수 있는가</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+:root{
+  --bg:#f5f8fc; --surface:#ffffff; --surface-2:#f1f5fa; --surface-3:#e6eef7;
+  --line:#e4eaf2; --line-2:#cfdbe8;
+  --text:#0b1420; --mid:#243141; --dim:#4a5a6b;
+  --accent:#0369a1; --warm:#9c5c00; --cool:#2563eb;
+  --good:#0b7d73; --bad:#dc2626; --violet:#7c3aed;
+  --bang:#b45f06; --star:#dc2626; --nova:#7c3aed;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',-apple-system,sans-serif;}
+body{background:var(--bg);color:var(--text);-webkit-text-size-adjust:100%;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+/* button 은 color 를 물려받지 않아 기본 검정이 된다. 어두운 배경에서 안 보이므로 지정. */
+button{font:inherit;cursor:pointer;color:var(--text);}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.topbar{flex:0 0 54px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);}
+.topbar h1{font-size:.9rem;font-weight:800;letter-spacing:-.02em;white-space:nowrap;}
+.topbar h1 span{color:var(--accent);}
+.std{font-size:.66rem;color:var(--dim);background:var(--surface-2);border:1px solid var(--line);
+  padding:3px 8px;border-radius:5px;white-space:nowrap;}
+.tabs{display:flex;gap:3px;}
+.tab{padding:7px 12px;font-size:.79rem;font-weight:700;color:var(--dim);background:transparent;
+  border:1px solid transparent;border-radius:8px;transition:.15s;white-space:nowrap;}
+.tab:hover{color:var(--mid);background:var(--surface-2);}
+.tab.on{color:#ffffff;background:var(--accent);border-color:var(--accent);}
+.tab-n{opacity:.6;margin-right:4px;}
+
+.wrap{flex:1;min-height:0;}
+.page{display:none;height:100%;overflow-y:auto;}
+.page.on{display:block;}
+.pane{padding:24px;max-width:1060px;margin:0 auto;}
+
+h2.sec{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+p.sub{font-size:.82rem;color:var(--mid);line-height:1.75;margin-bottom:16px;word-break:keep-all;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+label.lbl{display:block;font-size:.75rem;font-weight:700;color:var(--mid);margin-bottom:5px;}
+input[type=text],textarea{width:100%;padding:8px 10px;background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;color:var(--text);font-size:.85rem;}
+textarea{resize:vertical;min-height:62px;line-height:1.6;}
+.btn{padding:8px 14px;border:1px solid var(--line-2);border-radius:7px;background:var(--surface-2);
+  color:var(--text);font-size:.82rem;font-weight:700;transition:.15s;}
+.btn:hover{background:var(--surface-3);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#ffffff;}
+.btn.primary:hover{background:#0ea5e9;}
+
+/* 표 */
+table.dt{width:100%;border-collapse:collapse;font-size:.82rem;}
+table.dt th,table.dt td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;
+  font-variant-numeric:tabular-nums;white-space:nowrap;}
+table.dt th{color:var(--dim);font-size:.73rem;font-weight:700;border-bottom:1px solid var(--line-2);}
+table.dt th:first-child,table.dt td:first-child{text-align:left;white-space:normal;}
+table.dt td.nm{font-weight:700;}
+table.dt tr:hover td{background:var(--surface-2);}
+.spread{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:14px 0;}
+.sp{border-radius:12px;padding:15px;border:1px solid;}
+.sp .t{font-size:.76rem;font-weight:800;margin-bottom:5px;}
+.sp .v{font-size:1.7rem;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
+.sp .d{font-size:.74rem;color:var(--dim);margin-top:4px;line-height:1.55;}
+
+/* 가설 판별 */
+.hyp{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:12px;margin-bottom:14px;}
+.hc{background:var(--surface);border:1px solid var(--line-2);border-radius:12px;padding:15px;
+  transition:.15s;text-align:left;}
+.hc:hover{border-color:var(--accent);}
+.hc.ok{border-color:var(--good);background:rgba(52,211,153,.09);}
+.hc.no{border-color:var(--bad);background:rgba(248,113,113,.09);opacity:.75;}
+.hc h4{font-size:.88rem;font-weight:800;margin-bottom:7px;}
+.hc p{font-size:.79rem;color:var(--mid);line-height:1.7;word-break:keep-all;}
+.fb{margin-top:12px;font-size:.82rem;line-height:1.8;padding:12px 14px;border-radius:9px;
+  display:none;word-break:keep-all;}
+.fb.on{display:block;background:rgba(52,211,153,.09);border:1px solid rgba(52,211,153,.35);color:#a7f3d0;}
+
+/* 유도 단계 */
+.derive{display:flex;flex-direction:column;gap:11px;}
+.dv{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px 16px;position:relative;}
+.dv-n{position:absolute;left:-1px;top:-1px;width:26px;height:26px;border-radius:11px 0 11px 0;
+  background:var(--bang);color:#ffffff;font-size:.74rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;}
+.dv h4{font-size:.89rem;font-weight:800;margin:0 0 7px 22px;word-break:keep-all;}
+.dv p{font-size:.81rem;color:var(--mid);line-height:1.8;word-break:keep-all;}
+.dv p+p{margin-top:6px;}
+.dv b{color:var(--text);}
+.eq{margin:8px 0;padding:10px 13px;background:#f8fafc;border:1px solid var(--line-2);
+  border-radius:8px;font-size:.88rem;text-align:center;color:var(--accent);
+  font-family:ui-monospace,'Pretendard',monospace;letter-spacing:.02em;}
+.eq sub,.eq sup{font-size:.72em;}
+.nuc{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;align-items:center;}
+.nuc i{width:20px;height:20px;border-radius:50%;display:inline-block;font-style:normal;
+  font-size:.6rem;font-weight:800;color:#ffffff;display:flex;align-items:center;justify-content:center;}
+.nuc .p{background:#2563eb;}
+.nuc .n{background:#dc2626;}
+.nuc .he{display:flex;gap:2px;padding:5px;border:2px solid var(--bang);border-radius:9px;
+  background:rgba(251,191,36,.13);margin-right:8px;}
+.nuc .lbl{font-size:.7rem;color:var(--bang);font-weight:800;margin-right:6px;}
+.calc{margin-top:14px;padding:12px 14px;background:var(--surface-2);border-radius:9px;
+  text-align:center;font-size:.88rem;color:var(--mid);}
+.calc b{color:var(--text);}
+
+/* 우주 연표 */
+.tl{position:relative;padding-left:26px;}
+.tl::before{content:'';position:absolute;left:8px;top:6px;bottom:6px;width:2px;
+  background:linear-gradient(180deg,#b45f06,#dc2626,#03699f,#0b7d73);border-radius:1px;}
+.tle{position:relative;margin-bottom:10px;background:var(--surface);border:1px solid var(--line);
+  border-radius:11px;padding:13px 15px;}
+.tle::before{content:'';position:absolute;left:-22px;top:18px;width:11px;height:11px;
+  border-radius:50%;background:var(--surface-3);border:2px solid var(--line-2);}
+.tle.key{border-color:var(--bang);background:rgba(251,191,36,.07);}
+.tle.key::before{background:var(--bang);border-color:var(--bang);
+  box-shadow:0 0 0 4px rgba(251,191,36,.18);}
+.tle-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:5px;}
+.tle-t{font-size:.79rem;font-weight:800;color:var(--accent);
+  font-variant-numeric:tabular-nums;white-space:nowrap;}
+.tle.key .tle-t{color:var(--bang);}
+.tle-n{font-size:.9rem;font-weight:800;}
+.tle-T{font-size:.7rem;color:var(--dim);background:var(--surface-2);
+  padding:2px 8px;border-radius:5px;white-space:nowrap;margin-left:auto;}
+.tle-d{font-size:.79rem;color:var(--mid);line-height:1.75;word-break:keep-all;}
+.tle-d b{color:var(--text);}
+
+/* 재결합 3컷 */
+.rec3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;}
+.rc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px;position:relative;}
+.rc-n{position:absolute;left:-1px;top:-1px;width:26px;height:26px;border-radius:11px 0 11px 0;
+  background:var(--accent);color:#ffffff;font-size:.74rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;}
+.rc h4{font-size:.88rem;font-weight:800;margin:0 0 8px 22px;word-break:keep-all;}
+.rc p{font-size:.79rem;color:var(--mid);line-height:1.75;word-break:keep-all;}
+.rc p+p{margin-top:6px;}
+.rc b{color:var(--text);}
+
+/* CMB */
+.cmb-box{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;}
+#cmb{display:block;width:100%;border-radius:8px;}
+.cmb-ctl{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap;}
+.cmb-ctl input[type=range]{flex:1;min-width:180px;accent-color:var(--accent);}
+.scale-v{font-size:.85rem;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.cmb-say{margin-top:10px;padding:11px 13px;border-radius:9px;background:var(--surface-2);
+  border-left:3px solid var(--accent);font-size:.82rem;line-height:1.75;color:var(--mid);word-break:keep-all;}
+.cmb-say b{color:var(--text);}
+.legend-bar{height:12px;border-radius:3px;flex:0 0 130px;
+  background:linear-gradient(90deg,#2563eb,#1d4ed8,#e2e8f0,#f97316,#991b1b);}
+
+/* 핵융합 단계 */
+.temp-ctl{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.temp-ctl input[type=range]{flex:1;min-width:200px;accent-color:var(--warm);}
+.temp-v{font-size:1.15rem;font-weight:800;color:var(--warm);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.stages{display:flex;flex-direction:column;gap:8px;}
+.stg{padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+  transition:.25s;opacity:.42;}
+.stg-top{display:grid;grid-template-columns:150px 1fr 190px;gap:12px;align-items:center;}
+.stg-eq{margin-top:9px;padding:7px 11px;background:#f8fafc;border:1px solid var(--line-2);
+  border-radius:7px;font-size:.8rem;color:var(--accent);text-align:center;
+  font-family:ui-monospace,'Pretendard',monospace;word-break:keep-all;}
+.stg-eq sub,.stg-eq sup{font-size:.72em;}
+.stg.iron.on .stg-eq{color:var(--bad);}
+/* p-p · CNO */
+.chain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:13px;}
+.chain{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px;}
+.ch-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.ch-t{font-size:.95rem;font-weight:800;}
+.ch-b{font-size:.68rem;font-weight:800;padding:3px 9px;border-radius:5px;white-space:nowrap;}
+.ch-b2{font-size:.79rem;color:var(--mid);line-height:1.7;margin-bottom:10px;word-break:keep-all;}
+.ch-b2 b{color:var(--text);}
+.ch-step{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid var(--line);}
+.ch-step .s{flex:0 0 18px;height:18px;border-radius:5px;background:var(--surface-3);
+  color:var(--dim);font-size:.63rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.ch-step .e{font-size:.83rem;color:var(--text);font-family:ui-monospace,'Pretendard',monospace;}
+.ch-step .e sub,.ch-step .e sup{font-size:.72em;}
+.ch-note{margin-top:10px;font-size:.76rem;color:var(--dim);line-height:1.7;word-break:keep-all;}
+.ch-note b{color:var(--mid);}
+.stg.on{opacity:1;border-color:var(--warm);background:rgba(245,158,11,.09);}
+.stg .rx{font-size:.84rem;font-weight:800;}
+.stg .need{font-size:.76rem;color:var(--dim);font-variant-numeric:tabular-nums;}
+.stg .out{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;}
+.stg .out span{font-size:.72rem;font-weight:800;padding:3px 8px;border-radius:5px;
+  background:var(--surface-3);color:var(--mid);}
+.stg.on .out span{background:rgba(245,158,11,.2);color:var(--warm);}
+.stg.iron.on{border-color:var(--bad);background:rgba(248,113,113,.1);}
+.stg.iron.on .out span{background:rgba(248,113,113,.2);color:var(--bad);}
+
+/* 질량 */
+.mass-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:18px;}
+.mb{padding:13px 9px;border-radius:11px;border:1px solid var(--line-2);background:var(--surface-2);
+  text-align:center;transition:.15s;}
+.mb:hover{background:var(--surface-3);}
+.mb.on{border-color:var(--accent);background:rgba(56,189,248,.13);}
+.mb .m{font-size:1.05rem;font-weight:800;}
+.mb .l{font-size:.68rem;color:var(--dim);margin-top:3px;line-height:1.4;}
+.path{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:14px 0;}
+.pn{font-size:.79rem;font-weight:700;padding:8px 12px;border-radius:8px;background:var(--surface-2);
+  border:1px solid var(--line-2);color:var(--mid);word-break:keep-all;}
+.pn.hot{border-color:rgba(245,158,11,.5);color:var(--warm);}
+.pn.end{border-color:rgba(96,165,250,.5);color:var(--cool);}
+.pn.boom{border-color:rgba(192,132,252,.5);color:var(--nova);}
+.ar{color:var(--mid);}
+
+/* 총정리 공통 */
+.sum-hero{background:linear-gradient(180deg,rgba(56,189,248,.09),rgba(56,189,248,.02));
+  border:1px solid rgba(56,189,248,.28);border-radius:14px;padding:22px;margin-bottom:24px;}
+.sum-hero h1{font-size:1.4rem;font-weight:800;letter-spacing:-.03em;margin-bottom:8px;}
+.sum-hero p{font-size:.85rem;color:var(--mid);line-height:1.85;word-break:keep-all;}
+.concept{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:13px;margin-bottom:26px;}
+.cc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.cc-n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;
+  background:var(--accent);color:#ffffff;font-size:.72rem;font-weight:800;margin-bottom:9px;}
+.cc h4{font-size:.92rem;font-weight:800;margin-bottom:8px;word-break:keep-all;}
+.cc p{font-size:.79rem;color:var(--mid);line-height:1.8;word-break:keep-all;}
+.cc p+p{margin-top:7px;}
+.cc b{color:var(--text);}
+.cc .link{margin-top:10px;padding:9px 11px;background:var(--surface-2);border-left:3px solid var(--warm);
+  border-radius:0 7px 7px 0;font-size:.75rem;color:var(--warm);line-height:1.65;word-break:keep-all;}
+.ftable{width:100%;border-collapse:collapse;font-size:.77rem;margin-top:8px;}
+.ftable th,.ftable td{padding:7px 8px;border:1px solid var(--line);text-align:left;line-height:1.5;}
+.ftable th{background:var(--surface-2);color:var(--dim);font-size:.71rem;font-weight:700;}
+.ftable td b{color:var(--text);}
+.flowbox{display:flex;flex-wrap:wrap;align-items:center;gap:7px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;padding:16px;}
+.fl{font-size:.79rem;font-weight:700;padding:7px 11px;border-radius:7px;background:var(--surface-2);
+  border:1px solid var(--line-2);color:var(--mid);word-break:keep-all;}
+.fl.bang{border-color:rgba(251,191,36,.5);color:var(--bang);}
+.fl.star{border-color:rgba(248,113,113,.5);color:var(--star);}
+.fl.nova{border-color:rgba(192,132,252,.5);color:var(--nova);}
+.fl.good{border-color:rgba(52,211,153,.5);color:var(--good);}
+.chk{display:flex;flex-direction:column;gap:8px;}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;background:var(--surface);
+  border:1px solid var(--line);border-radius:9px;font-size:.82rem;line-height:1.6;color:var(--mid);
+  cursor:pointer;transition:.15s;word-break:keep-all;}
+.chk label:hover{border-color:var(--line-2);}
+.chk input{accent-color:var(--good);margin-top:3px;flex-shrink:0;}
+.chk input:checked+span{color:var(--good);}
+.qa{display:flex;flex-direction:column;gap:12px;}
+.qa-item{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:14px 16px;}
+.qa-item.deep{border-left-color:var(--violet);}
+.qa-q{font-size:.85rem;font-weight:700;margin-bottom:9px;line-height:1.6;word-break:keep-all;}
+.qa-q em{font-style:normal;color:var(--accent);}
+.qa-item.deep .qa-q em{color:var(--violet);}
+.qa-tag{display:inline-block;font-size:.66rem;font-weight:800;padding:2px 7px;border-radius:4px;
+  background:var(--surface-3);color:var(--dim);margin-right:6px;vertical-align:2px;}
+.ans-block{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-bottom:9px;}
+.ans-q{font-size:.79rem;font-weight:700;color:var(--mid);margin-bottom:6px;line-height:1.55;}
+.ans-a{font-size:.83rem;color:var(--text);line-height:1.75;white-space:pre-wrap;word-break:break-word;}
+.ans-a.none{color:var(--dim);font-style:italic;}
+.empty{padding:32px;text-align:center;color:var(--dim);font-size:.83rem;line-height:1.85;}
+details.adv{background:var(--surface);border:1px solid var(--line-2);border-radius:10px;
+  padding:13px 15px;margin-top:14px;}
+details.adv summary{font-size:.8rem;font-weight:800;color:var(--violet);cursor:pointer;}
+details.adv .body{margin-top:11px;font-size:.79rem;color:var(--mid);line-height:1.8;word-break:keep-all;}
+@media(max-width:760px){ .pane{padding:16px;} .topbar{flex-wrap:wrap;height:auto;flex:0 0 auto;padding:8px 12px;} .std{display:none;} .stg{grid-template-columns:1fr;gap:6px;} .stg .out{justify-content:flex-start;} }
+
+/* ═══════════ 모바일 대응 ═══════════ */
+@supports (height:100dvh){ body{height:100dvh;} }
+@media(max-width:820px){
+  .topbar{flex:0 0 auto;height:auto;flex-wrap:wrap;padding:8px 12px;gap:6px 8px;}
+  .topbar h1{font-size:.82rem;order:1;flex:1 1 auto;white-space:normal;line-height:1.35;}
+  .std{order:2;font-size:.58rem;}
+  .tabs{order:3;flex:1 1 100%;max-width:none;overflow-x:auto;scrollbar-width:none;
+        padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .tabs::-webkit-scrollbar{height:0;}
+  .tab{flex:0 0 auto;padding:8px 11px;font-size:.75rem;}
+  .pane{padding:14px 12px 34px;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+
+  table.dt{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.dt tbody{display:table;width:100%;min-width:460px;}
+  table.dt th,table.dt td{padding:5px 6px;}
+  .stg-top{grid-template-columns:1fr;}
+  h2.sec{font-size:.98rem;}
+  p.sub{font-size:.79rem;}
+  textarea{min-height:76px;}
+  .btn,.btn.sm{padding:8px 12px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1>우주의 원소 공장 <span>· 어떤 별이 어디까지 만들 수 있는가</span></h1>
+  <span class="std">[10통과1-02-01] · [10통과1-02-02]</span>
+  <nav class="tabs">
+    <button class="tab on" data-tab="0"><span class="tab-n">0</span>헬륨의 수수께끼</button>
+    <button class="tab" data-tab="1"><span class="tab-n">1</span>우주배경복사</button>
+    <button class="tab" data-tab="2"><span class="tab-n">2</span>별의 원소 공장</button>
+    <button class="tab" data-tab="3"><span class="tab-n">3</span>질량이 운명을</button>
+    <button class="tab" data-tab="4"><span class="tab-n">4</span>총정리</button>
+  </nav>
+</header>
+
+<div class="wrap">
+
+<!-- ============ 0. 헬륨의 수수께끼 ============ -->
+<section class="page on" id="page0"><div class="pane">
+  <h2 class="sec">헬륨은 어디에서 왔을까</h2>
+  <p class="sub">
+    앞 활동에서 우주의 약 4분의 1이 헬륨이라는 것을 확인했습니다. 그런데 이 헬륨은 누가 만들었을까요?
+    별이 수소를 태워 헬륨을 만든다는 것은 분명합니다. 그렇다면 <b>우주의 헬륨은 전부 별이 만든 것</b>일까요?
+    아래 관측 자료로 직접 판단해 봅시다.
+  </p>
+
+  <div class="card" style="padding:0;overflow-x:auto;margin-bottom:14px;">
+    <table class="dt">
+      <thead><tr>
+        <th>천체 (오래된 것부터)</th><th>헬륨 질량비</th><th>중원소 질량비</th><th>중원소는 별이 만든 것</th>
+      </tr></thead>
+      <tbody id="he-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="spread">
+    <div class="sp" style="border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.08)">
+      <div class="t" style="color:var(--bang)">헬륨은 얼마나 차이 나는가</div>
+      <div class="v" style="color:var(--bang)" id="he-spread">—</div>
+      <div class="d">가장 많은 곳 ÷ 가장 적은 곳</div>
+    </div>
+    <div class="sp" style="border-color:rgba(248,113,113,.45);background:rgba(248,113,113,.08)">
+      <div class="t" style="color:var(--star)">중원소는 얼마나 차이 나는가</div>
+      <div class="v" style="color:var(--star)" id="z-spread">—</div>
+      <div class="d">가장 많은 곳 ÷ 가장 적은 곳</div>
+    </div>
+  </div>
+
+  <h2 class="sec" style="margin-top:24px;">두 가설 중 어느 쪽이 맞을까</h2>
+  <p class="sub">위 표를 근거로 골라 보세요.</p>
+  <div class="hyp">
+    <button class="hc" data-h="A">
+      <h4>가설 A · 헬륨도 별이 만들었다</h4>
+      <p>중원소처럼 헬륨도 별이 만들었다면, <b>오래된 천체일수록 헬륨이 적어야</b> 합니다.
+         별이 아직 많이 일하지 않았을 때니까요.</p>
+    </button>
+    <button class="hc" data-h="B">
+      <h4>가설 B · 헬륨은 처음부터 있었다</h4>
+      <p>별이 태어나기 전부터 헬륨이 있었다면, <b>어디를 재도 비슷한 양</b>이 나와야 합니다.
+         별이 만든 몫은 그 위에 조금 얹힐 뿐입니다.</p>
+    </button>
+  </div>
+  <div class="fb" id="hyp-fb"></div>
+
+  <div class="card" style="margin-top:18px;">
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">추론</span>중원소는 <em>100배 넘게</em> 차이 나는데 헬륨은 거의 차이가 없습니다.
+      이 사실이 뜻하는 바를 내 말로 써 보세요.
+    </div>
+    <textarea id="q0" placeholder="중원소는 별이 만들었으니 별이 많이 일한 곳일수록 많습니다. 그런데 헬륨은…"></textarea>
+  </div>
+
+  <h2 class="sec" style="margin-top:28px;">왜 하필 4분의 1일까</h2>
+  <p class="sub">
+    이 값은 우연이 아닙니다. <b>중성자가 양성자보다 무겁다</b>는 사실 하나에서 거의 그대로 따라 나옵니다.
+    단계별로 따라가 봅시다.
+  </p>
+
+  <div class="derive">
+    <div class="dv">
+      <span class="dv-n">1</span>
+      <h4>아주 뜨거울 때 — 양성자와 중성자는 같은 수</h4>
+      <p>빅뱅 직후 우주는 10<sup>11</sup> K이 넘었습니다. 약한 상호작용으로 둘은 자유롭게 오갔습니다.</p>
+      <div class="eq">n + ν<sub>e</sub> ⇌ p + e<sup>−</sup>　　n + e<sup>+</sup> ⇌ p + ν̄<sub>e</sub></div>
+      <p>에너지가 워낙 커서 어느 쪽으로 가든 부담이 없었고, 개수비는 <b>1 : 1</b>이었습니다.</p>
+    </div>
+
+    <div class="dv">
+      <span class="dv-n">2</span>
+      <h4>중성자가 1.29 MeV 무겁다 — 여기서 균형이 깨진다</h4>
+      <table class="ftable" style="margin:6px 0 8px;">
+        <tr><th>입자</th><th>정지 질량 에너지</th></tr>
+        <tr><td>중성자 n</td><td><b>939.57 MeV</b></td></tr>
+        <tr><td>양성자 p</td><td>938.27 MeV</td></tr>
+        <tr><td>차이 Δmc²</td><td><b style="color:var(--warm)">1.29 MeV</b></td></tr>
+      </table>
+      <p>따라서 <b style="color:var(--good)">n → p 는 발열</b>(1.29 MeV를 내놓음),
+         <b style="color:var(--bad)">p → n 은 흡열</b>(1.29 MeV를 얻어와야 함)입니다.</p>
+      <p>우주가 식어 열에너지 <i>kT</i>가 1.29 MeV보다 작아지면, 흡열 쪽인 p → n 이 점점 어려워집니다.
+         그래서 <b>중성자가 손해를 보기 시작</b>합니다.</p>
+      <div class="eq">n / p = exp( − Δmc² / kT )</div>
+    </div>
+
+    <div class="dv">
+      <span class="dv-n">3</span>
+      <h4>약 1초 · 100억 K — 전환이 멈춘다 (동결)</h4>
+      <p>우주가 팽창하며 입자 밀도가 줄자, 약한 상호작용이 <b>팽창 속도를 따라가지 못하게</b> 됩니다.
+         전환 반응이 사실상 멈추고 개수비가 그 자리에서 얼어붙습니다.</p>
+      <p>이때 <i>kT</i> ≈ 0.8 MeV였고, 위 식에 넣으면 <b style="color:var(--bang)">n : p ≈ 1 : 6</b>입니다.</p>
+    </div>
+
+    <div class="dv">
+      <span class="dv-n">4</span>
+      <h4>약 3분까지 — 중성자가 조금 더 줄어든다</h4>
+      <p>홀로 있는 중성자는 반감기 약 <b>10분</b>으로 붕괴합니다.</p>
+      <div class="eq">n → p + e<sup>−</sup> + ν̄<sub>e</sub></div>
+      <p>동결 후 3분이 흐르는 동안 일부가 붕괴해 <b style="color:var(--bang)">n : p ≈ 1 : 7</b>이 됩니다.</p>
+    </div>
+
+    <div class="dv">
+      <span class="dv-n">5</span>
+      <h4>왜 3분이나 기다렸나 — 중수소 병목</h4>
+      <p>헬륨을 만들려면 먼저 중수소(²H)를 거쳐야 합니다. 그런데 중수소의 결합에너지는
+         <b>2.22 MeV</b>로 약해서, 광자가 너무 많고 뜨거우면 생기자마자 다시 깨집니다.</p>
+      <div class="eq">p + n ⇌ ²H + γ　(2.22 MeV)</div>
+      <p>온도가 약 10<sup>9</sup> K까지 내려가 광자가 중수소를 깨지 못하게 되어서야 반응이 열립니다.
+         그 시점이 <b>약 3분</b>이고, 그때부터는 <b>순식간에</b> ⁴He까지 진행됩니다.</p>
+    </div>
+
+    <div class="dv">
+      <span class="dv-n">6</span>
+      <h4>거의 모든 중성자가 ⁴He 속으로</h4>
+      <p>⁴He는 결합에너지가 <b>28.3 MeV</b>로 매우 안정합니다. 반응이 열리는 순간
+         중성자는 하나도 남김없이 ⁴He로 빨려 들어갑니다.
+         핵자 5개와 8개짜리 안정 원자핵이 없어서 <b>여기서 사슬이 끊깁니다.</b></p>
+    </div>
+  </div>
+
+  <h3 style="font-size:.95rem;font-weight:800;margin:20px 0 10px;">그래서 계산해 보면</h3>
+  <div class="card" style="margin-bottom:14px;">
+    <div style="font-size:.82rem;color:var(--mid);line-height:1.8;margin-bottom:12px;word-break:keep-all;">
+      핵자 16개를 가져와 봅시다. n : p = 1 : 7 이므로 <b style="color:var(--star)">중성자 2개</b>와
+      <b style="color:var(--cool)">양성자 14개</b>입니다.
+    </div>
+    <div class="nuc" id="nuc-before"></div>
+    <div style="text-align:center;font-size:1.1rem;color:var(--dim);margin:10px 0;">↓　중성자 2개가 양성자 2개를 데리고 ⁴He 하나를 만든다</div>
+    <div class="nuc" id="nuc-after"></div>
+    <div class="calc">
+      헬륨 질량비 = <b>⁴He 4</b> ÷ <b>전체 핵자 16</b> =
+      <b style="color:var(--bang);font-size:1.15rem;">0.25</b>
+      <div style="font-size:.76rem;color:var(--dim);margin-top:6px;">
+        일반식으로 쓰면　Y = 2(n/p) ÷ (1 + n/p) = 2×(1/7) ÷ (8/7) = <b>1/4</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="border-left:3px solid var(--bang);">
+    <div style="font-size:.82rem;color:var(--mid);line-height:1.85;word-break:keep-all;">
+      <b style="color:var(--text)">정리하면</b> — 중성자가 양성자보다 1.29 MeV 무겁다는 사실이
+      n : p = 1 : 7 을 정했고, 그것이 곧 <b style="color:var(--bang)">헬륨 질량비 25%</b>를 정했습니다.
+      입자의 질량 차이 하나가 <b>우주 전체의 화학 조성</b>을 결정한 셈입니다.<br><br>
+      그리고 이 반응은 <b>약 20분 만에 완전히 끝났습니다.</b> 그 뒤로
+      <b>1억 년쯤 지나 첫 별이 켜지기 전까지</b> 우주에는 새로운 원소가 하나도 만들어지지 않았습니다.
+    </div>
+  </div>
+
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="1">1단계로 넘어가기 →</button></div>
+</div></section>
+
+<!-- ============ 1. 우주배경복사 ============ -->
+<section class="page" id="page1"><div class="pane">
+  <h2 class="sec">우주의 역사 — 138억 년을 한 줄로</h2>
+  <p class="sub">
+    0단계에서 확인한 <b>수소 : 헬륨 ≈ 3 : 1</b>은 빅뱅 후 <b>3분</b>에 정해졌습니다.
+    그 뒤로 무슨 일이 있었는지 따라가 봅시다. 굵게 표시된 세 지점이 이 단원의 핵심입니다.
+  </p>
+
+  <div class="tl" id="timeline"></div>
+
+  <h2 class="sec" style="margin-top:30px;">왜 하필 38만 년에 빛이 풀려났을까</h2>
+  <p class="sub">
+    우주 배경 복사는 <b>우주가 투명해진 순간</b>에 출발한 빛입니다. 세 컷으로 나누어 봅시다.
+  </p>
+
+  <div class="rec3">
+    <div class="rc">
+      <span class="rc-n">1</span>
+      <h4>38만 년 이전 — 안개 속</h4>
+      <p>온도가 3000 K를 넘어 원자가 만들어지지 못했습니다.
+         <b>자유 전자</b>가 우주에 가득했고, 빛(광자)은 전자에 부딪혀 계속 방향이 꺾였습니다.</p>
+      <div class="eq" style="font-size:.8rem;">γ + e⁻ → γ + e⁻　(톰슨 산란)</div>
+      <p>빛이 곧게 나아갈 수 없으니 우주는 <b>불투명</b>했습니다. 짙은 안개 속과 같습니다.</p>
+    </div>
+    <div class="rc">
+      <span class="rc-n">2</span>
+      <h4>38만 년 · 3000 K — 재결합</h4>
+      <p>충분히 식자 전자가 원자핵에 붙잡혀 <b>중성 원자</b>가 되었습니다.
+         이것을 <b>재결합</b>이라고 부릅니다.</p>
+      <div class="eq" style="font-size:.8rem;">p + e⁻ → H + γ</div>
+      <p>빛을 튕겨낼 자유 전자가 <b>거의 사라졌습니다.</b></p>
+    </div>
+    <div class="rc">
+      <span class="rc-n">3</span>
+      <h4>그 순간의 빛이 지금까지</h4>
+      <p>가로막을 것이 없어진 빛은 그때부터 <b>곧게 날아왔습니다.</b>
+         우리가 보는 우주 배경 복사는 <b>138억 년 전 그 순간의 빛</b>입니다.</p>
+      <p>그동안 우주가 약 <b>1,100배</b> 팽창하면서 빛의 파장도 그만큼 늘어났습니다.</p>
+      <div class="eq" style="font-size:.85rem;">3000 K ÷ 1100 ≈ <b style="color:var(--bang)">2.7 K</b></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin:14px 0 26px;border-left:3px solid var(--accent);">
+    <div style="font-size:.82rem;color:var(--mid);line-height:1.85;word-break:keep-all;">
+      <b style="color:var(--text)">그래서 우주 배경 복사를 '최후 산란면'이라고 부릅니다.</b>
+      더 옛날을 보려 해도 그 앞은 불투명해서 볼 수 없습니다.
+      우주 배경 복사는 <b style="color:var(--accent)">빛으로 볼 수 있는 가장 먼 과거의 벽</b>입니다.
+    </div>
+  </div>
+
+  <h2 class="sec">그 빛을 하늘 전체에서 재어 보면</h2>
+  <p class="sub">
+    슬라이더로 <b>온도 차이를 보는 배율</b>을 바꿔 봅니다. 처음에는 아무 무늬도 없습니다.
+  </p>
+
+  <div class="cmb-box">
+    <canvas id="cmb" width="1100" height="570"></canvas>
+    <div class="cmb-ctl">
+      <span style="font-size:.78rem;color:var(--dim);white-space:nowrap;">온도 차이 보기</span>
+      <input type="range" id="cmb-scale" min="0" max="100" value="0">
+      <span class="scale-v" id="cmb-v">± 1 K</span>
+      <span class="legend-bar"></span>
+      <span style="font-size:.68rem;color:var(--dim);">차갑다 → 뜨겁다</span>
+    </div>
+    <div class="cmb-ctl" style="margin-top:8px;">
+      <label style="display:flex;align-items:center;gap:7px;font-size:.78rem;color:var(--mid);cursor:pointer;">
+        <input type="checkbox" id="cmb-clean" style="accent-color:var(--accent);">
+        실제 분석처럼 <b style="color:var(--text)">전경 걷어내기</b>
+        <span style="color:var(--dim);font-weight:400;">(우리 은하와 지구의 운동 효과를 빼고 본다)</span>
+      </label>
+    </div>
+    <div class="cmb-say" id="cmb-say">—</div>
+  </div>
+
+  <p class="sub" style="margin-bottom:20px;">
+    <b>10만분의 1</b>까지 확대해야 겨우 얼룩이 보입니다.
+    바꿔 말하면 우주 배경 복사는 <b>어느 방향을 보아도 거의 똑같이 균일</b>합니다.
+    아주 멀리 떨어져 빛조차 오간 적 없는 두 방향의 온도가 같다는 것은,
+    <b>우주 전체가 한때 한 덩어리로 붙어 있었다</b>는 뜻입니다.
+    그리고 그 미세한 얼룩이 <b>훗날 은하가 될 씨앗</b>이었습니다.
+  </p>
+
+  <div class="card">
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">해석</span>우주 배경 복사가 <em>모든 방향에서 거의 같은 온도</em>로 관측된다는 사실이
+      왜 빅뱅의 증거가 되는지 설명해 보세요.
+    </div>
+    <textarea id="q1" placeholder="지금은 아주 멀리 떨어진 두 곳의 온도가 같다는 것은…"></textarea>
+  </div>
+
+  <details class="adv">
+    <summary>참고 — 위 그림에 대하여</summary>
+    <div class="body">
+      위 지도는 실제 관측 자료가 아니라 <b>특징을 본떠 만든 모식도</b>입니다.
+      전체 하늘을 타원 하나에 펼친 그림이며, 가운데 가로띠는 우리 은하에서 오는 빛입니다.<br><br>
+      실제 관측은 COBE(1989) · WMAP(2001) · <b>플랑크(2009)</b> 위성이 수행했고,
+      COBE의 관측으로 1978년과 2006년 두 차례 노벨 물리학상이 나왔습니다.
+      진짜 지도가 보고 싶다면 'Planck CMB map'으로 검색해 보세요.
+    </div>
+  </details>
+
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="2">2단계로 넘어가기 →</button></div>
+</div></section>
+
+<!-- ============ 2. 별의 원소 공장 ============ -->
+<section class="page" id="page2"><div class="pane">
+  <h2 class="sec">별은 왜 빛나고, 무엇을 만드는가</h2>
+  <p class="sub">
+    성운이 중력으로 뭉치면 중심이 눌리며 뜨거워집니다. 중심 온도가 <b>1,000만 K</b>을 넘으면
+    수소 원자핵끼리 전기적 반발을 이겨내고 융합하기 시작합니다.
+    이때 나오는 에너지가 바깥으로 밀어내면서 <b>중력과 균형</b>을 이루고, 별은 그 상태로 오래 안정합니다.
+  </p>
+  <p class="sub" style="margin-bottom:20px;">
+    연료가 떨어지면 균형이 깨져 중심이 다시 수축하고, 그만큼 <b>온도가 더 올라갑니다.</b>
+    그러면 더 무거운 원소로 다음 단계의 핵융합이 켜집니다. 슬라이더를 올려 확인해 보세요.
+  </p>
+
+  <div class="temp-ctl">
+    <span style="font-size:.78rem;color:var(--dim);white-space:nowrap;">중심 온도</span>
+    <input type="range" id="temp" min="0" max="100" value="0">
+    <span class="temp-v" id="temp-v">100만 K</span>
+  </div>
+
+  <div class="stages" id="stages"></div>
+
+  <h2 class="sec" style="margin-top:28px;">핵융합은 왜 에너지를 내놓는가</h2>
+  <p class="sub">
+    답은 <b>질량이 줄어들기 때문</b>입니다. 수소 4개가 헬륨 1개가 될 때, 생성물이 반응물보다 가볍습니다.
+    사라진 질량이 그대로 에너지가 됩니다.
+  </p>
+
+  <div class="card" style="margin-bottom:14px;">
+    <table class="ftable" style="margin-top:0;">
+      <tr><th>항목</th><th>질량 (원자질량단위 u)</th></tr>
+      <tr><td>¹H 원자 4개　4 × 1.007825</td><td><b>4.031300 u</b></td></tr>
+      <tr><td>⁴He 원자 1개</td><td><b>4.002603 u</b></td></tr>
+      <tr><td style="color:var(--warm)"><b>줄어든 질량 Δm</b></td>
+          <td style="color:var(--warm)"><b>0.028697 u　(약 0.7%)</b></td></tr>
+    </table>
+    <div class="eq" style="margin-top:12px;">
+      E = Δm c² = 0.028697 u × 931.5 MeV/u ≈ <b style="color:var(--bang)">26.7 MeV</b>
+    </div>
+    <div style="font-size:.81rem;color:var(--mid);line-height:1.85;word-break:keep-all;">
+      질량의 <b style="color:var(--text)">0.7%</b>만 에너지로 바뀌는데도 이만큼입니다.
+      태양은 매초 약 <b style="color:var(--text)">6억 톤</b>의 수소를 헬륨으로 바꾸고,
+      그중 <b style="color:var(--warm)">약 400만 톤</b>이 질량에서 사라져 빛과 열이 됩니다.
+      그렇게 46억 년을 태웠는데도 아직 절반도 쓰지 않았습니다.
+    </div>
+  </div>
+
+  <h2 class="sec" style="margin-top:26px;">수소 핵융합에는 두 가지 길이 있다</h2>
+  <p class="sub">
+    <b>4 ¹H → ⁴He</b>라는 결과는 같지만, 거기에 이르는 경로는 별의 중심 온도에 따라 달라집니다.
+  </p>
+
+  <div class="chain-grid">
+    <div class="chain">
+      <div class="ch-h">
+        <span class="ch-t">p–p 연쇄 반응</span>
+        <span class="ch-b" style="background:rgba(96,165,250,.18);color:var(--cool)">약 1,800만 K 미만에서 우세</span>
+      </div>
+      <div class="ch-b2">태양처럼 <b>가벼운 별</b>이 쓰는 길입니다. 양성자끼리 직접 부딪쳐 시작합니다.</div>
+      <div class="ch-step"><span class="s">1</span><span class="e">¹H + ¹H → ²H + e⁺ + ν<sub>e</sub></span></div>
+      <div class="ch-step"><span class="s">2</span><span class="e">²H + ¹H → ³He + γ</span></div>
+      <div class="ch-step"><span class="s">3</span><span class="e">³He + ³He → ⁴He + 2 ¹H</span></div>
+      <div class="ch-note">1단계에서 <b>양성자 하나가 중성자로 바뀌어야</b> 하는데, 이는 약한 상호작용이라
+        매우 느립니다. 그래서 태양이 100억 년이나 천천히 탈 수 있습니다.</div>
+    </div>
+
+    <div class="chain">
+      <div class="ch-h">
+        <span class="ch-t">CNO 순환</span>
+        <span class="ch-b" style="background:rgba(248,113,113,.18);color:var(--star)">약 1,800만 K 이상에서 우세</span>
+      </div>
+      <div class="ch-b2"><b>무거운 별</b>이 쓰는 길입니다. 탄소·질소·산소가
+        <b>촉매</b> 역할만 하고 반응 뒤에 그대로 돌아옵니다.</div>
+      <div class="ch-step"><span class="s">1</span><span class="e">¹²C + ¹H → ¹³N + γ</span></div>
+      <div class="ch-step"><span class="s">2</span><span class="e">¹³N → ¹³C + e⁺ + ν<sub>e</sub></span></div>
+      <div class="ch-step"><span class="s">3</span><span class="e">¹³C + ¹H → ¹⁴N + γ</span></div>
+      <div class="ch-step"><span class="s">4</span><span class="e">¹⁴N + ¹H → ¹⁵O + γ</span></div>
+      <div class="ch-step"><span class="s">5</span><span class="e">¹⁵O → ¹⁵N + e⁺ + ν<sub>e</sub></span></div>
+      <div class="ch-step"><span class="s">6</span><span class="e">¹⁵N + ¹H → ¹²C + ⁴He</span></div>
+      <div class="ch-note">¹²C로 시작해 <b>¹²C로 끝납니다.</b> 온도에 매우 민감해서
+        (반응률 ∝ T¹⁵ 이상) 중심이 조금만 더 뜨거워도 p–p를 압도합니다.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px;border-left:3px solid var(--accent);">
+    <div style="font-size:.81rem;color:var(--mid);line-height:1.85;word-break:keep-all;">
+      <b style="color:var(--text)">중요한 점</b> — CNO 순환은 탄소·질소·산소를
+      <b>만드는 반응이 아니라 빌려 쓰는 반응</b>입니다.
+      그 원소들은 <b>이전 세대의 별</b>이 만들어 남긴 것입니다.
+      즉 CNO 순환이 돌아간다는 것 자체가, 그 별이 <b style="color:var(--accent)">2세대 이후의 별</b>이라는 증거입니다.
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px;border-left:3px solid var(--bad);">
+    <div style="font-size:.9rem;font-weight:800;color:var(--bad);margin-bottom:8px;">그리고 철에서 멈춘다</div>
+    <div style="font-size:.82rem;color:var(--mid);line-height:1.85;word-break:keep-all;">
+      철까지는 원자핵이 융합할 때마다 <b style="color:var(--text)">에너지가 나왔습니다.</b>
+      그래서 별은 그 에너지로 스스로를 지탱할 수 있었습니다.<br><br>
+      그런데 철은 <b style="color:var(--text)">가장 안정된 원자핵</b>입니다.
+      철보다 무거운 원소를 만들려면 에너지가 나오는 게 아니라 <b style="color:var(--bad)">오히려 넣어 주어야</b> 합니다.
+      별에게는 연료가 아니라 빚입니다. 그래서 핵융합은 여기서 끝나고,
+      중심을 버텨 주던 힘이 사라진 별은 <b style="color:var(--text)">스스로 무너집니다.</b>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">추론</span>중심 온도가 1억 K에 이르지 못하는 별은 <em>어떤 원소까지</em> 만들 수 있을까요?
+      그렇게 생각한 까닭도 함께 쓰세요.
+    </div>
+    <textarea id="q2" placeholder="위 표에서 1억 K이 필요한 반응은…"></textarea>
+  </div>
+
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="3">3단계로 넘어가기 →</button></div>
+</div></section>
+
+<!-- ============ 3. 질량이 운명을 가른다 ============ -->
+<section class="page" id="page3"><div class="pane">
+  <h2 class="sec">질량이 운명을 가른다</h2>
+  <p class="sub">
+    중심 온도를 얼마나 올릴 수 있는지는 <b>별의 질량</b>이 정합니다. 무거울수록 중력이 세게 눌러 더 뜨거워집니다.
+    그래서 질량이 곧 <b>어디까지 만들 수 있는가</b>를 결정합니다. 질량을 골라 보세요.
+  </p>
+
+  <div class="mass-pick" id="mass-pick"></div>
+
+  <div class="card" id="mass-info">
+    <p style="color:var(--dim);font-size:.85rem;">위에서 질량을 골라 보세요.</p>
+  </div>
+
+  <h2 class="sec" style="margin-top:26px;">한눈에 비교</h2>
+  <div class="card" style="padding:0;overflow-x:auto;">
+    <table class="dt">
+      <thead><tr>
+        <th>질량 (태양=1)</th><th>중심 최고 온도</th><th>만드는 원소</th><th>최후</th><th>남는 것</th><th>수명</th>
+      </tr></thead>
+      <tbody id="mass-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:18px;border-left:3px solid var(--nova);">
+    <div style="font-size:.9rem;font-weight:800;color:var(--nova);margin-bottom:8px;">금이 귀한 진짜 이유</div>
+    <div style="font-size:.82rem;color:var(--mid);line-height:1.85;word-break:keep-all;">
+      금 같은 무거운 원소를 만들려면 <b style="color:var(--text)">초신성 폭발</b>이 있어야 합니다.
+      그런데 초신성이 될 수 있는 무거운 별은 전체 별 가운데 <b style="color:var(--text)">1%도 되지 않고</b>,
+      그마저 수백만 년 만에 생을 마칩니다.<br><br>
+      게다가 무거운 별은 <b style="color:var(--nova)">수명이 짧습니다.</b> 태양보다 25배 무거운 별은
+      태양의 3천분의 1도 못 삽니다. 크게 타오를수록 빨리 꺼지는 셈입니다.
+      금이 드문 것은 <b style="color:var(--text)">만들 수 있는 별이 드물고, 그 별마저 금방 사라지기 때문</b>입니다.
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">비교</span>태양과 태양보다 25배 무거운 별을 비교했을 때,
+      <em>무거운 별이 오히려 수명이 짧은 까닭</em>은 무엇일까요?
+    </div>
+    <textarea id="q3" placeholder="연료는 더 많은데 왜 더 빨리 없어질까요? 얼마나 빠르게 태우는지를 생각해 보세요."></textarea>
+  </div>
+  <div class="card" style="margin-top:10px;">
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">종합</span>앞 활동에서 내 몸의 <em>산소·탄소는 별 내부에서, 철·금은 초신성에서</em> 왔다고 배웠습니다.
+      오늘 배운 것으로 그 까닭을 이어서 설명해 보세요.
+    </div>
+    <textarea id="q4" placeholder="산소는 1억 K 이상에서 만들어지므로… 반면 금은 철보다 무거워서…"></textarea>
+  </div>
+
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="4">총정리로 넘어가기 →</button></div>
+</div></section>
+
+<!-- ============ 4. 총정리 ============ -->
+<section class="page" id="page4"><div class="pane">
+  <div class="sum-hero">
+    <h1>오늘 배운 것을 한 장으로</h1>
+    <p>
+      우리는 관측 자료만 가지고 <b>헬륨이 별의 작품이 아니라는 것</b>을 밝혀냈고,
+      우주 배경 복사가 <b>왜 빅뱅의 증거</b>인지 눈으로 확인했으며,
+      별의 중심 온도가 <b>어디까지 만들 수 있는가</b>를 결정한다는 것을 알았습니다.
+      앞 활동이 "원소가 어디에 있는가"였다면, 오늘은 "왜 그렇게 되었는가"였습니다.
+    </p>
+  </div>
+
+  <h2 class="sec">개념 총정리</h2>
+  <div class="concept">
+    <div class="cc"><span class="cc-n">1</span><h4>빅뱅과 원소의 시작</h4>
+      <p>우주는 아주 뜨겁고 밀도가 높은 상태에서 시작해 팽창하며 식었습니다.
+         약 <b>3분</b> 만에 원자핵이 만들어지는 반응이 끝났고,
+         이때 <b>수소와 헬륨</b>만 만들어졌습니다.</p>
+      <p>그 비율이 <b>질량으로 약 3 : 1</b>입니다.</p>
+      <div class="link">오늘 확인한 것 — 중원소는 천체마다 100배 넘게 차이 나는데 헬륨은 거의 일정했습니다.</div></div>
+
+    <div class="cc"><span class="cc-n">2</span><h4>빅뱅의 두 가지 증거</h4>
+      <table class="ftable">
+        <tr><th>증거</th><th>내용</th></tr>
+        <tr><td><b>수소 : 헬륨<br>≈ 3 : 1</b></td><td>어느 천체를 봐도 헬륨이 24~28%.
+          별이 만든 것이라면 이렇게 일정할 수 없다.</td></tr>
+        <tr><td><b>우주 배경<br>복사</b></td><td>모든 방향에서 <b>2.7 K</b>로 거의 균일.
+          한때 우주 전체가 한 덩어리였다는 뜻.</td></tr>
+      </table>
+      <div class="link">두 증거 모두 <b>빛을 분석</b>해서 얻었습니다. 천문학은 빛을 읽는 학문입니다.</div></div>
+
+    <div class="cc"><span class="cc-n">3</span><h4>별은 왜 빛나는가</h4>
+      <p>중력이 성운을 뭉쳐 중심을 데웁니다. <b>1,000만 K</b>을 넘으면 수소 핵융합이 시작되고,
+         그 에너지가 바깥으로 밀어 <b>중력과 균형</b>을 이룹니다.</p>
+      <p>이 균형이 유지되는 동안이 별의 일생 중 가장 긴 시기입니다.
+         연료가 떨어지면 균형이 깨지고 중심이 다시 수축해 <b>더 뜨거워집니다.</b></p>
+      <div class="link">수축 → 온도 상승 → 다음 핵융합 점화. 이 되풀이가 별의 진화입니다.</div></div>
+
+    <div class="cc"><span class="cc-n">4</span><h4>온도가 원소를 정한다</h4>
+      <table class="ftable">
+        <tr><th>필요 온도</th><th>반응</th><th>산물</th></tr>
+        <tr><td>1,000만 K</td><td>수소 → 헬륨</td><td>He</td></tr>
+        <tr><td>1억 K</td><td>헬륨 → 탄소</td><td>C, O</td></tr>
+        <tr><td>8억 K</td><td>탄소 연소</td><td>Ne, Mg</td></tr>
+        <tr><td>20억 K</td><td>산소 연소</td><td>Si, S</td></tr>
+        <tr><td>30억 K</td><td>규소 연소</td><td><b>Fe</b></td></tr>
+      </table>
+      <div class="link">오늘 확인한 것 — 온도를 올릴수록 만들 수 있는 원소가 무거워졌습니다.</div></div>
+
+    <div class="cc"><span class="cc-n">5</span><h4>왜 철에서 멈추는가</h4>
+      <p>철까지는 융합할 때마다 <b>에너지가 나왔습니다.</b>
+         별은 그 에너지로 중력을 버텼습니다.</p>
+      <p>그런데 철은 <b>가장 안정된 원자핵</b>이라, 더 무거운 원소를 만들려면
+         에너지를 <b>넣어 주어야</b> 합니다. 버틸 힘이 사라진 별은 순식간에 무너지고,
+         그 반동으로 <b>초신성 폭발</b>이 일어납니다.</p>
+      <div class="link">철보다 무거운 금·은·우라늄은 바로 이 폭발의 순간에 만들어집니다.</div></div>
+
+    <div class="cc"><span class="cc-n">6</span><h4>질량이 운명을 가른다</h4>
+      <table class="ftable">
+        <tr><th>질량</th><th>어디까지</th><th>최후</th></tr>
+        <tr><td>0.08 미만</td><td>핵융합 못 함</td><td>갈색왜성</td></tr>
+        <tr><td>0.5</td><td>헬륨까지</td><td>백색왜성</td></tr>
+        <tr><td>1 (태양)</td><td>탄소·산소까지</td><td>백색왜성</td></tr>
+        <tr><td>8</td><td>철까지</td><td>초신성 → 중성자별</td></tr>
+        <tr><td>25</td><td>철까지</td><td>초신성 → 블랙홀</td></tr>
+      </table>
+      <div class="link">무거울수록 밝게 타지만 그만큼 빨리 연료를 써서 <b>수명이 짧습니다.</b></div></div>
+  </div>
+
+  <h2 class="sec">질량에 따른 별의 진화 계통도</h2>
+  <p class="sub">같은 성운에서 태어나도 질량이 다르면 여기서부터 길이 갈립니다.</p>
+  <div class="card" style="padding:14px;overflow-x:auto;margin-bottom:26px;">
+    <svg id="tree" viewBox="0 0 1000 400" style="width:100%;min-width:760px;height:auto;display:block;">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="#5b6e8a"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <h2 class="sec">한눈에 보는 흐름</h2>
+  <div class="flowbox">
+    <span class="fl bang">빅뱅 3분 · 수소와 헬륨 3:1</span><span class="ar">→</span>
+    <span class="fl bang">38만 년 · 우주 배경 복사</span><span class="ar">→</span>
+    <span class="fl">중력 수축으로 첫 별</span><span class="ar">→</span>
+    <span class="fl star">온도가 오를수록 무거운 원소</span><span class="ar">→</span>
+    <span class="fl star">철에서 정지</span><span class="ar">→</span>
+    <span class="fl nova">초신성 · 철보다 무거운 원소</span><span class="ar">→</span>
+    <span class="fl good">다음 세대의 별과 행성</span>
+  </div>
+
+  <h2 class="sec" style="margin-top:30px;">스스로 점검하기</h2>
+  <div class="chk" id="chk" style="margin-bottom:26px;">
+    <label><input type="checkbox"><span>수소와 헬륨이 우주 초기에 만들어졌다는 것을 관측 자료를 근거로 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>수소 : 헬륨 ≈ 3 : 1이 왜 빅뱅의 증거가 되는지 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>우주 배경 복사가 무엇이며 왜 빅뱅의 증거인지 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>별이 빛나는 까닭을 중력과 핵융합의 균형으로 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>별 내부에서 탄소·질소·산소가 만들어지는 과정을 정성적으로 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>핵융합이 철에서 멈추는 까닭을 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>철보다 무거운 원소가 초신성 폭발로 만들어짐을 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>별의 질량에 따라 진화 경로와 최후가 달라지는 까닭을 설명할 수 있다.</span></label>
+  </div>
+
+  <h2 class="sec">내가 쓴 답안 모아보기</h2>
+  <div id="ans-wrap" style="margin-bottom:22px;"><div class="empty">아직 쓴 답이 없습니다.</div></div>
+
+  <div class="card">
+    <label class="lbl" for="who">학번 · 이름</label>
+    <input type="text" id="who" placeholder="예: 10101 홍길동" style="max-width:220px;margin-bottom:12px;">
+    <div id="ws-actions"></div>
+  </div>
+</div></section>
+</div>
+
+<script src="worksheet.js?v=7"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function goTab(n){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===n));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  $('page'+n).classList.add('on');
+  if(n==='1') drawCMB();
+  if(n==='4') renderAnswers();
+  document.querySelector('.page.on').scrollTop=0;
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>goTab(t.dataset.tab)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.goto)));
+
+/* ================= 0. 헬륨 자료 ================= */
+/* 관측 자료를 반올림한 대표값 (질량비 %) */
+const HE=[
+  {nm:'금속이 매우 적은 왜소은하',   age:'가장 오래된 물질', he:24.5, z:0.02},
+  {nm:'먼 은하의 성간 가스',         age:'매우 오래됨',     he:25.0, z:0.10},
+  {nm:'우리 은하 헤일로의 늙은 별',  age:'약 120억 년',     he:24.8, z:0.05},
+  {nm:'태양 (46억 년 전 물질)',      age:'약 46억 년',      he:27.0, z:1.40},
+  {nm:'오리온 성운',                 age:'현재 별이 태어남', he:27.5, z:1.60},
+  {nm:'갓 태어난 젊은 성단의 별',    age:'가장 최근',       he:28.0, z:2.00}
+];
+$('he-tbody').innerHTML=HE.map(r=>`<tr>
+  <td class="nm">${r.nm}<div style="font-size:.7rem;color:var(--dim);font-weight:500;">${r.age}</div></td>
+  <td style="color:var(--bang);font-weight:800">${r.he.toFixed(1)}%</td>
+  <td style="color:var(--star);font-weight:800">${r.z.toFixed(2)}%</td>
+  <td style="color:var(--dim);font-size:.75rem;">별이 만든 것이 맞음</td></tr>`).join('');
+{
+  const he=HE.map(r=>r.he), z=HE.map(r=>r.z);
+  $('he-spread').textContent=(Math.max(...he)/Math.min(...he)).toFixed(2)+'배';
+  $('z-spread').textContent=Math.round(Math.max(...z)/Math.min(...z))+'배';
+}
+document.querySelectorAll('.hc').forEach(b=>b.addEventListener('click',()=>{
+  const ok=b.dataset.h==='B';
+  document.querySelectorAll('.hc').forEach(x=>x.classList.remove('ok','no'));
+  b.classList.add(ok?'ok':'no');
+  if(ok) document.querySelector('.hc[data-h="A"]').classList.add('no');
+  const fb=$('hyp-fb'); fb.className='fb on';
+  fb.innerHTML= ok
+    ? `<b>가설 B가 맞습니다.</b> 중원소는 천체마다 <b>100배</b>나 차이 나는데, 헬륨은 <b>1.14배</b>밖에 차이 나지 않습니다.
+       중원소는 별이 만들었으니 별이 오래 일한 곳일수록 많아지는 게 당연합니다.
+       그런데 헬륨이 거의 변하지 않는다는 것은, <b>헬륨의 대부분이 별이 태어나기 전에 이미 있었다</b>는 뜻입니다.
+       별이 만든 헬륨은 24.5%에서 28%로 조금 얹힌 몫일 뿐입니다.`
+    : `다시 표를 보세요. 가설 A가 맞다면 <b>가장 오래된 왜소은하의 헬륨이 거의 0에 가까워야</b> 합니다.
+       그런데 24.5%나 됩니다. 중원소가 0.02%뿐인 곳에서도 헬륨은 이미 4분의 1을 차지하고 있습니다.`;
+}));
+
+/* ================= 1. 우주의 역사 연표 ================= */
+const ERAS=[
+ {t:'10⁻⁴³초', T:'10³² K', h:'플랑크 시대',
+  d:'중력까지 포함한 네 가지 힘이 하나로 있었다고 봅니다. 지금의 물리학으로는 설명할 수 없는 구간입니다.'},
+ {t:'10⁻³⁶ ~ 10⁻³²초', T:'10²⁸ K', h:'급팽창 (인플레이션)',
+  d:'우주가 순식간에 어마어마하게 부풀었습니다. 이때 생긴 <b>아주 미세한 밀도 차이</b>가 훗날 은하의 씨앗이 됩니다.'},
+ {t:'10⁻⁶초', T:'10¹³ K', h:'양성자와 중성자 탄생',
+  d:'쿼크들이 뭉쳐 양성자와 중성자가 되었습니다. 이때는 둘의 개수가 <b>거의 같았습니다.</b>'},
+ {t:'1초', T:'10¹⁰ K', h:'중성자 : 양성자 비 동결', key:true,
+  d:'약한 상호작용이 팽창 속도를 따라가지 못해 개수비가 <b>1 : 6</b>에서 얼어붙었습니다. 중성자가 1.29 MeV 무거운 탓입니다.'},
+ {t:'3분', T:'10⁹ K', h:'빅뱅 핵합성', key:true,
+  d:'중수소 병목이 풀리며 헬륨이 한꺼번에 만들어졌습니다. 약 20분 만에 끝났고, 이때 <b>수소 : 헬륨 ≈ 3 : 1</b>이 정해졌습니다. 소량의 중수소와 리튬도 함께 남았습니다.'},
+ {t:'38만 년', T:'3,000 K', h:'재결합 · 우주 배경 복사 방출', key:true,
+  d:'전자가 원자핵에 붙잡혀 <b>중성 원자</b>가 되자 빛이 자유로워졌습니다. 그때 풀려난 빛이 지금의 <b>우주 배경 복사</b>입니다.'},
+ {t:'약 2억 년', T:'약 50 K', h:'최초의 별',
+  d:'수소와 헬륨만으로 이루어진 <b>1세대 별</b>이 켜졌습니다. 매우 무겁고 수명이 짧아 금세 초신성이 되며 무거운 원소를 뿌렸습니다.'},
+ {t:'약 3 ~ 4억 년', T:'약 30 K', h:'최초의 은하',
+  d:'별들이 중력으로 모여 은하를 이루기 시작했습니다. 우주 배경 복사의 미세한 얼룩이 실제로 자라난 결과입니다.'},
+ {t:'92억 년', T:'약 4 K', h:'태양계 형성',
+  d:'앞선 별들이 남긴 무거운 원소가 섞인 성운에서 태양과 지구가 만들어졌습니다. <b>지금으로부터 46억 년 전</b>입니다.'},
+ {t:'138억 년', T:'2.725 K', h:'현재',
+  d:'그때 풀려난 빛은 아직도 우주를 가로지르고 있고, 우리는 그것을 <b>마이크로파</b>로 받고 있습니다. 우리 몸의 수소도 그 3분에 만들어진 것입니다.'}
+];
+$('timeline').innerHTML=ERAS.map(e=>`
+  <div class="tle ${e.key?'key':''}">
+    <div class="tle-h"><span class="tle-t">${e.t}</span><span class="tle-n">${e.h}</span>
+      <span class="tle-T">${e.T}</span></div>
+    <div class="tle-d">${e.d}</div>
+  </div>`).join('');
+
+/* ================= 우주 배경 복사 지도 ================= */
+const cmb=$('cmb'), cx=cmb.getContext('2d');
+let FL=null, BG=null;           /* 요동 / 전경(쌍극자+은하) */
+const T0=2725000;               /* 2.725 K = 2,725,000 μK */
+
+/* --- 3차원 펄린 잡음 (하늘 방향벡터를 그대로 넣는다) --- */
+const PERM=(()=>{ const p=new Uint8Array(512), a=[...Array(256).keys()];
+  for(let i=255;i>0;i--){ const j=(Math.random()*(i+1))|0; [a[i],a[j]]=[a[j],a[i]]; }
+  for(let i=0;i<512;i++) p[i]=a[i&255]; return p; })();
+const fade=t=>t*t*t*(t*(t*6-15)+10);
+function grad(h,x,y,z){
+  switch(h&15){
+    case 0: return  x+y; case 1: return -x+y; case 2: return  x-y; case 3: return -x-y;
+    case 4: return  x+z; case 5: return -x+z; case 6: return  x-z; case 7: return -x-z;
+    case 8: return  y+z; case 9: return -y+z; case10: return  y-z; case11: return -y-z;
+    case12: return  y+x; case13: return -y+z; case14: return  y-x; default: return -y-z;
+  }
+}
+function noise3(x,y,z){
+  const X=Math.floor(x)&255, Y=Math.floor(y)&255, Z=Math.floor(z)&255;
+  x-=Math.floor(x); y-=Math.floor(y); z-=Math.floor(z);
+  const u=fade(x), v=fade(y), w=fade(z);
+  const A=PERM[X]+Y, AA=PERM[A]+Z, AB=PERM[A+1]+Z;
+  const B=PERM[X+1]+Y, BA=PERM[B]+Z, BB=PERM[B+1]+Z;
+  const L=(a,b,t)=>a+t*(b-a);
+  return L(L(L(grad(PERM[AA],x,y,z),      grad(PERM[BA],x-1,y,z),u),
+             L(grad(PERM[AB],x,y-1,z),    grad(PERM[BB],x-1,y-1,z),u),v),
+           L(L(grad(PERM[AA+1],x,y,z-1),  grad(PERM[BA+1],x-1,y,z-1),u),
+             L(grad(PERM[AB+1],x,y-1,z-1),grad(PERM[BB+1],x-1,y-1,z-1),u),v),w);
+}
+
+/* 하늘 전체를 몰바이데 도법으로 펼치고, 방향벡터에 3차원 잡음을 여러 배율로 겹쳐
+   실제 CMB처럼 잘게 흩어진 얼룩(주된 각크기 약 1°)을 만든다.
+   FL = 우주 배경 복사의 요동, BG = 전경(지구의 운동 + 우리 은하) */
+function buildFieldNew(){
+  const W=cmb.width,H=cmb.height,A=W/2-4,B=H/2-4,cxp=W/2,cyp=H/2;
+  FL=new Float32Array(W*H).fill(NaN);
+  BG=new Float32Array(W*H);
+  /* 각크기 1° ≈ 배율 57. 실제 파워 스펙트럼처럼 1° 부근에 힘이 몰리게 가중 */
+  const OCT=[{f:6,a:.30},{f:13,a:.48},{f:28,a:.80},{f:57,a:1.00},
+             {f:110,a:.82},{f:210,a:.48},{f:400,a:.22},{f:760,a:.09}];
+  let s=0,c=0;
+  for(let py=0;py<H;py++)for(let px=0;px<W;px++){
+    const X=(px-cxp)/A, Y=(py-cyp)/B;
+    if(X*X+Y*Y>1) continue;
+    const th=Math.asin(Math.max(-1,Math.min(1,Y)));
+    const lat=Math.asin(Math.max(-1,Math.min(1,(2*th+Math.sin(2*th))/Math.PI)));
+    const ct=Math.cos(th); if(ct<1e-6) continue;
+    const lon=Math.PI*X/ct; if(Math.abs(lon)>Math.PI) continue;
+    const i=py*W+px, cl=Math.cos(lat);
+    const ux=cl*Math.cos(lon), uy=cl*Math.sin(lon), uz=Math.sin(lat);
+    let v=0;
+    for(let k=0;k<OCT.length;k++){
+      const f=OCT[k].f;
+      v+=OCT[k].a*noise3(ux*f+13.7, uy*f+41.3, uz*f+77.1);
+    }
+    FL[i]=v; s+=v*v; c++;
+    /* 전경 ① 지구의 운동으로 생기는 쌍극자 ② 우리 은하 */
+    BG[i]=3350*(cl*Math.cos(lon-4.6)*0.66+Math.sin(lat)*0.74)
+        +(1400*Math.exp(-((lat/0.05)**2))+380*Math.exp(-((lat/0.15)**2)))
+         *(0.55+0.45*Math.cos(lon*1.3+0.4));
+  }
+  /* 요동의 표준편차를 실제와 비슷한 75 μK 로 맞춘다 */
+  const g=75/Math.sqrt(s/c);
+  for(let i=0;i<FL.length;i++) if(!isNaN(FL[i])) FL[i]*=g;
+}
+
+
+
+/* 슬라이더(0~100) → 표시 범위(μK). 1 K → 50 μK 로그 감소 */
+const scaleAt=v=>Math.round(1e6*Math.pow(50/1e6, v/100));
+function fmtScale(uk){
+  if(uk>=1e5) return '± '+(uk/1e6).toFixed(2).replace(/0+$/,'').replace(/\.$/,'')+' K';
+  if(uk>=1000) return '± '+(uk/1000).toFixed(1)+' mK';
+  return '± '+uk+' μK';
+}
+/* 몰바이데 정투영 (뉴턴 반복) */
+function moll(lon,lat,A,B,cx0,cy0){
+  let th=lat;
+  for(let i=0;i<6;i++){
+    const d=(2*th+Math.sin(2*th)-Math.PI*Math.sin(lat))/(2+2*Math.cos(2*th));
+    th-=d; if(Math.abs(d)<1e-8) break;
+  }
+  return [cx0+A*(lon/Math.PI)*Math.cos(th), cy0+B*Math.sin(th)];
+}
+/* 플랑크 위성 지도와 비슷한 색 배열 */
+const STOPS=[[8,0,120],[20,90,210],[90,195,215],[185,225,195],
+             [240,200,110],[235,140,50],[150,25,15]];
+function colorFor(v){   /* v: -1 ~ 1 */
+  const t=Math.max(-1,Math.min(1,v));
+  const p=(t+1)/2*(STOPS.length-1), i=Math.min(STOPS.length-2,Math.floor(p)), r=p-i;
+  return [0,1,2].map(k=>Math.round(STOPS[i][k]+(STOPS[i+1][k]-STOPS[i][k])*r));
+}
+function drawCMB(){
+  if(!FL){
+    /* 계산에 1초쯤 걸리므로 먼저 안내를 그린다 */
+    cx.fillStyle='#f8fafc'; cx.fillRect(0,0,cmb.width,cmb.height);
+    cx.fillStyle='#4a5a6b'; cx.font='bold 16px Pretendard'; cx.textAlign='center';
+    cx.fillText('전천 지도를 만드는 중…', cmb.width/2, cmb.height/2);
+    setTimeout(()=>{ buildFieldNew(); paintCMB(); }, 30);
+    return;
+  }
+  paintCMB();
+}
+function paintCMB(){
+  const W=cmb.width,H=cmb.height;
+  const S=scaleAt(+$('cmb-scale').value);
+  const clean=$('cmb-clean').checked;
+  const img=cx.createImageData(W,H);
+  for(let i=0;i<W*H;i++){
+    const fl=FL[i], o=i*4;
+    if(isNaN(fl)){ img.data[o+3]=0; continue; }
+    const c=colorFor((fl+(clean?0:BG[i]))/S);
+    img.data[o]=c[0]; img.data[o+1]=c[1]; img.data[o+2]=c[2]; img.data[o+3]=255;
+  }
+  cx.clearRect(0,0,W,H);
+  cx.putImageData(img,0,0);
+
+  /* 은하 좌표 눈금 + 타원 테두리 */
+  const A=W/2-4,B=H/2-4,cxp=W/2,cyp=H/2;
+  cx.save(); cx.strokeStyle='rgba(255,255,255,.16)'; cx.lineWidth=1;
+  for(let la=-60;la<=60;la+=30){
+    cx.beginPath();
+    for(let lo=-180;lo<=180;lo+=2){
+      const p=moll(lo*Math.PI/180,la*Math.PI/180,A,B,cxp,cyp);
+      lo===-180?cx.moveTo(p[0],p[1]):cx.lineTo(p[0],p[1]);
+    } cx.stroke();
+  }
+  for(let lo=-120;lo<=120;lo+=60){
+    cx.beginPath();
+    for(let la=-90;la<=90;la+=2){
+      const p=moll(lo*Math.PI/180,la*Math.PI/180,A,B,cxp,cyp);
+      la===-90?cx.moveTo(p[0],p[1]):cx.lineTo(p[0],p[1]);
+    } cx.stroke();
+  }
+  cx.strokeStyle='rgba(255,255,255,.35)'; cx.lineWidth=1.5;
+  cx.beginPath(); cx.ellipse(cxp,cyp,A,B,0,0,Math.PI*2); cx.stroke();
+  cx.fillStyle='rgba(226,232,240,.55)'; cx.font='10px Pretendard'; cx.textAlign='left';
+  cx.fillText('하늘 전체 · 몰바이데 도법 · 은하 좌표', 10, 16);
+  cx.restore();
+
+  $('cmb-v').textContent=fmtScale(S);
+
+  const say=$('cmb-say');
+  if(clean && S<400) say.innerHTML=`전경을 걷어낸 <b>순수한 우주 배경 복사</b>입니다.
+    플랑크 위성이 발표한 지도가 바로 이 모습입니다. 붉은 곳과 푸른 곳의 차이는 겨우
+    <b>10만분의 1</b>이며, 이 얼룩 하나하나가 <b>훗날 은하단이 될 씨앗</b>이었습니다.`;
+  else if(S>=3e5) say.innerHTML=`온도 차이를 <b>±${fmtScale(S).slice(2)}</b>까지 보고 있습니다.
+    하늘 전체가 <b>완전히 똑같은 색</b>입니다. 어느 방향을 보아도 2.725 K로 같다는 뜻입니다.`;
+  else if(S>=2000) say.innerHTML=`<b>천분의 일</b> 수준까지 좁혔더니 한쪽이 조금 뜨겁고 반대쪽이 조금 찬 무늬가 보입니다.
+    이것은 우주의 무늬가 아니라 <b>지구가 초속 370 km로 움직이기 때문</b>에 생기는 <b>쌍극자</b>입니다.`;
+  else if(S>=400) say.innerHTML=`가운데 가로띠가 나타났습니다. 이것도 우주 배경 복사가 아니라
+    <b>우리 은하에서 오는 빛</b>입니다. 아래 <b>'전경 걷어내기'</b>를 켜서 없애 보세요.`;
+  else say.innerHTML=`<b>10만분의 1</b>까지 좁혀야 비로소 진짜 얼룩이 보입니다.
+    다만 아직 은하와 쌍극자에 가려 있습니다. <b>'전경 걷어내기'</b>를 켜 보세요.`;
+}
+$('cmb-scale').addEventListener('input',drawCMB);
+$('cmb-clean').addEventListener('change',drawCMB);
+
+/* ================= 2. 핵융합 단계 ================= */
+const STAGES=[
+  {rx:'수소 연소', t:1e7,  out:['⁴He'], note:'주계열성이 하는 일 · 별 일생의 90%',
+   eq:'4 ¹H → ⁴He + 2e⁺ + 2ν<sub>e</sub>　(26.7 MeV)'},
+  {rx:'헬륨 연소', t:1e8,  out:['¹²C','¹⁶O'], note:'적색거성 단계 · 삼중 알파 과정',
+   eq:'3 ⁴He → ¹²C + γ　／　¹²C + ⁴He → ¹⁶O + γ'},
+  {rx:'탄소 연소', t:8e8,  out:['²⁰Ne','²³Na','²⁴Mg'], note:'태양 질량 8배 이상만',
+   eq:'¹²C + ¹²C → ²⁰Ne + ⁴He　／　→ ²³Na + ¹H'},
+  {rx:'네온 연소', t:1.5e9,out:['¹⁶O','²⁴Mg'], note:'광분해가 먼저 일어난다',
+   eq:'²⁰Ne + γ → ¹⁶O + ⁴He　／　²⁰Ne + ⁴He → ²⁴Mg + γ'},
+  {rx:'산소 연소', t:2e9,  out:['²⁸Si','³²S'], note:'',
+   eq:'¹⁶O + ¹⁶O → ²⁸Si + ⁴He　／　→ ³¹P + ¹H'},
+  {rx:'규소 연소', t:3e9,  out:['⁵⁶Fe'], note:'단 하루 만에 끝난다', iron:true,
+   eq:'²⁸Si + 7 ⁴He → … → ⁵⁶Ni → ⁵⁶Fe　(알파 포획 연쇄)'}
+];
+const fmtT=t=> t>=1e8 ? (t/1e8).toFixed(0)+'억 K' : (t/1e4).toFixed(0)+'만 K';
+$('stages').innerHTML=STAGES.map((s,i)=>`
+  <div class="stg ${s.iron?'iron':''}" data-i="${i}">
+    <div class="stg-top">
+      <div><div class="rx">${s.rx}</div>${s.note?`<div class="need">${s.note}</div>`:''}</div>
+      <div class="need">필요 온도 ${fmtT(s.t)} 이상</div>
+      <div class="out">${s.out.map(o=>`<span>${o}</span>`).join('')}</div>
+    </div>
+    <div class="stg-eq">${s.eq}</div>
+  </div>`).join('');
+const tempAt=v=>1e6*Math.pow(5e9/1e6, v/100);
+function drawTemp(){
+  const T=tempAt(+$('temp').value);
+  $('temp-v').textContent = T>=1e8 ? (T/1e8).toFixed(1)+'억 K'
+                         : T>=1e6 ? (T/1e4).toFixed(0)+'만 K' : Math.round(T)+' K';
+  document.querySelectorAll('.stg').forEach((el,i)=>el.classList.toggle('on',T>=STAGES[i].t));
+}
+$('temp').addEventListener('input',drawTemp);
+drawTemp();
+
+/* ================= 3. 질량 ================= */
+const MASS=[
+  {m:'0.05', l:'갈색왜성', tmax:'300만 K', make:'없음', end:'식어 감', left:'갈색왜성',
+   life:'—', path:['성운','수축','온도 부족','핵융합 못 함'],
+   x:'중심 온도가 1,000만 K에 이르지 못해 수소 핵융합조차 시작하지 못합니다. 별이라 부르기 어려운 천체로, 서서히 식어 갈 뿐입니다.'},
+  {m:'0.5',  l:'적색왜성', tmax:'1,500만 K', make:'헬륨', end:'조용히 식음', left:'백색왜성',
+   life:'약 570억 년', path:['성운','주계열성','헬륨만 만듦','백색왜성'],
+   x:'수소는 태우지만 헬륨 핵융합에 필요한 1억 K에는 도달하지 못합니다. 대신 연료를 아주 천천히 써서 우주 나이보다도 오래 삽니다. 아직 수명을 다한 적색왜성은 우주에 하나도 없습니다.'},
+  {m:'1',    l:'태양', tmax:'1억 K', make:'헬륨 · 탄소 · 산소', end:'행성상 성운', left:'백색왜성',
+   life:'약 100억 년', path:['성운','주계열성','적색거성','행성상 성운','백색왜성'],
+   x:'헬륨까지 태워 탄소와 산소로 이루어진 중심핵을 남깁니다. 탄소 연소에 필요한 8억 K에는 이르지 못해 여기서 멈춥니다. 바깥층은 행성상 성운으로 흩어지고 중심만 백색왜성으로 남습니다.'},
+  {m:'8',    l:'무거운 별', tmax:'30억 K', make:'철까지 전부', end:'초신성 폭발', left:'중성자별',
+   life:'약 5,500만 년', path:['성운','주계열성','초거성','철 중심핵','초신성','중성자별'],
+   x:'규소 연소까지 도달해 중심에 철 핵을 만듭니다. 더 태울 것이 없어지면 순식간에 무너지며 초신성으로 폭발하고, 이때 철보다 무거운 원소가 만들어져 우주로 흩어집니다.'},
+  {m:'25',   l:'매우 무거운 별', tmax:'30억 K 이상', make:'철까지 전부', end:'초신성 폭발', left:'블랙홀',
+   life:'약 320만 년', path:['성운','주계열성','초거성','철 중심핵','초신성','블랙홀'],
+   x:'같은 초신성이지만 남은 중심핵이 너무 무거워 중성자조차 버티지 못하고 블랙홀이 됩니다. 태양의 3천분의 1도 못 사는 짧고 강렬한 일생입니다.'}
+];
+$('mass-pick').innerHTML=MASS.map((m,i)=>
+  `<button class="mb" data-i="${i}"><div class="m">${m.m} M☉</div><div class="l">${m.l}</div></button>`).join('');
+$('mass-tbody').innerHTML=MASS.map(m=>`<tr>
+  <td class="nm">${m.m} <span style="color:var(--dim);font-weight:500;font-size:.75rem">${m.l}</span></td>
+  <td>${m.tmax}</td><td style="color:var(--warm)">${m.make}</td>
+  <td>${m.end}</td><td style="color:var(--cool)">${m.left}</td>
+  <td style="color:var(--good)">${m.life}</td></tr>`).join('');
+$('mass-pick').querySelectorAll('.mb').forEach(b=>b.addEventListener('click',()=>{
+  $('mass-pick').querySelectorAll('.mb').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  const m=MASS[+b.dataset.i];
+  const cls=p=> /초신성|블랙홀|중성자별/.test(p)?'boom' : /백색왜성|갈색왜성|성운$/.test(p)&&p!=='성운'?'end'
+              : /거성|주계열/.test(p)?'hot':'';
+  $('mass-info').innerHTML=`
+    <div style="font-size:1rem;font-weight:800;margin-bottom:4px;">${m.m} M☉ · ${m.l}</div>
+    <div class="path">${m.path.map((p,i)=>
+      (i?'<span class="ar">→</span>':'')+`<span class="pn ${cls(p)}">${p}</span>`).join('')}</div>
+    <table class="ftable" style="margin-bottom:10px;">
+      <tr><th>중심 최고 온도</th><td><b>${m.tmax}</b></td><th>수명</th><td><b>${m.life}</b></td></tr>
+      <tr><th>만드는 원소</th><td colspan="3"><b>${m.make}</b></td></tr>
+    </table>
+    <div style="font-size:.82rem;color:var(--mid);line-height:1.85;word-break:keep-all;">${m.x}</div>`;
+}));
+
+/* ================= 진화 계통도 (SVG) ================= */
+(function drawTree(){
+  const svg=$('tree'); if(!svg) return;
+  const NS='http://www.w3.org/2000/svg';
+  const C={hot:'#b45f06',giant:'#dc2626',end:'#2563eb',boom:'#7c3aed',
+           dim:'#5b6e8a',line:'#cfdbe8',txt:'#0b1420'};
+  const add=(t,a,txt)=>{const e=document.createElementNS(NS,t);
+    for(const k in a) e.setAttribute(k,a[k]); if(txt!=null) e.textContent=txt;
+    svg.appendChild(e); return e;};
+  const box=(x,y,w,h,col,t1,t2)=>{
+    add('rect',{x,y,width:w,height:h,rx:9,fill:col+'22',stroke:col,'stroke-width':1.4});
+    add('text',{x:x+w/2,y:y+(t2?h/2-2:h/2+4),'text-anchor':'middle',
+      fill:col,'font-size':13,'font-weight':800,'font-family':'Pretendard'},t1);
+    if(t2) add('text',{x:x+w/2,y:y+h/2+14,'text-anchor':'middle',
+      fill:C.dim,'font-size':10.5,'font-family':'Pretendard'},t2);
+  };
+  const arrow=(x1,y1,x2,y2)=>add('path',
+    {d:`M${x1} ${y1} L${x2} ${y2}`,stroke:C.dim,'stroke-width':1.6,
+     fill:'none','marker-end':'url(#ah)'});
+  const curve=(x1,y1,x2,y2)=>add('path',
+    {d:`M${x1} ${y1} C${(x1+x2)/2} ${y1}, ${(x1+x2)/2} ${y2}, ${x2} ${y2}`,
+     stroke:C.dim,'stroke-width':1.6,fill:'none','marker-end':'url(#ah)'});
+
+  /* 출발 */
+  box(12,168,104,54,'#03699f','성운','수소 · 헬륨');
+
+  const ROWS=[
+    {y:22,  m:'0.08 M☉ 미만', steps:[['갈색왜성','핵융합 못 함',C.end]], last:2},
+    {y:96,  m:'0.08 ~ 0.5',   steps:[['적색왜성','수소만 연소',C.hot],
+                                     ['백색왜성','매우 오래 뒤',C.end]], last:3},
+    {y:170, m:'0.5 ~ 8',      steps:[['주계열성','수소 연소',C.hot],
+                                     ['적색거성','헬륨 연소',C.giant],
+                                     ['행성상 성운','바깥층 방출',C.giant],
+                                     ['백색왜성','C · O 핵',C.end]], last:5},
+    {y:250, m:'8 ~ 25',       steps:[['주계열성','수소 연소',C.hot],
+                                     ['초거성','철까지 연소',C.giant],
+                                     ['초신성 폭발','Fe 이상 원소',C.boom],
+                                     ['중성자별','',C.end]], last:5},
+    {y:324, m:'25 M☉ 이상',   steps:[['주계열성','수소 연소',C.hot],
+                                     ['초거성','철까지 연소',C.giant],
+                                     ['초신성 폭발','Fe 이상 원소',C.boom],
+                                     ['블랙홀','',C.end]], last:5}
+  ];
+  const W=148, H=50, GAP=182, X0=196;
+
+  ROWS.forEach(r=>{
+    /* 질량 라벨 */
+    add('text',{x:130,y:r.y+H/2+4,'text-anchor':'middle',fill:C.txt,
+      'font-size':11.5,'font-weight':800,'font-family':'Pretendard'},r.m);
+    /* 성운 → 첫 상자 */
+    curve(116,195,X0-6,r.y+H/2);
+    r.steps.forEach((s,i)=>{
+      const x=X0+i*GAP;
+      box(x,r.y,W,H,s[2],s[0],s[1]);
+      if(i<r.steps.length-1) arrow(x+W+4,r.y+H/2,x+GAP-6,r.y+H/2);
+    });
+  });
+
+  /* 되먹임 화살표 — 흩어진 물질이 다시 성운으로 */
+  add('path',{d:'M760 300 C860 392, 300 400, 70 240',stroke:'#0b7d73','stroke-width':1.5,
+    fill:'none','stroke-dasharray':'5 4','marker-end':'url(#ah)'});
+  add('text',{x:430,y:392,'text-anchor':'middle',fill:'#0b7d73',
+    'font-size':11,'font-weight':700,'font-family':'Pretendard'},
+    '흩어진 물질이 다시 뭉쳐 다음 세대의 별과 행성이 된다');
+})();
+
+/* 16개 핵자 그림 */
+(function nucleons(){
+  const p='<i class="p">p</i>', n='<i class="n">n</i>';
+  $('nuc-before').innerHTML = n.repeat(2)+p.repeat(14);
+  $('nuc-after').innerHTML =
+    `<span class="lbl">⁴He</span><span class="he">${n}${n}${p}${p}</span>`
+    + `<span class="lbl" style="color:var(--cool)">남은 ¹H</span>` + p.repeat(12);
+})();
+
+/* ================= 답안 · 활동지 ================= */
+const QIDS=[
+  ['q0','중원소는 100배 넘게 차이 나는데 헬륨은 거의 차이가 없다 — 이 사실이 뜻하는 바'],
+  ['q1','우주 배경 복사가 모든 방향에서 거의 같은 온도인 것이 왜 빅뱅의 증거인가'],
+  ['q2','중심 온도가 1억 K에 이르지 못하는 별은 어떤 원소까지 만들 수 있는가'],
+  ['q3','태양보다 25배 무거운 별이 오히려 수명이 짧은 까닭'],
+  ['q4','산소·탄소는 별 내부에서, 철·금은 초신성에서 오는 까닭']
+];
+function renderAnswers(){
+  const A=QIDS.map(([id,q])=>({q,a:($(id).value||'').trim()}));
+  const done=A.filter(x=>x.a).length;
+  $('ans-wrap').innerHTML= done
+    ? A.map(x=>`<div class="ans-block"><div class="ans-q">${esc(x.q)}</div>
+        <div class="ans-a ${x.a?'':'none'}">${x.a?esc(x.a):'아직 쓰지 않았습니다.'}</div></div>`).join('')
+      +`<div style="font-size:.78rem;color:var(--dim);margin-top:8px;">
+         ${A.length}문항 중 <b style="color:var(--good)">${done}문항</b> 작성했습니다.</div>`
+    : '<div class="empty">아직 쓴 답이 없습니다.</div>';
+}
+function wsConfig(blank){
+  return {
+    blank,
+    title:'우주의 원소 공장',
+    subtitle:'어떤 별이 어디까지 만들 수 있는가 · 통합과학1 물질과 규칙성',
+    standard:'[10통과1-02-01] 천체에서 방출되는 빛의 스펙트럼을 분석하여 우주 초기에 형성된 원소와 천체의 구성 물질을 추론할 수 있다.\n'
+            +'[10통과1-02-02] 우주 초기의 원소들로부터 태양계의 재료이면서 생명체를 구성하는 원소들이 형성되는 과정을 통해 지구와 생명의 역사가 우주 역사의 일부분임을 해석할 수 있다.',
+    who:($('who').value||'').trim(),
+    records:[
+      {h:'헬륨과 중원소 존재비 비교 (질량 %)',type:'table',
+       head:['천체','헬륨','중원소'], rows:HE.map(r=>[r.nm,r.he.toFixed(1)+'%',r.z.toFixed(2)+'%'])},
+      {h:'핵융합 단계와 필요 온도',type:'table',
+       head:['반응','필요 온도','산물'], rows:STAGES.map(s=>[s.rx,fmtT(s.t)+' 이상',s.out.join(', ')])},
+      {h:'별의 질량에 따른 진화',type:'table',
+       head:['질량','최고 온도','만드는 원소','최후','남는 것','수명'],
+       rows:MASS.map(m=>[m.m+' M☉',m.tmax,m.make,m.end,m.left,m.life])}
+    ],
+    answers:QIDS.map(([id,q])=>({q,a:$(id).value,lines:5})),
+    checks:Worksheet.collect.checks('#chk'),
+    summary:Worksheet.collect.summary('#page4 .cc')
+  };
+}
+Worksheet.mount('ws-actions', wsConfig,
+  ()=>(($('who').value||'이름없음').trim()+'_우주의원소공장'));
+</script>
+</body>
+</html>

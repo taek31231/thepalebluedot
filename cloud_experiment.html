@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>단열 팽창과 구름 발생 — 압력으로 온도를 재는 실험</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+:root{
+  --bg:#f5f8fc; --surface:#ffffff; --surface-2:#f1f5fa; --surface-3:#e6eef7;
+  --line:#e4eaf2; --line-2:#cfdbe8;
+  --text:#0b1420; --mid:#243141; --dim:#4a5a6b;
+  --accent:#0369a1; --warm:#9c5c00; --cool:#2563eb;
+  --good:#0b7d73; --bad:#dc2626; --violet:#7c3aed;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',-apple-system,sans-serif;}
+body{background:var(--bg);color:var(--text);-webkit-text-size-adjust:100%;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+button{font:inherit;cursor:pointer;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+code{font-family:ui-monospace,Menlo,monospace;}
+
+/* ---------- 단계 헤더 ---------- */
+.topbar{flex:0 0 56px;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--line);}
+.topbar h1{font-size:.92rem;font-weight:800;letter-spacing:-.02em;white-space:nowrap;}
+.topbar h1 span{color:var(--accent);}
+.steps{display:flex;gap:3px;}
+.step-btn{padding:7px 13px;font-size:.81rem;font-weight:700;color:var(--dim);
+  background:transparent;border:1px solid transparent;border-radius:8px;transition:.15s;white-space:nowrap;}
+.step-btn:hover{color:var(--mid);background:var(--surface-2);}
+.step-btn.on{color:#ffffff;background:var(--accent);border-color:var(--accent);}
+.step-num{opacity:.65;margin-right:5px;}
+
+.wrap{flex:1;min-height:0;}
+.page{display:none;height:100%;}
+.page.on{display:flex;}
+
+/* ---------- 공통 ---------- */
+.scroll{overflow-y:auto;height:100%;width:100%;}
+.pane{padding:22px;max-width:1080px;margin:0 auto;}
+h2.sec{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+p.sub{font-size:.82rem;color:var(--mid);line-height:1.7;margin-bottom:16px;word-break:keep-all;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+label.lbl{display:block;font-size:.77rem;font-weight:700;color:var(--mid);margin-bottom:6px;}
+input[type=text],input[type=number],select,textarea{
+  width:100%;padding:9px 11px;background:var(--surface-2);border:1px solid var(--line-2);
+  border-radius:8px;color:var(--text);font-size:.88rem;}
+textarea{resize:vertical;min-height:64px;line-height:1.6;}
+.btn{padding:9px 16px;border:1px solid var(--line-2);border-radius:8px;
+  background:var(--surface-2);color:var(--text);font-size:.85rem;font-weight:700;transition:.15s;}
+.btn:hover{background:var(--surface-3);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#ffffff;}
+.btn.primary:hover{background:#0ea5e9;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.proc{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:22px;}
+.proc-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px;}
+.proc-no{font-size:.67rem;font-weight:800;color:var(--accent);letter-spacing:.1em;margin-bottom:7px;}
+.proc-card h4{font-size:.89rem;font-weight:800;margin-bottom:6px;}
+.proc-card p{font-size:.79rem;color:var(--mid);line-height:1.65;word-break:keep-all;}
+.proc-card .tip{margin-top:8px;font-size:.74rem;color:var(--warm);line-height:1.55;}
+
+.kit{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;}
+.kit span{font-size:.76rem;padding:5px 11px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:999px;color:var(--mid);}
+.kit span.pick{border-color:var(--good);color:var(--good);}
+
+.warn{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.32);
+  border-radius:10px;padding:13px 15px;margin-bottom:20px;}
+.warn strong{color:var(--bad);font-size:.83rem;display:block;margin-bottom:5px;}
+.warn p{font-size:.79rem;color:var(--mid);line-height:1.7;word-break:keep-all;}
+
+/* 개념 설명 박스 */
+.explain{background:linear-gradient(180deg,rgba(56,189,248,.07),rgba(56,189,248,.02));
+  border:1px solid rgba(56,189,248,.3);border-radius:12px;padding:18px;margin-bottom:20px;}
+.explain h3{font-size:.93rem;font-weight:800;color:var(--accent);margin-bottom:12px;}
+.explain-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;}
+.ex-step{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:12px;}
+.ex-n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;
+  border-radius:50%;background:var(--accent);color:#ffffff;font-size:.7rem;font-weight:800;margin-bottom:7px;}
+.ex-step p{font-size:.79rem;color:var(--mid);line-height:1.65;word-break:keep-all;}
+.ex-step strong{color:var(--text);}
+.explain .conclude{margin-top:12px;font-size:.82rem;color:var(--text);line-height:1.75;
+  background:var(--surface);border-left:3px solid var(--accent);padding:11px 13px;border-radius:0 8px 8px 0;word-break:keep-all;}
+
+details.adv{background:var(--surface);border:1px solid var(--line-2);border-radius:10px;padding:13px 15px;margin-bottom:18px;}
+details.adv summary{font-size:.8rem;font-weight:800;color:var(--violet);cursor:pointer;}
+details.adv .body{margin-top:11px;font-size:.79rem;color:var(--mid);line-height:1.8;word-break:keep-all;}
+details.adv .body code{color:var(--violet);background:var(--surface-2);padding:2px 6px;border-radius:4px;font-size:.76rem;}
+
+.pred-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:12px;}
+.pred-q{font-size:.85rem;font-weight:700;margin-bottom:9px;line-height:1.55;word-break:keep-all;}
+.pred-q em{font-style:normal;color:var(--accent);}
+.pred-hint{font-size:.74rem;color:var(--mid);margin-top:7px;line-height:1.55;}
+.radio-row{display:flex;flex-direction:column;gap:6px;}
+.radio-row label{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--mid);cursor:pointer;
+  padding:7px 10px;border:1px solid var(--line);border-radius:7px;transition:.15s;}
+.radio-row label:hover{border-color:var(--line-2);}
+.radio-row input{accent-color:var(--accent);}
+
+/* 측정 기록 표 (0단계) */
+.rec{width:100%;border-collapse:collapse;font-size:.82rem;}
+.rec th,.rec td{padding:9px 8px;border-bottom:1px solid var(--line);}
+.rec th{color:var(--dim);font-size:.73rem;font-weight:700;text-align:left;}
+.rec td:first-child{color:var(--mid);}
+.rec input{max-width:120px;text-align:right;}
+.out{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;
+  padding:13px 15px;margin-top:12px;font-size:.82rem;line-height:1.75;color:var(--mid);word-break:keep-all;}
+.out b{color:var(--text);}
+.out .hl{font-size:1.15rem;font-weight:800;font-variant-numeric:tabular-nums;}
+
+/* ---------- STEP 2 ---------- */
+.side{flex:0 0 300px;background:var(--surface);border-right:1px solid var(--line);
+  padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;}
+.side-r{flex:0 0 330px;background:var(--surface);border-left:1px solid var(--line);
+  padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:13px;}
+.center{flex:1;min-width:0;display:flex;flex-direction:column;background:#f8fafc;}
+
+.drop{border:2px dashed var(--line-2);border-radius:12px;padding:20px 14px;text-align:center;transition:.15s;cursor:pointer;}
+.drop:hover,.drop.over{border-color:var(--accent);background:rgba(56,189,248,.06);}
+.drop strong{display:block;font-size:.85rem;margin-bottom:5px;}
+.drop span{font-size:.74rem;color:var(--dim);line-height:1.5;display:block;}
+
+.grp{display:flex;flex-direction:column;gap:9px;}
+.grp-t{font-size:.71rem;font-weight:800;letter-spacing:.06em;color:var(--dim);
+  text-transform:uppercase;border-left:3px solid var(--accent);padding-left:7px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+.chart-head{flex:0 0 auto;padding:12px 18px 0;display:flex;justify-content:space-between;
+  align-items:center;gap:12px;flex-wrap:wrap;}
+.chart-title{font-size:.84rem;font-weight:700;color:var(--mid);}
+.marker-bar{display:flex;gap:5px;flex-wrap:wrap;}
+.mk{padding:5px 10px;font-size:.73rem;font-weight:700;border-radius:6px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--mid);transition:.15s;}
+.mk:hover{background:var(--surface-3);}
+.mk.armed{background:var(--accent);border-color:var(--accent);color:#ffffff;}
+.mk i{font-style:normal;display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;}
+.chart-box{flex:1;min-height:0;position:relative;padding:8px 18px 14px;}
+canvas{width:100%;height:100%;display:block;}
+.chart-hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  text-align:center;color:var(--dim);font-size:.85rem;line-height:1.9;pointer-events:none;}
+
+.res{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:13px;}
+.res-t{font-size:.74rem;font-weight:800;color:var(--mid);letter-spacing:.04em;margin-bottom:9px;}
+.res-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:5px 0;font-size:.81rem;}
+.res-row+.res-row{border-top:1px solid var(--line);}
+.res-k{color:var(--mid);}
+.res-v{font-weight:800;font-variant-numeric:tabular-nums;}
+.big{font-size:1.55rem;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
+.unit{font-size:.8rem;font-weight:600;color:var(--mid);margin-left:3px;}
+.note{font-size:.76rem;line-height:1.7;color:var(--mid);word-break:keep-all;}
+.verdict{padding:11px 13px;border-radius:9px;font-size:.79rem;line-height:1.65;word-break:keep-all;}
+.verdict.ok{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.35);color:#6ee7b7;}
+.verdict.no{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.35);color:#fca5a5;}
+.verdict.mid{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);color:#fcd34d;}
+
+/* ---------- STEP 3 ---------- */
+table.cmp{width:100%;border-collapse:collapse;font-size:.8rem;}
+table.cmp th,table.cmp td{padding:9px 10px;border-bottom:1px solid var(--line);
+  text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+table.cmp th{color:var(--dim);font-weight:700;font-size:.73rem;border-bottom:1px solid var(--line-2);}
+table.cmp th:first-child,table.cmp td:first-child{text-align:left;}
+table.cmp td.name{font-weight:700;color:var(--text);}
+table.cmp tr:hover td{background:var(--surface-2);}
+.empty{padding:42px;text-align:center;color:var(--dim);font-size:.84rem;line-height:1.85;}
+.qa{display:flex;flex-direction:column;gap:12px;margin-top:8px;}
+.qa-item{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:14px 16px;}
+.qa-q{font-size:.85rem;font-weight:700;margin-bottom:9px;line-height:1.6;word-break:keep-all;}
+.qa-q em{font-style:normal;color:var(--accent);}
+
+.foot{flex:0 0 auto;background:#f8fafc;border-top:1px solid var(--line);
+  padding:11px 20px;display:flex;align-items:center;gap:14px;}
+.foot-b{background:var(--accent);color:#ffffff;font-weight:800;font-size:.72rem;
+  padding:4px 10px;border-radius:5px;white-space:nowrap;}
+.foot-t{font-size:.78rem;color:var(--mid);line-height:1.6;word-break:keep-all;}
+
+/* ---------- 총정리 ---------- */
+.sum-hero{background:linear-gradient(180deg,rgba(56,189,248,.09),rgba(56,189,248,.02));
+  border:1px solid rgba(56,189,248,.28);border-radius:14px;padding:22px;margin-bottom:24px;}
+.sum-hero h1{font-size:1.4rem;font-weight:800;letter-spacing:-.03em;margin-bottom:8px;}
+.sum-hero p{font-size:.85rem;color:var(--mid);line-height:1.85;word-break:keep-all;}
+.concept{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:13px;margin-bottom:26px;}
+.cc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.cc-n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;
+  background:var(--accent);color:#ffffff;font-size:.72rem;font-weight:800;margin-bottom:9px;}
+.cc h4{font-size:.92rem;font-weight:800;margin-bottom:8px;letter-spacing:-.01em;word-break:keep-all;}
+.cc p{font-size:.79rem;color:var(--mid);line-height:1.8;word-break:keep-all;}
+.cc p+p{margin-top:7px;}
+.cc b{color:var(--text);}
+.cc .link{margin-top:10px;padding:9px 11px;background:var(--surface-2);border-left:3px solid var(--warm);
+  border-radius:0 7px 7px 0;font-size:.75rem;color:var(--warm);line-height:1.65;word-break:keep-all;}
+.ftable{width:100%;border-collapse:collapse;font-size:.77rem;margin-top:8px;}
+.ftable th,.ftable td{padding:7px 8px;border:1px solid var(--line);text-align:left;line-height:1.55;}
+.ftable th{background:var(--surface-2);color:var(--dim);font-size:.71rem;font-weight:700;}
+.ftable td b{color:var(--text);}
+.flowbox{display:flex;flex-wrap:wrap;align-items:center;gap:7px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;padding:16px;}
+.fl{font-size:.79rem;font-weight:700;padding:7px 11px;border-radius:7px;
+  background:var(--surface-2);border:1px solid var(--line-2);color:var(--mid);word-break:keep-all;}
+.fl.cool{border-color:rgba(96,165,250,.5);color:var(--cool);}
+.fl.warm{border-color:rgba(245,158,11,.5);color:var(--warm);}
+.fl.good{border-color:rgba(52,211,153,.5);color:var(--good);}
+.ar{color:var(--mid);font-size:.9rem;}
+.chk{display:flex;flex-direction:column;gap:8px;}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;background:var(--surface);
+  border:1px solid var(--line);border-radius:9px;font-size:.82rem;line-height:1.6;
+  color:var(--mid);cursor:pointer;transition:.15s;word-break:keep-all;}
+.chk label:hover{border-color:var(--line-2);}
+.chk input{accent-color:var(--good);margin-top:3px;flex-shrink:0;}
+.chk input:checked+span{color:var(--good);}
+.ans-block{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-bottom:9px;}
+.ans-q{font-size:.79rem;font-weight:700;color:var(--mid);margin-bottom:6px;line-height:1.55;}
+.ans-a{font-size:.83rem;color:var(--text);line-height:1.75;white-space:pre-wrap;word-break:break-word;}
+.ans-a.none{color:var(--dim);font-style:italic;}
+.empty{padding:34px;text-align:center;color:var(--dim);font-size:.83rem;line-height:1.85;}
+
+@media(max-width:1180px){ .side{flex-basis:265px;} .side-r{flex-basis:285px;} }
+@media(max-width:900px){
+  .page.on{flex-direction:column;overflow-y:auto;}
+  .side,.side-r{flex:0 0 auto;width:100%;border:none;border-bottom:1px solid var(--line);}
+  .center{min-height:400px;}
+  .steps .step-btn{padding:7px 9px;font-size:.75rem;}
+}
+
+/* ═══════════ 모바일 대응 ═══════════ */
+@supports (height:100dvh){ body{height:100dvh;} }
+@media(max-width:820px){
+  .topbar{flex:0 0 auto;height:auto;flex-wrap:wrap;padding:8px 12px;gap:6px 8px;}
+  .topbar h1{font-size:.82rem;order:1;flex:1 1 auto;white-space:normal;line-height:1.35;}
+  .std{order:2;font-size:.58rem;}
+  .tabs{order:3;flex:1 1 100%;max-width:none;overflow-x:auto;scrollbar-width:none;
+        padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .tabs::-webkit-scrollbar{height:0;}
+  .tab{flex:0 0 auto;padding:8px 11px;font-size:.75rem;}
+  .pane{padding:14px 12px 34px;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+  .page.on{flex-direction:column;overflow-y:auto;}
+  .side,.side-r{flex:0 0 auto;width:auto;max-height:none;overflow:visible;
+    border-right:0;border-left:0;border-bottom:1px solid var(--line);}
+  .scroll{overflow:visible;height:auto;}
+  table.dt{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.dt tbody{display:table;width:100%;min-width:460px;}
+  table.dt th,table.dt td{padding:5px 6px;}
+  h2.sec{font-size:.98rem;}
+  p.sub{font-size:.79rem;}
+  textarea{min-height:76px;}
+  .btn,.btn.sm{padding:8px 12px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1>단열 팽창과 구름 발생 <span>· 압력으로 온도를 재다</span></h1>
+  <nav class="steps">
+    <button class="step-btn on" data-step="0"><span class="step-num">0</span>주사기 연습</button>
+    <button class="step-btn"    data-step="1"><span class="step-num">1</span>준비 · 예상</button>
+    <button class="step-btn"    data-step="2"><span class="step-num">2</span>측정 · 분석</button>
+    <button class="step-btn"    data-step="3"><span class="step-num">3</span>비교 · 정리</button>
+    <button class="step-btn"    data-step="4"><span class="step-num">4</span>총정리</button>
+  </nav>
+</header>
+
+<div class="wrap">
+
+<!-- ==================== STEP 0 : 주사기 연습 ==================== -->
+<section class="page on" id="page0">
+ <div class="scroll"><div class="pane">
+
+  <h2 class="sec">먼저 주사기로 연습해 봅시다</h2>
+  <p class="sub">
+    페트병 실험에 들어가기 전에, 훨씬 간단한 장치로 같은 일을 먼저 겪어 봅니다.
+    주사기를 센서에 끼우기만 하면 되고 만들 것은 하나도 없습니다.
+    여기서 알아낸 것이 다음 실험을 그대로 설명해 줍니다.
+  </p>
+
+  <div class="kit">
+    <span>Vernier 무선 가스 압력 센서</span>
+    <span>20 mL 주사기 (센서에 딸려 온 것)</span>
+    <span>Graphical Analysis 앱</span>
+  </div>
+
+  <div class="proc">
+    <div class="proc-card">
+      <div class="proc-no">실험 A</div>
+      <h4>천천히 밀기</h4>
+      <p>주사기를 <b>20 mL</b>에 맞춰 센서에 끼웁니다. 5초에 걸쳐 <b>천천히</b> 10 mL까지 밀고 압력을 읽습니다.</p>
+      <p class="tip">부피가 절반이 되면 압력은 몇 배가 될까요? 중1에서 배운 내용입니다.</p>
+    </div>
+    <div class="proc-card">
+      <div class="proc-no">실험 B</div>
+      <h4>확 밀기</h4>
+      <p>다시 20 mL로 되돌린 뒤, 이번에는 <b>한순간에</b> 10 mL까지 밀어 넣고 그대로 붙잡습니다. 최고 압력과, 15초 뒤 압력을 읽습니다.</p>
+      <p class="tip">부피는 A와 똑같이 10 mL인데 압력이 다르다면, 무엇이 달라진 걸까요?</p>
+    </div>
+    <div class="proc-card">
+      <div class="proc-no">실험 C</div>
+      <h4>확 당기기</h4>
+      <p>10 mL에서 <b>한순간에</b> 20 mL까지 당기고 붙잡습니다. 가장 낮은 압력과, 15초 뒤 압력을 읽습니다.</p>
+      <p class="tip">이것이 구름 실험의 축소판입니다. 주사기를 만져 보세요.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px;">
+    <h2 class="sec" style="font-size:.95rem;">측정 기록</h2>
+    <p class="sub" style="margin-bottom:12px;">읽은 값을 kPa 단위로 적으면 아래에서 바로 해석해 줍니다.</p>
+    <table class="rec">
+      <tr><th style="width:60%">측정 항목</th><th>압력 (kPa)</th></tr>
+      <tr><td>① 20 mL일 때 (처음)</td><td><input type="number" id="s0" step="0.1" placeholder="예: 101.3"></td></tr>
+      <tr><td>② 천천히 10 mL까지 밀었을 때</td><td><input type="number" id="s1" step="0.1"></td></tr>
+      <tr><td>③ 확 밀었을 때 <b>최고</b> 압력</td><td><input type="number" id="s2" step="0.1"></td></tr>
+      <tr><td>④ 그대로 15초 뒤</td><td><input type="number" id="s3" step="0.1"></td></tr>
+      <tr><td>⑤ 확 당겼을 때 <b>최저</b> 압력</td><td><input type="number" id="s4" step="0.1"></td></tr>
+      <tr><td>⑥ 그대로 15초 뒤</td><td><input type="number" id="s5" step="0.1"></td></tr>
+      <tr><td>교실 온도 (℃)</td><td><input type="number" id="s-room" value="20" step="0.1"></td></tr>
+    </table>
+    <div class="out" id="syr-out">숫자를 넣으면 해석이 나타납니다.</div>
+  </div>
+
+  <div class="explain">
+    <h3>왜 부피가 같은데 압력이 다를까?</h3>
+    <div class="explain-steps">
+      <div class="ex-step"><span class="ex-n">1</span>
+        <p><b>천천히</b> 밀면 눌리면서 생긴 열이 주사기 벽을 통해 밖으로 빠져나갑니다. 공기 온도는 교실 온도 그대로입니다.</p></div>
+      <div class="ex-step"><span class="ex-n">2</span>
+        <p><b>확</b> 밀면 열이 빠져나갈 틈이 없습니다. 공기가 <strong>뜨거워진 채</strong>로 갇히고, 뜨거운 공기는 더 세게 밀어내므로 압력이 더 높습니다.</p></div>
+      <div class="ex-step"><span class="ex-n">3</span>
+        <p>15초 기다리면 열이 빠져나가 교실 온도로 돌아옵니다. 그래서 압력이 ②의 값까지 <strong>스르르 내려앉습니다.</strong></p></div>
+      <div class="ex-step"><span class="ex-n">4</span>
+        <p>당길 때는 정반대입니다. 확 당기면 공기가 <strong>차가워지고</strong>, 압력이 예상보다 더 낮아졌다가 서서히 올라옵니다.</p></div>
+    </div>
+    <div class="conclude">
+      <b>열이 드나들 틈 없이 빠르게 부피가 바뀌는 것</b>을 <b>단열 변화</b>라고 합니다.
+      빠르게 눌리면 뜨거워지고(단열 압축), 빠르게 넓어지면 차가워집니다(<b>단열 팽창</b>).
+      다음 단계에서는 이 '단열 팽창'으로 실제 구름을 만들어 봅니다.
+    </div>
+  </div>
+
+  <div style="display:flex;gap:9px;">
+    <button class="btn primary" data-goto="1">1단계로 넘어가기 →</button>
+  </div>
+
+ </div></div>
+</section>
+
+
+<!-- ==================== STEP 1 : 준비·예상 ==================== -->
+<section class="page" id="page1">
+ <div class="scroll"><div class="pane">
+
+  <h2 class="sec">페트병으로 구름 만들기 — 장치 준비</h2>
+  <p class="sub">뚫거나 붙이거나 달굴 일이 없습니다. 병 입구를 <strong>고무마개로 막는 것</strong>이 전부입니다.</p>
+
+  <div class="kit">
+    <span>Vernier 무선 가스 압력 센서</span>
+    <span>Luer 튜브</span>
+    <span class="pick">고무마개 (센서에 딸려 온 것)</span>
+    <span>1.5 L 생수병 — 얇아서 잘 눌리는 것</span>
+    <span>물 10 mL</span>
+    <span>향 또는 성냥</span>
+  </div>
+
+  <div class="proc">
+    <div class="proc-card">
+      <div class="proc-no">STEP 01</div>
+      <h4>병 입구 막기</h4>
+      <p>뚜껑을 버리고 <b>고무마개</b>를 병 입구에 꾹 눌러 끼웁니다. 마개의 구멍에 튜브를 연결하고 반대쪽을 센서에 끼웁니다.</p>
+      <p class="tip">마개가 병 입구에 헐겁다면 <b>블루택이나 유토</b>로 튜브 둘레를 꼼꼼히 눌러 막아도 됩니다. 도구가 필요 없고 몇 번이고 다시 쓸 수 있습니다.</p>
+    </div>
+    <div class="proc-card">
+      <div class="proc-no">STEP 02</div>
+      <h4>물과 연기 넣기</h4>
+      <p>막기 전에 물 10 mL를 넣고 흔들어 안을 촉촉하게 만듭니다. 향 연기를 몇 초 불어넣고 곧바로 막습니다.</p>
+      <p class="tip">연기가 <b>응결핵</b>입니다. 연기를 넣지 않은 병도 하나 준비해 비교하세요.</p>
+    </div>
+    <div class="proc-card">
+      <div class="proc-no">STEP 03</div>
+      <h4>새는지 확인</h4>
+      <p>기록을 시작하고 5초간 가만히 둡니다. 그다음 살짝 쥐어 압력을 올린 채 10초간 지켜봅니다.</p>
+      <p class="tip">압력이 계속 흘러내리면 <b>새는 것</b>입니다. 마개를 다시 눌러 끼우고 확인하세요. 여기서 새면 뒤의 계산이 전부 어긋납니다.</p>
+    </div>
+    <div class="proc-card">
+      <div class="proc-no">STEP 04</div>
+      <h4>쥐고 · 기다리고 · 놓기</h4>
+      <p>두 손으로 힘껏 쥡니다. <b>그 상태로 15초</b> 기다린 뒤, 한순간에 확 놓습니다. 병 안을 잘 보세요.</p>
+      <p class="tip">15초 기다리기가 핵심입니다. 0단계 실험 B에서 보았듯이, 눌려서 뜨거워진 공기가 교실 온도로 돌아올 시간입니다.</p>
+    </div>
+  </div>
+
+  <div class="warn">
+    <strong>안전</strong>
+    <p>
+      · 손으로 쥐는 정도의 압력이므로 위험은 낮지만, 마개가 튀어나올 수 있으니 <strong>병 입구를 사람 쪽으로 향하지 않게</strong> 놓고 실험합니다.<br>
+      · 센서는 400 kPa를 넘으면 손상됩니다. <strong>펌프로 공기를 넣지 마세요.</strong> 손으로만 누릅니다.<br>
+      · 향과 성냥은 교사가 다루고, 불씨가 병 안에 들어가지 않게 합니다. 실험 후 환기합니다.
+    </p>
+  </div>
+
+  <div class="explain">
+    <h3>온도계가 없는데 어떻게 온도를 잰다는 걸까?</h3>
+    <div class="explain-steps">
+      <div class="ex-step"><span class="ex-n">1</span>
+        <p>부피가 정해진 통 안에서 공기가 <strong>차가워지면 압력이 낮아지고</strong>, 따뜻해지면 압력이 높아집니다. 0단계에서 이미 확인한 사실입니다.</p></div>
+      <div class="ex-step"><span class="ex-n">2</span>
+        <p>손을 놓는 순간 병은 원래 모양으로 돌아옵니다. 그런데 압력을 보면 <strong>바깥 공기보다 낮습니다.</strong> 공기가 차가워졌다는 뜻입니다.</p></div>
+      <div class="ex-step"><span class="ex-n">3</span>
+        <p>가만히 두면 압력이 <strong>저절로 올라가</strong> 원래 값으로 돌아옵니다. 병 안 공기가 교실 온도까지 데워진 것입니다.</p></div>
+      <div class="ex-step"><span class="ex-n">4</span>
+        <p>압력이 몇 % 낮았는지를 알면 <strong>몇 도나 차가웠는지</strong>를 알 수 있습니다. 압력이 온도계 역할을 하는 셈입니다.</p></div>
+    </div>
+    <div class="conclude">
+      한 가지 약속이 필요합니다. 압력과 온도가 정확히 비례하려면 <b>−273 ℃를 0으로 삼는 온도(절대온도, 단위 K)</b>를 써야 합니다.
+      교실이 20 ℃라면 293 K입니다. 압력이 1 % 낮아졌다면 절대온도도 1 % 낮아진 것이므로
+      293 × 0.99 = 290 K, 다시 ℃로 바꾸면 <b>17 ℃</b>가 됩니다. 이 계산은 2단계에서 자동으로 해 드립니다.
+    </div>
+  </div>
+
+  <h2 class="sec" style="margin-top:8px;">먼저 예상해 봅시다</h2>
+  <p class="sub">조작하기 전에 답을 적어 두세요. 틀려도 괜찮습니다. 2단계에서 실제 측정값과 나란히 보여 드립니다.</p>
+
+  <div class="pred-grid">
+    <div class="card">
+      <div class="pred-q">Q1. 병을 쥐었다가 <em>놓는 순간</em>, 병 안의 압력은 어떻게 될까요?</div>
+      <div class="radio-row">
+        <label><input type="radio" name="pq1" value="a"> 원래 압력으로 곧장 되돌아온다</label>
+        <label><input type="radio" name="pq1" value="b"> 원래보다 <b>더 낮아졌다가</b> 천천히 되돌아온다</label>
+        <label><input type="radio" name="pq1" value="c"> 원래보다 <b>더 높아졌다가</b> 천천히 되돌아온다</label>
+      </div>
+      <div class="pred-hint">0단계 실험 C에서 무슨 일이 있었는지 떠올려 보세요.</div>
+    </div>
+    <div class="card">
+      <div class="pred-q">Q2. 놓는 순간 병 안 공기는 몇 ℃까지 내려갈 것 같나요?</div>
+      <label class="lbl" style="margin-top:4px;">예상 온도 (℃)</label>
+      <input type="number" id="pred-temp" step="0.1" placeholder="예: 15">
+      <div class="pred-hint">교실 온도를 기준으로 생각해 보세요.</div>
+    </div>
+    <div class="card">
+      <div class="pred-q">Q3. 향 연기를 넣지 <em>않은</em> 병에서도 구름이 생길까요? 그렇게 생각한 까닭은?</div>
+      <textarea id="pred-nuclei" placeholder="예상과 까닭을 적어 보세요."></textarea>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:9px;margin-top:16px;">
+    <button class="btn primary" id="pred-save">예상 저장하고 2단계로 →</button>
+    <span id="pred-msg" style="align-self:center;font-size:.79rem;color:var(--good);"></span>
+  </div>
+
+ </div></div>
+</section>
+
+
+<!-- ==================== STEP 2 : 측정·분석 ==================== -->
+<section class="page" id="page2">
+
+  <aside class="side">
+    <div class="grp">
+      <div class="grp-t">1. 데이터 불러오기</div>
+      <div class="drop" id="drop">
+        <strong>CSV 파일을 끌어다 놓기</strong>
+        <span>Graphical Analysis → 내보내기 → CSV<br>(클릭해서 선택도 가능)</span>
+      </div>
+      <input type="file" id="file" accept=".csv,.txt,.tsv" hidden>
+      <button class="btn" id="btn-sample">센서 없이 먼저 살펴보기 (예시 데이터)</button>
+      <div id="file-info" style="font-size:.74rem;color:var(--dim);line-height:1.5;"></div>
+    </div>
+
+    <div class="grp">
+      <div class="grp-t">2. 실험 조건</div>
+      <div>
+        <label class="lbl" for="run-name">실험 이름</label>
+        <input type="text" id="run-name" placeholder="예: 3반 2모둠 · 연기 있음">
+      </div>
+      <div class="row2">
+        <div><label class="lbl" for="t-room">교실 온도 (℃)</label>
+          <input type="number" id="t-room" value="20" step="0.1"></div>
+        <div><label class="lbl" for="rh">상대습도 (%)</label>
+          <input type="number" id="rh" value="100" min="1" max="100" step="1"></div>
+      </div>
+      <div class="row2">
+        <div><label class="lbl" for="nuclei">응결핵(연기)</label>
+          <select id="nuclei"><option value="1">넣음</option><option value="0">넣지 않음</option></select></div>
+        <div><label class="lbl" for="cloud">구름 관찰</label>
+          <select id="cloud">
+            <option value="2">뚜렷하게 보임</option>
+            <option value="1">희미하게 보임</option>
+            <option value="0">보이지 않음</option></select></div>
+      </div>
+      <div>
+        <label class="lbl" for="unit">CSV의 압력 단위</label>
+        <select id="unit">
+          <option value="kPa">kPa</option><option value="hPa">hPa / mbar</option>
+          <option value="atm">atm</option><option value="psi">psi</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grp">
+      <div class="grp-t">3. 결과 저장</div>
+      <button class="btn primary" id="btn-add" disabled>이 실험을 비교표에 추가</button>
+      <button class="btn" id="btn-reset">구간 다시 잡기</button>
+    </div>
+  </aside>
+
+  <div class="center">
+    <div class="chart-head">
+      <span class="chart-title">압력 – 시간 그래프</span>
+      <div class="marker-bar">
+        <button class="mk" data-mk="0"><i style="background:#41505f"></i>P₀ 처음</button>
+        <button class="mk" data-mk="1"><i style="background:#9c5c00"></i>P₁ 놓기 직전</button>
+        <button class="mk" data-mk="2"><i style="background:#2563eb"></i>P₂ 가장 낮을 때</button>
+        <button class="mk" data-mk="3"><i style="background:#0b7d73"></i>P₃ 되돌아온 뒤</button>
+      </div>
+    </div>
+    <div class="chart-box">
+      <canvas id="chart"></canvas>
+      <div class="chart-hint" id="chart-hint">
+        왼쪽에서 CSV를 불러오면 그래프가 나타납니다.<br>
+        <span style="font-size:.78rem">센서가 없다면 '예시 데이터'로 먼저 연습해 보세요.</span>
+      </div>
+    </div>
+  </div>
+
+  <aside class="side-r">
+    <div class="res">
+      <div class="res-t">읽어낸 압력</div>
+      <div class="res-row"><span class="res-k">P₀ 처음 (바깥 공기)</span><span class="res-v" id="v-p0">—</span></div>
+      <div class="res-row"><span class="res-k">P₁ 놓기 직전</span><span class="res-v" id="v-p1" style="color:var(--warm)">—</span></div>
+      <div class="res-row"><span class="res-k">P₂ 가장 낮을 때</span><span class="res-v" id="v-p2" style="color:var(--cool)">—</span></div>
+      <div class="res-row"><span class="res-k">P₃ 되돌아온 뒤</span><span class="res-v" id="v-p3" style="color:var(--good)">—</span></div>
+      <div class="res-row"><span class="res-k">얼마나 내려갔나 (P₃−P₂)</span><span class="res-v" id="v-dip">—</span></div>
+    </div>
+
+    <div class="res" style="border-color:var(--line-2);">
+      <div class="res-t">놓는 순간 병 안 공기의 온도</div>
+      <div style="text-align:center;padding:6px 0 10px;">
+        <span class="big" id="v-tmeas" style="color:var(--cool)">—</span><span class="unit">℃</span>
+        <div style="font-size:.78rem;color:var(--dim);margin-top:3px;">
+          교실 온도보다 <span id="v-dt" style="font-weight:700;color:var(--cool)">—</span>
+        </div>
+      </div>
+      <div class="note" id="how-note">
+        부피는 그대로인데 압력이 P₂에서 P₃까지 <b>저절로 올라갔습니다.</b>
+        그동안 공기가 데워졌다는 뜻이고, 올라간 정도만큼 원래 차가웠던 것입니다.
+      </div>
+    </div>
+
+    <div class="res">
+      <div class="res-t">이 온도면 구름이 생길까?</div>
+      <div class="res-row"><span class="res-k">이슬점</span><span class="res-v" id="v-dew">—</span></div>
+      <div class="res-row"><span class="res-k">실제로 내려간 온도</span><span class="res-v" id="v-reach">—</span></div>
+      <div id="v-verdict" class="verdict mid" style="margin-top:9px;">데이터를 불러오세요.</div>
+    </div>
+
+    <div class="res" id="pred-box" style="display:none;">
+      <div class="res-t">1단계 예상과 비교</div>
+      <div class="res-row"><span class="res-k">내가 예상한 온도</span><span class="res-v" id="v-pred">—</span></div>
+      <div class="res-row"><span class="res-k">실제 측정한 온도</span><span class="res-v" id="v-pred-real">—</span></div>
+      <div class="note" style="margin-top:8px;" id="pred-note">—</div>
+    </div>
+
+    <details class="adv">
+      <summary>심화 — 열이 하나도 안 새었다면 얼마나 차가워졌을까</summary>
+      <div class="body">
+        <div class="res-row"><span class="res-k">완전 단열이라면</span><span class="res-v" id="v-tth">—</span></div>
+        <div class="res-row"><span class="res-k">실제 측정값</span><span class="res-v" id="v-tth-real">—</span></div>
+        <div class="res-row"><span class="res-k">차이</span><span class="res-v" id="v-gap">—</span></div>
+        <p style="margin-top:10px;" id="gap-note">—</p>
+        <p style="margin-top:10px;">
+          열이 전혀 드나들지 않는 이상적인 팽창에서는 압력과 온도가
+          <code>T₂ = T₁ × (P₂/P₁)^0.286</code> 관계를 따릅니다(포아송 관계).
+          고등학교에서 배우는 식이니 중학교에서는 <b>"완전 단열이라면 더 차가워야 한다"</b>는 사실만 확인하면 충분합니다.
+        </p>
+      </div>
+    </details>
+
+    <details class="adv">
+      <summary>심화 — 압력 세 개로 공기의 성질 알아내기</summary>
+      <div class="body">
+        <div class="res-row"><span class="res-k">측정한 값</span><span class="res-v" id="v-gamma">—</span></div>
+        <div class="res-row"><span class="res-k">공기의 실제 값</span><span class="res-v">1.40</span></div>
+        <p style="margin-top:10px;">
+          <code>γ = ln(P₁/P₂) ÷ ln(P₁/P₃)</code> — 클레망·데조름 방법입니다.
+          온도계 없이 압력만으로 기체의 비열비를 구할 수 있습니다.
+        </p>
+      </div>
+    </details>
+  </aside>
+</section>
+
+
+<!-- ==================== STEP 3 : 비교·정리 ==================== -->
+<section class="page" id="page3">
+ <div class="scroll"><div class="pane" style="max-width:1180px;">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:14px;">
+    <div>
+      <h2 class="sec">조건별 비교</h2>
+      <p class="sub" style="margin-bottom:0;">한 번에 한 가지 조건만 바꾸어 여러 번 측정하고, 그 결과를 여기 모읍니다.</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" id="btn-export">비교표 CSV로 내려받기</button>
+      <button class="btn" id="btn-clear">전체 지우기</button>
+    </div>
+  </div>
+
+  <div class="card" style="padding:0;overflow-x:auto;">
+    <table class="cmp" id="cmp">
+      <thead><tr>
+        <th>실험</th><th>응결핵</th><th>P₁ 쥐었을 때</th><th>내려간 압력</th>
+        <th>내려간 온도</th><th>이슬점</th><th>구름</th>
+      </tr></thead>
+      <tbody id="cmp-body"></tbody>
+    </table>
+    <div class="empty" id="cmp-empty">아직 추가된 실험이 없습니다.<br>2단계에서 데이터를 분석한 뒤 '비교표에 추가'를 누르세요.</div>
+  </div>
+
+  <h2 class="sec" style="margin-top:34px;">정리 문항</h2>
+  <p class="sub">비교표의 숫자를 근거로 삼아 답하세요.</p>
+
+  <div class="qa">
+    <div class="qa-item">
+      <div class="qa-q">Q1. 병을 놓은 직후 압력이 <em>바깥 공기보다 낮아졌다가</em> 다시 올라왔습니다. 병 모양은 그대로였는데 왜 이런 일이 일어났을까요?</div>
+      <textarea placeholder="0단계 실험 C를 떠올려 보세요."></textarea>
+    </div>
+    <div class="qa-item">
+      <div class="qa-q">Q2. 응결핵을 넣은 병과 넣지 않은 병은 <em>내려간 온도가 거의 같았는데</em> 구름은 달랐습니다. 구름이 생기려면 온도 말고 무엇이 더 필요하다는 뜻일까요?</div>
+      <textarea placeholder="수증기가 물방울이 되려면 무엇에 달라붙어야 할까요?"></textarea>
+    </div>
+    <div class="qa-item">
+      <div class="qa-q">Q3. 실제로 내려간 온도가 <em>계산보다 덜 차가웠습니다.</em> 어디에서 열이 들어왔을지 두 가지 이상 써 보세요.</div>
+      <textarea placeholder="① 병 벽을 통해서… ② 수증기가 물방울이 될 때…"></textarea>
+    </div>
+    <div class="qa-item">
+      <div class="qa-q">Q4. 실제 하늘에서 이 실험의 <em>'손을 놓는 것'</em>에 해당하는 일은 무엇일까요? 공기 덩어리가 어떻게 움직일 때 같은 일이 일어나는지 설명해 보세요.</div>
+      <textarea placeholder="공기 덩어리가 위로 올라가면 주변 기압은 어떻게 될까요?"></textarea>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;">
+    <button class="btn primary" data-goto="4">총정리로 넘어가기 →</button>
+  </div>
+
+ </div></div>
+</section>
+
+<!-- ==================== STEP 4 : 총정리 ==================== -->
+<section class="page" id="page4">
+ <div class="scroll"><div class="pane">
+
+  <div class="sum-hero">
+    <h1>오늘 배운 것을 한 장으로</h1>
+    <p>
+      우리는 온도계 없이 <b>압력만으로 공기의 온도</b>를 알아냈고,
+      그 온도가 이슬점 아래로 내려갔을 때 <b>구름</b>이 생기는 것을 보았습니다.
+      페트병 안에서 일어난 일은 실제 하늘에서 매일 일어나는 일과 똑같습니다.
+      아래 정리를 읽으며 내가 본 숫자와 맞춰 보세요.
+    </p>
+  </div>
+
+  <h2 class="sec">개념 총정리</h2>
+  <p class="sub">교과서 내용을 오늘 실험한 것과 이어서 정리했습니다.</p>
+
+  <div class="concept">
+    <div class="cc">
+      <span class="cc-n">1</span>
+      <h4>포화 수증기량과 이슬점</h4>
+      <p>공기가 품을 수 있는 수증기의 양에는 한계가 있습니다. 이 한계량을 <b>포화 수증기량</b>이라 하며,
+         <b>기온이 높을수록 커집니다.</b></p>
+      <p>공기를 식히다 보면 어느 온도에서 품고 있던 수증기가 딱 포화 상태가 됩니다.
+         이 온도가 <b>이슬점</b>입니다. 이슬점보다 더 식으면 넘치는 수증기가 <b>물방울로 맺힙니다(응결).</b></p>
+      <div class="link">오늘 확인한 것 — 화면이 계산해 준 이슬점보다 낮은 온도까지 내려갔을 때만
+        구름이 생겼습니다.</div>
+    </div>
+
+    <div class="cc">
+      <span class="cc-n">2</span>
+      <h4>상대습도</h4>
+      <p>지금 공기가 품은 수증기량이 포화 수증기량의 몇 %인지를 나타낸 값입니다.</p>
+      <p>상대습도가 <b>100%</b>라는 것은 <b>기온과 이슬점이 같다</b>는 뜻입니다.
+         조금만 식어도 곧바로 응결이 시작됩니다.</p>
+      <div class="link">오늘 확인한 것 — 병에 물을 넣고 흔들어 두면 안이 거의 100%가 되어
+        조금만 식혀도 구름이 생겼습니다.</div>
+    </div>
+
+    <div class="cc">
+      <span class="cc-n">3</span>
+      <h4>단열 팽창과 냉각</h4>
+      <p>열이 드나들 틈 없이 빠르게 부피가 변하는 것을 <b>단열 변화</b>라고 합니다.</p>
+      <p>공기가 <b>빠르게 넓어지면</b> 주변을 밀어내는 데 에너지를 쓰므로
+         <b style="color:var(--cool)">온도가 내려갑니다(단열 팽창).</b>
+         반대로 빠르게 눌리면 온도가 올라갑니다(단열 압축).</p>
+      <div class="link">오늘 확인한 것 — 0단계 주사기에서 확 당겼을 때 압력이 예상보다
+        더 내려갔고, 페트병에서도 같은 일이 일어났습니다.</div>
+    </div>
+
+    <div class="cc">
+      <span class="cc-n">4</span>
+      <h4>응결핵과 구름</h4>
+      <p>온도가 이슬점 아래로 내려가도 그것만으로는 부족합니다.
+         수증기가 <b>달라붙을 자리</b>가 있어야 물방울이 됩니다.
+         이 자리 역할을 하는 아주 작은 알갱이를 <b>응결핵</b>이라고 합니다.</p>
+      <p>실제 하늘에서는 <b>먼지, 꽃가루, 화산재, 바다 소금 알갱이</b> 등이 응결핵이 됩니다.</p>
+      <div class="link">오늘 확인한 것 — 향 연기를 넣은 병과 넣지 않은 병은
+        내려간 온도가 거의 같았는데도 구름은 크게 달랐습니다.</div>
+    </div>
+
+    <div class="cc">
+      <span class="cc-n">5</span>
+      <h4>실제 하늘에서는 무엇이 '손을 놓는' 역할을 할까</h4>
+      <p>대기는 위로 갈수록 기압이 낮아집니다. 그래서 공기 덩어리가
+         <b>위로 올라가면 저절로 부풀어</b> 단열 팽창이 일어나고 온도가 내려갑니다.</p>
+      <p>공기가 올라가는 까닭은 네 가지입니다.</p>
+      <table class="ftable">
+        <tr><td><b>① 지표 가열</b></td><td>땅이 뜨거워져 공기가 떠오름</td></tr>
+        <tr><td><b>② 산 비탈</b></td><td>바람이 산을 타고 오름</td></tr>
+        <tr><td><b>③ 저기압 중심</b></td><td>사방에서 모인 공기가 위로</td></tr>
+        <tr><td><b>④ 전선</b></td><td>따뜻한 공기가 찬 공기 위로 올라탐</td></tr>
+      </table>
+      <div class="link">③과 ④는 다음 단원 '중위도 저기압'에서 다시 만납니다.</div>
+    </div>
+
+    <div class="cc">
+      <span class="cc-n">6</span>
+      <h4>구름에서 비가 되기까지</h4>
+      <p>구름 알갱이는 너무 작아서 그대로는 떨어지지 않습니다. 서로 뭉쳐 커져야 비가 됩니다.
+         뭉치는 방식은 지역에 따라 다릅니다.</p>
+      <table class="ftable">
+        <tr><th></th><th>빙정설</th><th>병합설</th></tr>
+        <tr><td>지역</td><td>중위도·고위도</td><td>열대 지방</td></tr>
+        <tr><td>구름 속</td><td>얼음 알갱이와<br>물방울이 함께</td><td>물방울만</td></tr>
+        <tr><td>커지는 법</td><td>물방울의 수증기가<br><b>얼음 알갱이에 달라붙음</b></td><td>크기가 다른 물방울이<br><b>부딪쳐 합쳐짐</b></td></tr>
+        <tr><td>내리는 것</td><td>눈 · 녹으면 비</td><td>비</td></tr>
+      </table>
+      <div class="link">우리나라는 중위도라 대부분 빙정설로 설명합니다.</div>
+    </div>
+  </div>
+
+  <h2 class="sec">한눈에 보는 흐름</h2>
+  <div class="flowbox">
+    <span class="fl">공기가 위로 올라감</span><span class="ar">→</span>
+    <span class="fl">기압이 낮아져 부풀어 오름</span><span class="ar">→</span>
+    <span class="fl cool">단열 팽창으로 온도 내려감</span><span class="ar">→</span>
+    <span class="fl cool">이슬점 아래로</span><span class="ar">→</span>
+    <span class="fl warm">응결핵에 수증기가 달라붙음</span><span class="ar">→</span>
+    <span class="fl good">구름</span><span class="ar">→</span>
+    <span class="fl good">뭉쳐서 커지면 비·눈</span>
+  </div>
+
+  <h2 class="sec" style="margin-top:30px;">스스로 점검하기</h2>
+  <p class="sub">설명할 수 있으면 표시하세요. 표시가 안 되는 항목은 위 정리를 다시 읽어 보세요.</p>
+  <div class="chk" id="chk" style="margin-bottom:26px;">
+    <label><input type="checkbox"><span>포화 수증기량이 기온에 따라 어떻게 달라지는지 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>이슬점이 무엇인지, 상대습도와 어떤 관계인지 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>단열 팽창이 일어나면 왜 온도가 내려가는지 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>구름이 생기려면 온도 말고 무엇이 더 필요한지 말할 수 있다.</span></label>
+    <label><input type="checkbox"><span>실제 대기에서 공기가 상승하는 까닭을 두 가지 이상 들 수 있다.</span></label>
+    <label><input type="checkbox"><span>빙정설과 병합설의 차이를 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>부피가 같을 때 압력으로 온도를 알아내는 방법을 설명할 수 있다.</span></label>
+  </div>
+
+  <h2 class="sec">내가 쓴 답안 모아보기</h2>
+  <p class="sub">3단계에서 쓴 답이 여기에 모입니다. 빠뜨린 문항이 있는지 확인하세요.</p>
+  <div id="ans-wrap" style="margin-bottom:22px;">
+    <div class="empty" id="ans-empty">아직 쓴 답이 없습니다.</div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="who">학번 · 이름</label>
+    <input type="text" id="who" placeholder="예: 30105 홍길동" style="max-width:220px;margin-bottom:12px;">
+    <div id="ws-actions"></div>
+  </div>
+
+ </div></div>
+</section>
+
+</div>
+
+<footer class="foot">
+  <span class="foot-b">핵심 원리</span>
+  <span class="foot-t">
+    공기가 빠르게 넓어지면 열이 드나들 틈이 없어 <strong style="color:var(--accent)">단열 팽창</strong>이 일어나고,
+    주변을 밀어내는 데 에너지를 쓰므로 <strong style="color:var(--cool)">온도가 내려갑니다.</strong>
+    온도가 이슬점 아래로 내려가고 <strong style="color:var(--warm)">응결핵</strong>이 있으면 수증기가 물방울로 맺혀 구름이 됩니다.
+    실제 대기에서는 공기 덩어리가 <strong>위로 올라가 기압이 낮아질 때</strong> 똑같은 일이 일어납니다.
+  </span>
+</footer>
+
+<script src="worksheet.js?v=7"></script>
+<script>
+/* =========================================================
+   상태
+   ========================================================= */
+const S = { raw:[], idx:[null,null,null,null], armed:-1, runs:[], pred:null };
+const MK_COLOR = ['#41505f','#9c5c00','#2563eb','#0b7d73'];
+const MK_SHORT = ['P₀','P₁','P₂','P₃'];
+const MK_NAME  = ['P₀ 처음','P₁ 놓기 직전','P₂ 가장 낮을 때','P₃ 되돌아온 뒤'];
+const GEXP = 0.2857;                       // (γ−1)/γ , γ = 1.4
+const TO_KPA = { kPa:1, hPa:0.1, atm:101.325, psi:6.89476 };
+const $ = id => document.getElementById(id);
+
+/* =========================================================
+   단계 전환
+   ========================================================= */
+document.querySelectorAll('.step-btn').forEach(b=>b.addEventListener('click',()=>goStep(b.dataset.step)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>goStep(b.dataset.goto)));
+function goStep(n){
+  document.querySelectorAll('.step-btn').forEach(b=>b.classList.toggle('on',b.dataset.step===n));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  $('page'+n).classList.add('on');
+  if(n==='2') requestAnimationFrame(draw);
+  if(n==='3') renderTable();
+  if(n==='4') renderAnswers();
+}
+
+/* =========================================================
+   STEP 0 — 주사기 기록 해석
+   ========================================================= */
+['s0','s1','s2','s3','s4','s5','s-room'].forEach(id=>
+  $(id).addEventListener('input', syringe));
+
+function syringe(){
+  const g = id => parseFloat($(id).value);
+  const [p0,p1,p2,p3,p4,p5] = ['s0','s1','s2','s3','s4','s5'].map(g);
+  const Tc = g('s-room'); const Tk = (isFinite(Tc)?Tc:20) + 273.15;
+  const out = $('syr-out');
+  const parts = [];
+
+  // A. 보일 법칙
+  if(isFinite(p0) && isFinite(p1)){
+    const ratio = p1/p0;
+    parts.push(`<b>천천히 밀기</b> — 부피를 절반으로 줄였더니 압력이
+      <span class="hl" style="color:var(--accent)">${ratio.toFixed(2)}배</span>가 되었습니다.
+      ${Math.abs(ratio-2)<0.35 ? '2배에 가깝습니다. 부피와 압력이 반비례한다는 중1의 내용이 확인됩니다.'
+        : '2배에서 조금 벗어났습니다. 센서 안에도 공기가 조금 들어 있고, 미는 동안 열이 오갔기 때문입니다.'}`);
+  }
+  // B. 빠른 압축
+  if(isFinite(p2) && isFinite(p3)){
+    const over = p2-p3;
+    const T = Tk*p2/p3 - 273.15;
+    parts.push(`<b>확 밀기</b> — 최고 압력이 15초 뒤보다
+      <span class="hl" style="color:var(--warm)">${over.toFixed(1)} kPa</span> 높았습니다.
+      그 순간 공기는 약 <span class="hl" style="color:var(--warm)">${T.toFixed(1)} ℃</span>,
+      교실보다 <b>${(T-Tc).toFixed(1)} ℃ 뜨거웠습니다.</b> 눌리면서 뜨거워진 것입니다.`);
+  }
+  // C. 빠른 팽창
+  if(isFinite(p4) && isFinite(p5)){
+    const under = p5-p4;
+    const T = Tk*p4/p5 - 273.15;
+    parts.push(`<b>확 당기기</b> — 가장 낮은 압력이 15초 뒤보다
+      <span class="hl" style="color:var(--cool)">${under.toFixed(1)} kPa</span> 낮았습니다.
+      그 순간 공기는 약 <span class="hl" style="color:var(--cool)">${T.toFixed(1)} ℃</span>,
+      교실보다 <b>${Math.abs(T-Tc).toFixed(1)} ℃ 차가웠습니다.</b>
+      이것이 <b>단열 팽창</b>이고, 다음 단계에서 이 냉각으로 구름을 만듭니다.`);
+  }
+  out.innerHTML = parts.length ? parts.join('<hr style="border:0;border-top:1px solid var(--line);margin:11px 0">')
+                              : '숫자를 넣으면 해석이 나타납니다.';
+}
+
+/* =========================================================
+   STEP 1 — 예상 저장
+   ========================================================= */
+$('pred-save').addEventListener('click',()=>{
+  const q1 = document.querySelector('input[name=pq1]:checked');
+  const t  = parseFloat($('pred-temp').value);
+  S.pred = { q1:q1?q1.value:null, temp:isFinite(t)?t:null, nuclei:$('pred-nuclei').value.trim() };
+  $('pred-msg').textContent = '저장되었습니다.';
+  if(S.pred.temp!==null){ $('pred-box').style.display=''; $('v-pred').textContent = S.pred.temp.toFixed(1)+' ℃'; }
+  setTimeout(()=>goStep('2'), 350);
+});
+
+/* =========================================================
+   CSV 읽기
+   ========================================================= */
+function parseCSV(text){
+  const rows=[];
+  for(const line of text.split(/\r?\n/)){
+    if(!line.trim()) continue;
+    const c = line.split(/[,\t;]/).map(x=>x.replace(/^"|"$/g,'').trim());
+    if(c.length<2) continue;
+    const a=parseFloat(c[0]), b=parseFloat(c[1]);
+    if(isFinite(a)&&isFinite(b)) rows.push([a,b]);
+  }
+  return rows;
+}
+
+function loadRows(rows,label){
+  if(rows.length<20){ alert('데이터가 너무 적습니다. 시간과 압력 두 열이 있는 CSV인지 확인해 주세요.'); return; }
+  const k = TO_KPA[$('unit').value] || 1;
+  S.raw = rows.map(r=>({t:r[0], p:r[1]*k}));
+  const t0 = S.raw[0].t; S.raw.forEach(d=>d.t-=t0);
+  $('file-info').textContent = `${label} · ${S.raw.length}개 지점 · ${S.raw[S.raw.length-1].t.toFixed(1)}초`;
+  $('chart-hint').style.display='none';
+  autoDetect(); compute(); draw();
+  $('btn-add').disabled = false;
+}
+
+const drop=$('drop'), fileInput=$('file');
+drop.addEventListener('click',()=>fileInput.click());
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over');});
+drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');
+  if(e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);});
+fileInput.addEventListener('change',e=>{ if(e.target.files[0]) readFile(e.target.files[0]); });
+function readFile(f){ const r=new FileReader(); r.onload=ev=>loadRows(parseCSV(ev.target.result),f.name); r.readAsText(f,'utf-8'); }
+
+$('unit').addEventListener('change',()=>{
+  if(S.raw.length) $('file-info').textContent += ' · 단위를 바꿨습니다. 파일을 다시 불러오세요.';
+});
+
+/* 예시 데이터 */
+$('btn-sample').addEventListener('click',()=>{
+  const dt=0.02, rows=[], P0=101.3, Pmax=110.5, Phold=109.2, Tr=293.15;
+  const tSq=5, tHold=20, tRel=20.15, tEnd=60;
+  const Tth = Tr*Math.pow(P0/Phold,GEXP);
+  const Tdip = Tr-(Tr-Tth)*0.62;         // 열 유입·숨은열로 이론보다 덜 차가움
+  const Pdip = P0*Tdip/Tr;
+  for(let t=0;t<=tEnd;t+=dt){
+    let p;
+    if(t<tSq)            p=P0;
+    else if(t<tSq+0.6)   p=P0+(Pmax-P0)*((t-tSq)/0.6);
+    else if(t<tHold)     p=Phold+(Pmax-Phold)*Math.exp(-(t-tSq-0.6)/2.4);
+    else if(t<tRel)      p=Phold+(Pdip-Phold)*((t-tHold)/(tRel-tHold));
+    else                 p=P0+(Pdip-P0)*Math.exp(-(t-tRel)/9.5);
+    rows.push([t, p+(Math.random()-0.5)*0.06]);
+  }
+  $('unit').value='kPa';
+  loadRows(rows,'예시 데이터 (합성)');
+});
+
+/* =========================================================
+   구간 자동 인식
+   ========================================================= */
+function autoDetect(){
+  const n=S.raw.length, P=S.raw.map(d=>d.p);
+  const head=Math.max(5,Math.floor(n*0.08));
+  S.idx[0]=Math.floor(head/2);
+
+  let dropI=1, dropV=0;
+  for(let i=1;i<n;i++){ const d=P[i]-P[i-1]; if(d<dropV){dropV=d;dropI=i;} }
+  S.idx[1]=Math.max(0,dropI-3);
+
+  let e2=dropI;
+  while(e2<n-1 && S.raw[e2].t-S.raw[dropI].t<3) e2++;
+  let mi=dropI, mv=Infinity;
+  for(let i=dropI;i<=e2;i++) if(P[i]<mv){mv=P[i];mi=i;}
+  S.idx[2]=mi;
+  S.idx[3]=n-1-Math.floor(head/2);
+}
+$('btn-reset').addEventListener('click',()=>{ if(S.raw.length){autoDetect();compute();draw();} });
+
+document.querySelectorAll('.mk').forEach(b=>b.addEventListener('click',()=>{
+  const k=+b.dataset.mk;
+  S.armed = (S.armed===k)?-1:k;
+  document.querySelectorAll('.mk').forEach(x=>x.classList.toggle('armed',+x.dataset.mk===S.armed));
+  draw();
+}));
+
+/* =========================================================
+   계산
+   ========================================================= */
+function dewPoint(Tc,rh){
+  const a=17.625,b=243.04;
+  const g=Math.log(Math.max(rh,1)/100)+a*Tc/(b+Tc);
+  return b*g/(a-g);
+}
+
+function compute(){
+  if(!S.raw.length || S.idx.some(i=>i===null)) return;
+  const [P0,P1,P2,P3] = S.idx.map(i=>S.raw[i].p);
+  const Tc = parseFloat($('t-room').value) || 20;
+  const Tk = Tc+273.15;
+  const rh = parseFloat($('rh').value) || 100;
+  const set=(id,v)=>$(id).textContent=v;
+
+  set('v-p0',P0.toFixed(2)+' kPa'); set('v-p1',P1.toFixed(2)+' kPa');
+  set('v-p2',P2.toFixed(2)+' kPa'); set('v-p3',P3.toFixed(2)+' kPa');
+  set('v-dip',(P3-P2).toFixed(2)+' kPa');
+
+  const Tmeas = Tk*P2/P3 - 273.15;
+  set('v-tmeas',Tmeas.toFixed(1));
+  const dT = Tmeas-Tc;
+  $('v-dt').textContent = (dT<0? Math.abs(dT).toFixed(1)+' ℃ 낮음' : dT.toFixed(1)+' ℃ 높음');
+
+  $('how-note').innerHTML =
+    `부피는 그대로인데 압력이 <b>${P2.toFixed(2)}</b>에서 <b>${P3.toFixed(2)} kPa</b>까지 저절로 올라갔습니다.
+     ${(100*(P3-P2)/P3).toFixed(1)}% 올라간 것이므로, 절대온도도 그만큼 낮았던 셈입니다.
+     ${(Tk).toFixed(0)} K × ${(P2/P3).toFixed(4)} = ${(Tk*P2/P3).toFixed(0)} K = <b>${Tmeas.toFixed(1)} ℃</b>`;
+
+  // 이슬점
+  const dew = dewPoint(Tc,rh);
+  set('v-dew',dew.toFixed(1)+' ℃');
+  set('v-reach',Tmeas.toFixed(1)+' ℃');
+  const vd=$('v-verdict'), nuclei=$('nuclei').value==='1';
+  if(Tmeas<=dew){
+    if(nuclei){ vd.className='verdict ok';
+      vd.innerHTML=`이슬점보다 <b>${(dew-Tmeas).toFixed(1)} ℃ 더 내려갔고</b> 응결핵도 있었습니다.
+        <b>구름이 생길 조건이 모두 갖춰졌습니다.</b>`; }
+    else{ vd.className='verdict mid';
+      vd.innerHTML=`온도는 이슬점 아래로 내려갔지만 <b>응결핵이 없었습니다.</b>
+        수증기가 달라붙을 자리가 없으면 구름은 잘 생기지 않습니다.`; }
+  }else{ vd.className='verdict no';
+    vd.innerHTML=`이슬점보다 <b>${(Tmeas-dew).toFixed(1)} ℃ 높은 데서 멈췄습니다.</b>
+      더 세게 쥐거나, 물을 넣고 더 오래 두어 습도를 높여 보세요.`; }
+
+  // 심화 1 — 완전 단열
+  const Tth = Tk*Math.pow(P2/P1,GEXP)-273.15;
+  set('v-tth',Tth.toFixed(1)+' ℃');
+  set('v-tth-real',Tmeas.toFixed(1)+' ℃');
+  const gap = Tmeas-Tth;
+  set('v-gap',(gap>=0?'+':'')+gap.toFixed(1)+' ℃');
+  $('gap-note').innerHTML = gap>0.3
+    ? `실제로는 이론보다 <b style="color:var(--warm)">${gap.toFixed(1)} ℃ 덜 차가웠습니다.</b>
+       완전한 단열이 아니어서 병 벽을 통해 열이 들어왔고, 수증기가 물방울로 맺힐 때 <b>숨은열</b>을 내놓았기 때문입니다.`
+    : `이론값과 거의 같습니다. 팽창이 그만큼 빠르게 일어났다는 뜻입니다.`;
+
+  // 심화 2 — γ
+  const g = Math.log(P1/P2)/Math.log(P1/P3);
+  set('v-gamma',(isFinite(g)&&g>0&&g<3)?g.toFixed(2):'—');
+
+  // 예상 비교
+  if(S.pred && S.pred.temp!==null){
+    $('pred-box').style.display='';
+    $('v-pred').textContent = S.pred.temp.toFixed(1)+' ℃';
+    $('v-pred-real').textContent = Tmeas.toFixed(1)+' ℃';
+    const d=Math.abs(S.pred.temp-Tmeas);
+    $('pred-note').innerHTML = d<3
+      ? `예상이 <b style="color:var(--good)">${d.toFixed(1)} ℃ 이내</b>로 맞았습니다.`
+      : `예상과 <b style="color:var(--warm)">${d.toFixed(1)} ℃</b> 차이가 납니다. 어디서 어긋났는지 이야기해 보세요.`;
+  }
+}
+['t-room','rh','nuclei'].forEach(id=>$(id).addEventListener('input',()=>{compute();draw();}));
+
+/* =========================================================
+   그래프
+   ========================================================= */
+const cv=$('chart'), cx=cv.getContext('2d');
+const PAD={l:58,r:16,t:14,b:34};
+
+function fit(){
+  const r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  cv.width=Math.max(1,r.width*dpr); cv.height=Math.max(1,r.height*dpr);
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  return {w:r.width,h:r.height};
+}
+
+function draw(){
+  const {w,h}=fit();
+  cx.clearRect(0,0,w,h);
+  if(!S.raw.length) return;
+
+  const T=S.raw.map(d=>d.t), P=S.raw.map(d=>d.p);
+  const tMin=T[0], tMax=T[T.length-1];
+  let pMin=Math.min(...P), pMax=Math.max(...P);
+  const m=(pMax-pMin)*0.12||1; pMin-=m; pMax+=m;
+  const X=t=>PAD.l+(t-tMin)/(tMax-tMin)*(w-PAD.l-PAD.r);
+  const Y=p=>h-PAD.b-(p-pMin)/(pMax-pMin)*(h-PAD.t-PAD.b);
+
+  cx.strokeStyle='#e2e8f0'; cx.lineWidth=1; cx.fillStyle='#4a5a6b'; cx.font='10px Pretendard';
+  for(let i=0;i<=5;i++){
+    const p=pMin+(pMax-pMin)*i/5, y=Y(p);
+    cx.beginPath(); cx.moveTo(PAD.l,y); cx.lineTo(w-PAD.r,y); cx.stroke();
+    cx.textAlign='right'; cx.fillText(p.toFixed(1),PAD.l-7,y+3);
+  }
+  for(let i=0;i<=6;i++){
+    const t=tMin+(tMax-tMin)*i/6, x=X(t);
+    cx.beginPath(); cx.moveTo(x,PAD.t); cx.lineTo(x,h-PAD.b); cx.stroke();
+    cx.textAlign='center'; cx.fillText(t.toFixed(0)+'s',x,h-PAD.b+15);
+  }
+  cx.textAlign='left'; cx.fillText('kPa',6,PAD.t+8);
+
+  if(S.idx[0]!==null){
+    const y0=Y(S.raw[S.idx[0]].p);
+    cx.setLineDash([4,4]); cx.strokeStyle='#475569';
+    cx.beginPath(); cx.moveTo(PAD.l,y0); cx.lineTo(w-PAD.r,y0); cx.stroke();
+    cx.setLineDash([]);
+    cx.fillStyle='#41505f'; cx.font='9px Pretendard'; cx.textAlign='left';
+    cx.fillText('바깥 공기 압력', PAD.l+4, y0-4);
+  }
+
+  if(S.idx[2]!==null && S.idx[3]!==null && S.idx[2]<S.idx[3]){
+    const y0=Y(S.raw[S.idx[0]].p);
+    cx.fillStyle='rgba(96,165,250,.10)';
+    cx.beginPath(); cx.moveTo(X(S.raw[S.idx[2]].t),y0);
+    for(let i=S.idx[2];i<=S.idx[3];i++) cx.lineTo(X(T[i]),Y(P[i]));
+    cx.lineTo(X(S.raw[S.idx[3]].t),y0); cx.closePath(); cx.fill();
+  }
+
+  cx.strokeStyle='#03699f'; cx.lineWidth=1.8; cx.beginPath();
+  for(let i=0;i<T.length;i++){ const x=X(T[i]),y=Y(P[i]); i?cx.lineTo(x,y):cx.moveTo(x,y); }
+  cx.stroke();
+
+  S.idx.forEach((idx,k)=>{
+    if(idx===null) return;
+    const x=X(T[idx]), y=Y(P[idx]);
+    cx.strokeStyle=MK_COLOR[k]; cx.lineWidth=1.2; cx.setLineDash([3,3]);
+    cx.beginPath(); cx.moveTo(x,PAD.t); cx.lineTo(x,h-PAD.b); cx.stroke(); cx.setLineDash([]);
+    cx.fillStyle=MK_COLOR[k];
+    cx.beginPath(); cx.arc(x,y,4.5,0,Math.PI*2); cx.fill();
+    cx.strokeStyle='#f5f8fc'; cx.lineWidth=1.5; cx.stroke();
+    cx.font='bold 10px Pretendard'; cx.textAlign='center'; cx.fillStyle=MK_COLOR[k];
+    cx.fillText(MK_SHORT[k], x, k===2 ? y+20 : y-11);
+  });
+
+  if(S.armed>=0){
+    cx.fillStyle='rgba(56,189,248,.9)'; cx.font='bold 11px Pretendard'; cx.textAlign='left';
+    cx.fillText(`▶ 그래프를 클릭해 ${MK_NAME[S.armed]} 위치를 정하세요`, PAD.l+6, PAD.t+14);
+  }
+}
+
+cv.addEventListener('click',e=>{
+  if(S.armed<0||!S.raw.length) return;
+  const r=cv.getBoundingClientRect(), x=e.clientX-r.left;
+  const T=S.raw.map(d=>d.t), tMin=T[0], tMax=T[T.length-1];
+  const frac=(x-PAD.l)/(r.width-PAD.l-PAD.r);
+  const t=tMin+Math.min(1,Math.max(0,frac))*(tMax-tMin);
+  let best=0,bd=Infinity;
+  for(let i=0;i<T.length;i++){ const d=Math.abs(T[i]-t); if(d<bd){bd=d;best=i;} }
+  S.idx[S.armed]=best; S.armed=-1;
+  document.querySelectorAll('.mk').forEach(x=>x.classList.remove('armed'));
+  compute(); draw();
+});
+window.addEventListener('resize',()=>{ if(S.raw.length) draw(); });
+
+/* =========================================================
+   비교표 · 내보내기
+   ========================================================= */
+$('btn-add').addEventListener('click',()=>{
+  if(!S.raw.length) return;
+  const g=id=>$(id).textContent;
+  S.runs.push({
+    name: $('run-name').value.trim() || `실험 ${S.runs.length+1}`,
+    nuclei: $('nuclei').value==='1'?'있음':'없음',
+    p1:g('v-p1'), dip:g('v-dip'), tm:g('v-tmeas')+' ℃', dew:g('v-dew'),
+    cloud:['보이지 않음','희미함','뚜렷함'][+$('cloud').value]
+  });
+  renderTable(); goStep('3');
+});
+
+function renderTable(){
+  $('cmp-body').innerHTML = S.runs.map(r=>`<tr>
+      <td class="name">${esc(r.name)}</td><td>${r.nuclei}</td><td>${r.p1}</td><td>${r.dip}</td>
+      <td style="color:var(--cool);font-weight:800">${r.tm}</td><td>${r.dew}</td><td>${r.cloud}</td>
+    </tr>`).join('');
+  $('cmp-empty').style.display = S.runs.length?'none':'';
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+$('btn-clear').addEventListener('click',()=>{
+  if(S.runs.length && confirm('비교표를 모두 지울까요?')){ S.runs=[]; renderTable(); }
+});
+
+$('btn-export').addEventListener('click',()=>{
+  if(!S.runs.length){ alert('추가된 실험이 없습니다.'); return; }
+  const head=['실험','응결핵','P1 쥐었을 때','내려간 압력','내려간 온도','이슬점','구름'];
+  const rows=S.runs.map(r=>[r.name,r.nuclei,r.p1,r.dip,r.tm,r.dew,r.cloud]);
+  download('구름발생_비교표.csv','﻿'+[head,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'));
+});
+
+function collectAnswers(){
+  return [...document.querySelectorAll('#page3 .qa-item')].map(q=>({
+    q:q.querySelector('.qa-q').innerText.trim(),
+    a:q.querySelector('textarea').value.trim()
+  }));
+}
+function renderAnswers(){
+  const A=collectAnswers(), done=A.filter(x=>x.a).length, wrap=$('ans-wrap');
+  if(!done){ wrap.innerHTML='<div class="empty">아직 쓴 답이 없습니다. 3단계에서 문항에 답해 보세요.</div>'; return; }
+  wrap.innerHTML=A.map(x=>`<div class="ans-block">
+      <div class="ans-q">${esc(x.q)}</div>
+      <div class="ans-a ${x.a?'':'none'}">${x.a?esc(x.a):'아직 쓰지 않았습니다.'}</div>
+    </div>`).join('')
+    + `<div style="font-size:.78rem;color:var(--dim);margin-top:8px;">
+         ${A.length}문항 중 <b style="color:var(--good)">${done}문항</b> 작성했습니다.</div>`;
+}
+
+/* ===== 활동지 (worksheet.js) ===== */
+const SYR=[['① 20 mL일 때 (처음)','s0'],['② 천천히 10 mL까지 밀었을 때','s1'],
+           ['③ 확 밀었을 때 최고 압력','s2'],['④ 그대로 15초 뒤','s3'],
+           ['⑤ 확 당겼을 때 최저 압력','s4'],['⑥ 그대로 15초 뒤','s5'],
+           ['교실 온도 (℃)','s-room']];
+function wsConfig(blank){
+  const who=($('who').value||S.runs[0]?.name||'').trim();
+  const records=[
+    {h:'0단계 · 주사기 연습 (kPa)',type:'kv',
+     rows:SYR.map(([k,id])=>[k,$(id).value])},
+    {h:'주사기 연습 해석',type:'text',text:$('syr-out').innerText.trim()},
+    {h:'페트병 실험 — 조건별 비교',type:'table',
+     head:['실험','응결핵','P₁ 쥐었을 때','내려간 압력','내려간 온도','이슬점','구름'],
+     rows:S.runs.map(r=>[r.name,r.nuclei,r.p1,r.dip,r.tm,r.dew,r.cloud]), blankRows:4}
+  ];
+  return {
+    blank,
+    title:'단열 팽창과 구름 발생',
+    subtitle:'압력으로 온도를 재다 · 중학교 3학년 날씨와 기후변화',
+    standard:'[9과17-03] 상대습도, 단열 팽창 및 응결 현상의 관계를 이해하고, 구름의 생성과 강수 과정을 설명할 수 있다.',
+    who, records,
+    answers: collectAnswers().map(x=>({...x, lines:5})),
+    checks: Worksheet.collect.checks('#chk'),
+    summary: Worksheet.collect.summary('#page4 .cc')
+  };
+}
+Worksheet.mount('ws-actions', wsConfig,
+  ()=>(($('who').value||S.runs[0]?.name||'이름없음').trim()+'_구름발생'));
+
+function download(fname,text){
+  const b=new Blob([text],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download=fname; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+fit();
+</script>
+</body>
+</html>

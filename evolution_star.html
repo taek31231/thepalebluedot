@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <title>통합과학 - 별의 질량에 따른 진화 트랙 및 물리량 시뮬레이터</title>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        .header { background-color: #1e293b; padding: 15px 20px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 18px; color: #f1f5f9; }
+
+        .main-wrapper { display: flex; flex: 1; height: calc(100vh - 200px); overflow: hidden; }
+
+        /* 1. 왼쪽 진화 제어 패널 */
+        .sidebar-left { width: 340px; background-color: #1e293b; padding: 15px; display: flex; flex-direction: column; gap: 12px; border-right: 1px solid #334155; overflow-y: auto; }
+        .control-group { background-color: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; }
+        .control-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #94a3b8; }
+        
+        .mass-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 5px; }
+        .mass-btn { background-color: #334155; border: 1px solid #475569; color: #cbd5e1; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; }
+        .mass-btn.active { background-color: #3b82f6; border-color: #60a5fa; color: white; }
+
+        .timeline-container { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; }
+        .timeline-step { background-color: #1e293b; border: 1px solid #334155; padding: 11px; border-radius: 6px; cursor: pointer; text-align: left; font-size: 13px; transition: 0.15s; }
+        .timeline-step:hover { background-color: #334155; border-color: #475569; }
+        .timeline-step.active { background-color: #1e3a8a; border-color: #3b82f6; font-weight: bold; color: #93c5fd; }
+
+        /* 실시간 물리량 데이터 바 스타일링 */
+        .gauge-container { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+        .gauge-item { background: #1e293b; padding: 8px; border-radius: 6px; border: 1px solid #334155; }
+        .gauge-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: #cbd5e1; }
+        .gauge-bar-bg { width: 100%; height: 8px; background: #0f172a; border-radius: 4px; overflow: hidden; }
+        .gauge-bar-fill { height: 100%; width: 0%; background: #3b82f6; transition: width 0.6s cubic-bezier(0.1, 0.8, 0.3, 1); }
+
+        /* 2. 중앙 메인 시뮬레이션 시각화 영역 */
+        .canvas-container { flex: 1; background-color: #020617; display: flex; justify-content: center; align-items: center; padding: 15px; }
+        canvas { background-color: #040814; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border-radius: 8px; border: 1px solid #1e293b; }
+
+        /* 3. 오른쪽 교과 고찰 문제 패널 */
+        .sidebar-right { width: 340px; background-color: #1e293b; padding: 15px; display: flex; flex-direction: column; gap: 12px; border-left: 1px solid #334155; overflow-y: auto; }
+        .sidebar-right h3 { font-size: 14px; color: #3b82f6; border-left: 3px solid #3b82f6; padding-left: 6px; margin-bottom: 3px; }
+        .quiz-card { background-color: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; }
+        .quiz-question { font-size: 13px; font-weight: 500; line-height: 1.4; margin-bottom: 8px; color: #f1f5f9; }
+        .quiz-options { display: flex; flex-direction: column; gap: 6px; }
+        .option-btn { background-color: #1e293b; border: 1px solid #334155; color: #cbd5e1; padding: 6px 10px; text-align: left; border-radius: 5px; cursor: pointer; font-size: 12px; transition: 0.15s; }
+        .option-btn:hover { background-color: #334155; }
+        .option-btn.correct { background-color: #065f46; border-color: #059669; color: #a7f3d0; }
+        .option-btn.wrong { background-color: #7f1d1d; border-color: #dc2626; color: #fca5a5; }
+        .quiz-feedback { margin-top: 8px; font-size: 12px; line-height: 1.4; color: #38bdf8; display: none; }
+
+        /* 4. 하단 핵심 과학 원리 요약 */
+        .summary-section { height: 130px; background-color: #0f172a; border-top: 1px solid #334155; padding: 12px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; overflow-y: auto; }
+        .summary-card { background-color: #1e293b; padding: 10px; border-radius: 6px; border: 1px solid #334155; font-size: 12px; }
+        .summary-card h4 { font-size: 13px; color: #f59e0b; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+        .summary-card p { color: #94a3b8; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>⭐ 별의 질량에 따른 진화 과정 및 내부 층상 구조 시뮬레이터</h1>
+        <div style="font-size: 12px; color: #94a3b8;">통합과학 교육용 모델</div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="sidebar-left">
+            <div class="control-group">
+                <label>1. 진화 모델 질량 계수</label>
+                <div class="mass-selector">
+                    <button class="mass-btn active" onclick="selectMass('low')">태양 질량 (1 M☉)</button>
+                    <button class="mass-btn" onclick="selectMass('high')">태양 10배 (10 M☉)</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>2. 단계별 진화 시나리오</label>
+                <div class="timeline-container" id="timelineBox">
+                    </div>
+            </div>
+
+            <div class="control-group">
+                <label>📊 실시간 주요 물리 지표 바</label>
+                <div class="gauge-container">
+                    <div class="gauge-item">
+                        <div class="gauge-label"><span>별의 반경 (R☉)</span><span id="radiusVal">1.0 R☉</span></div>
+                        <div class="gauge-bar-bg"><div id="radiusBar" class="gauge-bar-fill" style="background: #ef4444;"></div></div>
+                    </div>
+                    <div class="gauge-item">
+                        <div class="gauge-label"><span>표면 온도 (K)</span><span id="tempSurfaceVal">5,800 K</span></div>
+                        <div class="gauge-bar-bg"><div id="tempSurfaceBar" class="gauge-bar-fill" style="background: #3b82f6;"></div></div>
+                    </div>
+                    <div class="gauge-item">
+                        <div class="gauge-label"><span>중심핵 온도 (K)</span><span id="tempCoreVal">15M K</span></div>
+                        <div class="gauge-bar-bg"><div id="tempCoreBar" class="gauge-bar-fill" style="background: #f59e0b;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="evolutionCanvas" width="720" height="520"></canvas>
+        </div>
+
+        <div class="sidebar-right">
+            <h3>🧐 별의 일생 데이터 분석</h3>
+            
+            <div class="quiz-card" id="q1">
+                <div class="quiz-question">Q1. 태양 질량 10배 규모의 대질량 별이 진화하여 '초거성' 상태에 도달했을 때, 중심핵의 온도가 상승하면서 핵융합의 최종 산물로 산출되는 가장 안정적인 원소는 무엇입니까?</div>
+                <div class="quiz-options">
+                    <button class="option-btn" onclick="checkAnswer('q1', 0, false)">① 탄소(C)</button>
+                    <button class="option-btn" onclick="checkAnswer('q1', 1, false)">② 규소(Si)</button>
+                    <button class="option-btn" onclick="checkAnswer('q1', 2, true)">③ 철(Fe)</button>
+                </div>
+                <div class="quiz-feedback" id="q1-fb">정답입니다! 철(Fe) 원자핵은 모든 원소 중에서 핵자당 결합 에너지가 가장 높아 매우 안정하므로 별 내부의 핵융합 반응을 통해 더 무거운 원소로 융합하지 못하고 멈춥니다.</div>
+            </div>
+
+            <div class="quiz-card" id="q2">
+                <div class="quiz-question">Q2. 주계열성에서 거성 또는 초거성 단계로 진화할 때, 별의 지표 바 중 '반지름'과 '표면 온도'는 각각 어떻게 변동하나요?</div>
+                <div class="quiz-options">
+                    <button class="option-btn" onclick="checkAnswer('q2', 0, true)">① 반지름은 급격히 증가, 표면 온도는 감소</button>
+                    <button class="option-btn" onclick="checkAnswer('q2', 1, false)">② 반지름은 감소, 표면 온도는 급격히 증가</button>
+                    <button class="option-btn" onclick="checkAnswer('q2', 2, false)">③ 두 지표 모두 일정하게 유지됨</button>
+                </div>
+                <div class="quiz-feedback" id="q2-fb">정답입니다! 거성 단계가 되면 중심핵은 수축하지만 바깥 수소 껍질이 거대하게 팽창하여 반지름은 커지고, 표면 확산으로 인해 표면 온도는 낮아져 붉게 보이게 됩니다.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="summary-section">
+        <div class="summary-card">
+            <h4>📐 중력 수축과 복사압의 시소게임</h4>
+            <p>별의 진화는 내부의 안쪽으로 끌어당기는 '중력 수축'과 바깥으로 밀어내려는 핵융합에 의한 '복사압' 사이의 불균형에 의해 주도됩니다. 주계열성은 이 두 힘이 완벽히 평형을 이룬 정역학적 평형 상태입니다.</p>
+        </div>
+        <div class="summary-card">
+            <h4>🧅 질량별 원소 양파 껍질 구조</h4>
+            <p>질량이 큰 별일수록 중력 수축 에너지가 거대하여 중심핵 온도가 수억 K까지 상승합니다. 이로 인해 외각에서 중심핵 쪽으로 갈수록 무거운 원소들이 층을 이루는 양파 껍질 모양의 핵융합 영역이 형성됩니다.</p>
+        </div>
+        <div class="summary-card">
+            <h4>🌌 철보다 무거운 원소의 기원</h4>
+            <p>초거성 내부에서 철까지 생성된 대질량 별은 더 이상 에너지를 내지 못해 스스로 붕괴하며 초신성 폭발을 일으킵니다. 이때 발생하는 엄청난 에너지를 흡수하여 비로소 철보다 무거운 금, 납, 우라늄 등이 합성됩니다.</p>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('evolutionCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const timelineBox = document.getElementById('timelineBox');
+    const radiusBar = document.getElementById('radiusBar');
+    const tempSurfaceBar = document.getElementById('tempSurfaceBar');
+    const tempCoreBar = document.getElementById('tempCoreBar');
+
+    const radiusVal = document.getElementById('radiusVal');
+    const tempSurfaceVal = document.getElementById('tempSurfaceVal');
+    const tempCoreVal = document.getElementById('tempCoreVal');
+
+    let currentMassMode = 'low';
+    let currentStepIdx = 0;
+
+    // 질량별 고증 물리 데이터 트리 및 진화 프로세스 매핑
+    const designTracks = {
+        low: [
+            { name: "✨ 성운 및 원시별", r: 15, ts: 3000, tc: 500000, fusion: "none", regions: [] },
+            { name: "🌞 주계열성 (태양)", r: 1.0, ts: 5800, tc: 15000000, fusion: "수소 핵융합", regions: [{name:"수소 외부층", color:"#ef4444", r:100}, {name:"수소 핵융합 핵", color:"#fbbf24", r:30}] },
+            { name: "🎈 적색 거성", r: 120, ts: 3500, tc: 120000000, fusion: "헬륨 핵융합", regions: [{name:"수소 팽창각", color:"#b91c1c", r:100}, {name:"수소 연소각", color:"#f97316", r:60}, {name:"헬륨 융합핵 (C 합성)", color:"#38bdf8", r:25}] },
+            { name: "💨 행성상 성운 & 백색왜성", r: 0.01, ts: 100000, tc: 0, fusion: "반응 종료", regions: [{name:"탄소/산소 핵", color:"#94a3b8", r:40}] }
+        ],
+        high: [
+            { name: "☁️ 원시별", r: 40, ts: 4500, tc: 2000000, fusion: "none", regions: [] },
+            { name: "💎 청색 주계열성", r: 6.5, ts: 25000, tc: 40000000, fusion: "격렬한 수소 융합", regions: [{name:"수소 외부층", color:"#2563eb", r:100}, {name:"수소 핵융합 핵", color:"#60a5fa", r:35}] },
+            { name: "👹 양파 구조의 '초거성'", r: 900, ts: 3200, tc: 3000000000, fusion: "다단계 다층 핵융합", regions: [
+                {name:"수소 바깥층", color:"#7f1d1d", r:110},
+                {name:"헬륨 연쇄층", color:"#d97706", r:90},
+                {name:"탄소/네온 연소층", color:"#0b7d73", r:70},
+                {name:"산소/규소 연소층", color:"#2563eb", r:50},
+                {name:"최종 안정 '철(Fe)' 중심핵", color:"#475569", r:25}
+            ]},
+            { name: "💥 초신성 폭발 & 잔해", r: 5000, ts: 500000, tc: 100000000000, fusion: "철보다 무거운 원소 합성", regions: [{name:"폭발 충격파 영역", color:"#a855f7", r:110}] }
+        ]
+    };
+
+    function selectMass(mode) {
+        currentMassMode = mode;
+        document.querySelectorAll('.mass-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        buildTimeline();
+        setStep(1); // 주계열성을 디폴트 인덱스로 바인딩
+    }
+
+    function buildTimeline() {
+        timelineBox.innerHTML = "";
+        const steps = designTracks[currentMassMode];
+        steps.forEach((step, idx) => {
+            const btn = document.createElement('button');
+            btn.className = `timeline-step ${idx === currentStepIdx ? 'active' : ''}`;
+            btn.innerHTML = `${idx + 1}. ${step.name}`;
+            btn.onclick = () => setStep(idx);
+            timelineBox.appendChild(btn);
+        });
+    }
+
+    function setStep(idx) {
+        currentStepIdx = idx;
+        buildTimeline();
+        updatePhysicalGauges();
+    }
+
+    function updatePhysicalGauges() {
+        const data = designTracks[currentMassMode][currentStepIdx];
+        
+        // 1. 반지름 바 업데이트 및 로그스케일 보정 시각화
+        let rPercent = Math.min(100, Math.max(5, (Math.log10(data.r) + 3) * 18));
+        radiusBar.style.width = `${rPercent}%`;
+        radiusVal.innerText = `${data.r.toLocaleString()} R☉`;
+
+        // 2. 표면 온도 바 매핑
+        let tsPercent = Math.min(100, (data.ts / 30000) * 100);
+        tempSurfaceBar.style.width = `${tsPercent}%`;
+        tempSurfaceVal.innerText = `${data.ts.toLocaleString()} K`;
+
+        // 3. 중심핵 온도 바 매핑
+        let tcPercent = data.tc === 0 ? 0 : Math.min(100, (Math.log10(data.tc) / 11) * 100);
+        tempCoreBar.style.width = `${tcPercent}%`;
+        tempCoreVal.innerText = data.tc === 0 ? "- (축퇴 상태)" : (data.tc >= 100000000 ? `${(data.tc / 100000000).toFixed(1)}억 K` : `${(data.tc / 1000000).toFixed(1)}M K`);
+    }
+
+    function drawSimulation() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const data = designTracks[currentMassMode][currentStepIdx];
+
+        // 뷰포트 분할선 렌더링
+        ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(360, 0); ctx.lineTo(360, canvas.height); ctx.stroke();
+
+        // ------------------ [좌측 뷰: 거시적 별의 형태 외형] ------------------
+        const lx = 180; const ly = 260;
+        ctx.fillStyle = '#cbd5e1'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText("🌟 거시적 성상 외형", lx, 40);
+
+        ctx.fillStyle = '#64748b'; ctx.font = '12px sans-serif';
+        ctx.fillText(`현재 진행: ${data.name}`, lx, 65);
+
+        // 단계별 거시 형태 애니메이션 수치 유도
+        let pulse = Math.sin(Date.now() * 0.003) * 3;
+        
+        if (currentStepIdx === 0) { // 원시별
+            let grad = ctx.createRadialGradient(lx, ly, 2, lx, ly, 60 + pulse);
+            grad.addColorStop(0, '#f97316'); grad.addColorStop(0.6, 'rgba(249, 115, 22, 0.2)'); grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(lx, ly, 70, 0, Math.PI*2); ctx.fill();
+        } 
+        else if (currentStepIdx === 1) { // 주계열성
+            let size = currentMassMode === 'low' ? 40 : 55;
+            let color = currentMassMode === 'low' ? '#eab308' : '#38bdf8';
+            ctx.shadowColor = color; ctx.shadowBlur = 25;
+            ctx.fillStyle = color; ctx.beginPath(); ctx.arc(lx, ly, size, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+        } 
+        else if (currentStepIdx === 2) { // 거성 및 초거성
+            let size = currentMassMode === 'low' ? 110 : 135;
+            let grad = ctx.createRadialGradient(lx, ly, 10, lx, ly, size + pulse);
+            grad.addColorStop(0, '#ef4444'); grad.addColorStop(0.5, '#dc2626'); grad.addColorStop(0.9, 'rgba(220, 38, 38, 0.1)'); grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(lx, ly, size, 0, Math.PI*2); ctx.fill();
+        } 
+        else if (currentStepIdx === 3) { // 종말
+            if (currentMassMode === 'low') {
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)'; ctx.lineWidth = 14;
+                ctx.beginPath(); ctx.arc(lx, ly, 80 + pulse, 0, Math.PI*2); ctx.stroke();
+                ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(lx, ly, 5, 0, Math.PI*2); ctx.fill();
+            } else {
+                let size = 140 + Math.random() * 10;
+                let grad = ctx.createRadialGradient(lx, ly, 5, lx, ly, size);
+                grad.addColorStop(0, '#ffffff'); grad.addColorStop(0.2, '#ca8a04'); grad.addColorStop(0.6, '#a855f7'); grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(lx, ly, size, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        // ------------------ [우측 뷰: 내부 핵융합 영역 단면 가이드] ------------------
+        const rx = 540; const ry = 260;
+        ctx.fillStyle = '#cbd5e1'; ctx.font = 'bold 14px sans-serif'; ctx.fillText("🧅 중심핵 내부 원소 껍질 구조", rx, 40);
+
+        if (data.regions.length === 0) {
+            ctx.fillStyle = '#475569'; ctx.font = '12px sans-serif';
+            ctx.fillText("내부 핵융합 반응이", rx, ry - 10);
+            ctx.fillText("가동되지 않는 단계입니다.", rx, ry + 10);
+        } else {
+            // 바깥 서클부터 순차 중첩 렌더링을 통한 양파 구조 고증 표현
+            for(let i=0; i<data.regions.length; i++) {
+                const reg = data.regions[i];
+                ctx.fillStyle = reg.color;
+                ctx.beginPath();
+                ctx.arc(rx, ry, reg.r, 0, Math.PI*2);
+                ctx.fill();
+                
+                ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            // 각 영역 이름 및 지시선 텍스트 표기
+            ctx.textAlign = 'left';
+            ctx.font = '11px sans-serif';
+            for(let i=0; i<data.regions.length; i++) {
+                const reg = data.regions[i];
+                ctx.fillStyle = reg.color;
+                // 우측 여백 리스트 형태 인덱스 가이드 처리
+                ctx.fillRect(390, 390 + (i * 22), 12, 12);
+                ctx.fillStyle = '#e2e8f0';
+                ctx.fillText(reg.name, 410, 401 + (i * 22));
+            }
+            ctx.textAlign = 'center'; // 정렬 원복
+        }
+
+        // 중앙 하단 가이드 텍스트 출력
+        ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(`주요 가동 연소 메커니즘: [ ${data.fusion} ]`, 360, 495);
+    }
+
+    function checkAnswer(quizId, optionIdx, isCorrect) {
+        const card = document.getElementById(quizId);
+        const buttons = card.querySelectorAll('.option-btn');
+        const feedback = document.getElementById(quizId + '-fb');
+        buttons.forEach((btn, idx) => {
+            btn.className = 'option-btn';
+            if (idx === optionIdx) {
+                if (isCorrect) { btn.classList.add('correct'); feedback.style.display = 'block'; }
+                else { btn.classList.add('wrong'); }
+            }
+        });
+    }
+
+    function loop() {
+        drawSimulation();
+        requestAnimationFrame(loop);
+    }
+
+    // 초기 빌딩 및 루프 기동
+    buildTimeline();
+    setStep(1); // 주계열성 기본 바인딩
+    loop();
+</script>
+</body>
+</html>

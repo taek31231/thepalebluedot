@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <title>지구 시스템 탄소 순환 다중 중첩 시뮬레이터</title>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-wrapper {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 100px);
+            overflow: hidden;
+        }
+
+        /* 1. 왼쪽 제어 사이드바 */
+        .sidebar-left {
+            width: 390px;
+            background-color: #1e293b;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border-right: 1px solid #334155;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+            overflow-y: auto;
+        }
+
+        .sidebar-left h2 {
+            font-size: 1.1rem;
+            color: #38bdf8;
+            line-height: 1.4;
+        }
+
+        .process-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .process-group-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            border-left: 3px solid #38bdf8;
+            padding-left: 6px;
+        }
+
+        .cycle-btn {
+            width: 100%;
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: #cbd5e1;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.1s ease;
+        }
+
+        .cycle-btn:hover {
+            background-color: #1e293b;
+            border-color: #38bdf8;
+        }
+
+        .cycle-btn.active {
+            background-color: #1e3a8a;
+            border-color: #60a5fa;
+            box-shadow: 0 0 8px rgba(96, 165, 250, 0.3);
+        }
+
+        .btn-route {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 4px;
+            background-color: #334155;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+        .cycle-btn.active .btn-route {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+
+        .btn-name {
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        /* 오개념 수치판 대신 들어가는 실시간 과정 정보 카드 */
+        .info-card-container {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 160px;
+        }
+
+        .info-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 6px;
+        }
+
+        .info-card-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+
+        .info-card-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background-color: #1e3a8a;
+            color: #60a5fa;
+        }
+
+        .info-meta-row {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        .info-meta-row strong {
+            color: #e2e8f0;
+        }
+
+        .info-card-body {
+            font-size: 0.76rem;
+            color: #cbd5e1;
+            line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        /* 2. 중앙 메인 시뮬레이션 영역 (Canvas) */
+        .simulation-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0b1329;
+        }
+
+        canvas {
+            background-color: #0f172a;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border-radius: 8px;
+        }
+
+        /* 3. 오른쪽 고찰 사이드바 */
+        .sidebar-right {
+            width: 270px;
+            background-color: #1e293b;
+            padding: 16px;
+            border-left: 1px solid #334155;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar-right h3 { font-size: 0.95rem; color: #10b981; border-bottom: 2px solid #334155; padding-bottom: 6px; }
+        .question-card { background-color: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #1e293b; }
+        .question-title { font-size: 0.82rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+        .question-text { font-size: 0.78rem; color: #94a3b8; line-height: 1.4; word-break: keep-all; }
+
+        /* 4. 맨 밑 핵심 과학 원리 요약란 */
+        .footer-theory {
+            height: 100px;
+            background-color: #090d16;
+            border-top: 1px solid #1e293b;
+            padding: 12px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .theory-badge { background-color: #38bdf8; color: #0f172a; font-weight: 800; padding: 6px 12px; border-radius: 4px; font-size: 0.82rem; white-space: nowrap; }
+        .theory-content { font-size: 0.82rem; color: #cbd5e1; line-height: 1.5; word-break: keep-all; }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        
+        <div class="sidebar-left">
+            <div>
+                <h2>탄소 순환 상호작용 시뮬레이터</h2>
+                <p style="font-size:0.72rem; color:#94a3b8; margin-top:2px;">복수의 과정을 선택하여 자연계의 복합적인 탄소 흐름을 중첩해 관찰하세요.</p>
+            </div>
+
+            <div class="process-group">
+                <div class="process-group-title">기권 ↔ 생물권 및 토양</div>
+                <button class="cycle-btn" data-event="photosynthesis"><span class="btn-name">🌱 광합성</span><span class="btn-route">기권 ➔ 생물권</span></button>
+                <button class="cycle-btn" data-event="plant_respiration"><span class="btn-name">🌿 식물의 호흡</span><span class="btn-route">생물권 ➔ 기권</span></button>
+                <button class="cycle-btn" data-event="animal_respiration"><span class="btn-name">🦌 동물의 호흡</span><span class="btn-route">생물권 ➔ 기권</span></button>
+                <button class="cycle-btn" data-event="ingestion"><span class="btn-name">🍎 섭식 (먹이 사슬)</span><span class="btn-route">식물 ➔ 동물</span></button>
+                <button class="cycle-btn" data-event="decomposition"><span class="btn-name">🪱 사체·배설물 분해</span><span class="btn-route">생물권 ➔ 지권</span></button>
+            </div>
+
+            <div class="process-group">
+                <div class="process-group-title">기권 ↔ 수권 (해양)</div>
+                <button class="cycle-btn" data-event="dissolution"><span class="btn-name">💧 용해 (해양 흡수)</span><span class="btn-route">기권 ➔ 수권</span></button>
+                <button class="cycle-btn" data-event="release"><span class="btn-name">♨️ 방출 (해양 방출)</span><span class="btn-route">수권 ➔ 기권</span></button>
+            </div>
+
+            <div class="process-group">
+                <div class="process-group-title">지권 내부 및 인간 활동</div>
+                <button class="cycle-btn" data-event="fossilization"><span class="btn-name">🛢️ 화석 연료 형성</span><span class="btn-route">지권 ➔ 지권</span></button>
+                <button class="cycle-btn" data-event="combustion"><span class="btn-name">🏭 화석 연료 연소</span><span class="btn-route">지권 ➔ 기권</span></button>
+                <button class="cycle-btn" data-event="sedimentation"><span class="btn-name">🐚 침전 (석회암 형성)</span><span class="btn-route">수권 ➔ 지권</span></button>
+                <button class="cycle-btn" data-event="volcano"><span class="btn-name">🌋 화산 분출 / 지각 변동</span><span class="btn-route">지권 ➔ 기권</span></button>
+            </div>
+
+            <div class="info-card-container" id="info-card">
+                <div class="info-card-header">
+                    <span class="info-card-title">🔍 순환 정보 카드</span>
+                    <span class="info-card-badge" style="background-color:#334155; color:#94a3b8;">대기 중</span>
+                </div>
+                <div class="info-card-body" style="color: #94a3b8; text-align: center; padding-top: 20px;">
+                    왼쪽의 탄소 순환 과정을 클릭해 보세요.<br>가장 최근에 선택된 핵심 상호작용의 과학적 메커니즘과 정보가 이곳에 나타납니다.
+                </div>
+            </div>
+        </div>
+
+        <div class="simulation-container">
+            <canvas id="carbonCanvas" width="740" height="620"></canvas>
+        </div>
+
+        <div class="sidebar-right">
+            <h3>🤔 탄소 순환 평형 탐구</h3>
+            <div class="question-card">
+                <div class="question-title">Q1. 동적 평형 상태 관찰</div>
+                <div class="question-text">[광합성]과 [식물/동물의 호흡]을 함께 켜보세요. 서로 반대 방향으로 흐르는 이동 경로를 보며 자연계가 평형을 이루는 시각적 메커니즘을 유추해 봅시다.</div>
+            </div>
+            <div class="question-card">
+                <div class="question-title">Q2. 지권의 압도적인 저장량</div>
+                <div class="question-text">실제 지구 시스템에서 대다수의 탄소는 화석 연료나 석회암(CaCO₃) 형태로 지권에 고착화되어 있습니다. 인간 활동이 이를 깨뜨리는 이유를 고찰하세요.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer-theory">
+        <div class="theory-badge">핵심 과학 원리 요약</div>
+        <div class="theory-content">
+            지구 시스템 내부의 탄소는 각 권역의 특성에 따라 <strong>기권(이산화탄소), 생물권(유기물), 수권(탄산 이온), 지권(화석 연료 및 석회암)</strong>의 다양한 형태로 존재합니다. 탄소는 계 내에서 소멸되지 않고 끊임없이 순환하며 전체 질량의 동적 평형을 유지하지만, 인간의 과도한 화석 연료 연소와 같은 비가역적 이동은 기권의 탄소 농도를 높여 지구 온난화 및 시스템 불균형을 초래하는 근본 원인이 됩니다.
+        </div>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('carbonCanvas');
+        const ctx = canvas.getContext('2d');
+        const infoCard = document.getElementById('info-card');
+
+        // 활성화된 이벤트 목록 (중첩 구현을 위한 구조)
+        let activeEvents = new Set(); 
+        let tick = 0;
+        let particles = [];
+
+        // 과학 고증에 입각한 11대 과정 데이터베이스 선언
+        const processDatabase = {
+            photosynthesis: {
+                name: "🌱 광합성 (Photosynthesis)",
+                route: "기권 ➔ 생물권",
+                form: "이산화탄소(CO₂) ➔ 유기물(C₆H₁₂O₆)",
+                desc: "식물이 태양 에너지를 이용해 대기 중의 무기 탄소(이산화탄소)를 세포 내 유기화합물(포도당)로 전환하여 고정하는 생물학적 동화 작용입니다."
+            },
+            plant_respiration: {
+                name: "🌿 식물의 호흡 (Plant Respiration)",
+                route: "생물권 ➔ 기권",
+                form: "유기물(포도당) ➔ 이산화탄소(CO₂)",
+                desc: "식물이 생성한 유기물을 산소와 결합해 분해하여 생명 활동에 필요한 에너지를 얻고, 그 부산물로 이산화탄소를 다시 대기 중으로 방출하는 과정입니다."
+            },
+            animal_respiration: {
+                name: "🦌 동물의 호흡 (Animal Respiration)",
+                route: "생물권 ➔ 기권",
+                form: "유기물(포도당) ➔ 이산화탄소(CO₂)",
+                desc: "소비자인 동물이 섭취한 유기 영양소를 산화시켜 체내에서 필요한 물질대사 에너지를 획득한 후, 호흡기를 통해 대기 중으로 이산화탄소를 내뿜는 현상입니다."
+            },
+            ingestion: {
+                name: "🍎 섭식 / 먹이 사슬 (Ingestion)",
+                route: "생물권 내부 (식물 ➔ 동물)",
+                form: "유기물 ➔ 유기물 (체내 이동)",
+                desc: "생태계 먹이사슬을 통해 생산자(식물)의 체내에 축적되어 있던 유기 탄소가 소비자(동물)의 영양분 형태로 물리·화학적으로 전이되는 영양 단계 이동입니다."
+            },
+            decomposition: {
+                name: "🪱 사체·배설물 분해 (Decomposition)",
+                route: "생물권 ➔ 토양/지권",
+                form: "유기물 ➔ 토양 유기물 및 CO₂",
+                desc: "동식물의 사체나 배설물을 토양 속 균류 및 세균 등의 분해자가 분해하면서 탄소의 일부를 토양층으로 환원시키고 일부는 대기로 보냅니다."
+            },
+            dissolution: {
+                name: "💧 용해 / 해양 흡수 (Oceanic Dissolution)",
+                route: "기권 ➔ 수권",
+                form: "이산화탄소(CO₂) ➔ 탄산 이온(HCO₃⁻, CO₃²⁻)",
+                desc: "대기 중의 이산화탄소가 해수면에 부딪혀 녹아들어 가는 물리적 상호작용입니다. 해수 온도가 낮을수록, 대기 압력이 높을수록 더 많은 기체가 용해됩니다."
+            },
+            release: {
+                name: "♨️ 방출 / 해양 방출 (Oceanic Outgassing)",
+                route: "수권 ➔ 기권",
+                form: "탄산 이온 ➔ 이산화탄소(CO₂)",
+                desc: "용존 탄소를 머금은 해수의 온도가 상승하거나 압력이 낮아질 때, 수권에 결합해 있던 탄소가 다시 기체 상태인 이산화탄소로 분리되어 대기로 날아가는 기체 방출 현상입니다."
+            },
+            fossilization: {
+                name: "🛢️ 화석 연료 형성 (Fossilization)",
+                route: "토양 ➔ 깊은 지권",
+                form: "유기물 ➔ 석탄·석유 (탄화수소)",
+                desc: "과거 지질 시대에 땅속에 묻힌 생물들의 유해가 썩지 않고 고온·고압의 혐기성 환경 속에서 수백만 년간 고착화되어 석탄, 석유, 천연가스 등으로 변환되는 장기 순환 과정입니다."
+            },
+            combustion: {
+                name: "🏭 화석 연료 연소 (Combustion)",
+                route: "지권 ➔ 기권",
+                form: "탄화수소(화석연료) ➔ 이산화탄소(CO₂)",
+                desc: "인간이 산업 활동을 위해 지권에 갇혀 있던 화석 연료를 채굴하여 인위적으로 산소와 반응(연소)시킴으로써, 막대한 양의 탄소를 순식간에 기권으로 강제 배출하는 현상입니다."
+            },
+            sedimentation: {
+                name: "🐚 침전 / 석회암 형성 (Sedimentation)",
+                route: "수권 ➔ 지권 (해저 지층)",
+                form: "탄산 이온(CO₃²⁻) ➔ 석회암(CaCO₃)",
+                desc: "해양 용존 탄소 이온이 바다 생물의 칼슘 성분과 반응해 조개껍데기, 산호 등을 형성하거나 화학적으로 침전하여 해저 바닥에 거대한 석회암 지층으로 고착되는 지구 최대의 탄소 저장 반응입니다."
+            },
+            volcano: {
+                name: "🌋 화산 분출 / 지각 변동 (Volcanic Outgassing)",
+                route: "지권 ➔ 기권",
+                form: "암석 내 탄소 ➔ 이산화탄소(CO₂)",
+                desc: "지각 변동이나 판의 운동으로 인해 깊은 지하에 판 매몰 방식으로 저장되어 있던 석회암 지층이 마그마에 의해 녹고, 화산 폭발 시 대기 중으로 가스 형태로 격렬하게 분출되는 지구조적 순환입니다."
+            }
+        };
+
+        const buttons = document.querySelectorAll('.cycle-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const ev = btn.getAttribute('data-event');
+                
+                if (activeEvents.has(ev)) {
+                    activeEvents.delete(ev);
+                    btn.classList.remove('active');
+                } else {
+                    activeEvents.add(ev);
+                    btn.classList.add('active');
+                }
+
+                // 최근 선택한 과정에 대한 안내 정보 카드 실시간 렌더링
+                if (activeEvents.has(ev)) {
+                    updateInfoCard(ev);
+                } else if (activeEvents.size > 0) {
+                    // 꺼진 상태라면 남아있는 활성화 목록 중 마지막 요소를 보여줌
+                    const remaining = Array.from(activeEvents);
+                    updateInfoCard(remaining[remaining.length - 1]);
+                } else {
+                    // 모두 꺼졌을 때 기본 대기 화면 원복
+                    infoCard.innerHTML = `
+                        <div class="info-card-header">
+                            <span class="info-card-title">🔍 순환 정보 카드</span>
+                            <span class="info-card-badge" style="background-color:#334155; color:#94a3b8;">대기 중</span>
+                        </div>
+                        <div class="info-card-body" style="color: #94a3b8; text-align: center; padding-top: 20px;">
+                            왼쪽의 탄소 순환 과정을 클릭해 보세요.<br>가장 최근에 선택된 핵심 상호작용의 과학적 메커니즘과 정보가 이곳에 나타납니다.
+                        </div>
+                    `;
+                }
+            });
+        });
+
+        function updateInfoCard(eventKey) {
+            const data = processDatabase[eventKey];
+            if (!data) return;
+
+            infoCard.innerHTML = `
+                <div class="info-card-header">
+                    <span class="info-card-title">${data.name}</span>
+                    <span class="info-card-badge">최근 선택</span>
+                </div>
+                <div class="info-meta-row"><strong>📍 이동 경로:</strong> ${data.route}</div>
+                <div class="info-meta-row"><strong>🧪 형태 변환:</strong> ${data.form}</div>
+                <div class="info-card-body"><strong>💡 과학 원리:</strong> ${data.desc}</div>
+            `;
+        }
+
+        // 캔버스 기본 모식도 배경 그리기
+        function drawLayout() {
+            // 1. 기권 영역
+            ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 740, 220);
+            ctx.fillStyle = "rgba(148, 163, 184, 0.15)"; ctx.font = "bold 15px Pretendard";
+            ctx.fillText("기 권 (Atmosphere) - 대기 가스 저장 공간", 25, 30);
+
+            // 2. 수권 영역
+            ctx.fillStyle = "#0c4a6e"; ctx.fillRect(380, 220, 360, 400);
+            ctx.fillStyle = "rgba(56, 189, 248, 0.15)"; ctx.font = "bold 15px Pretendard";
+            ctx.fillText("수 권 (Hydrosphere - 해양)", 530, 250);
+            ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(380, 220); ctx.lineTo(740, 220); ctx.stroke();
+
+            // 해저 석회암 침전층
+            ctx.fillStyle = "#cbd5e1"; ctx.fillRect(380, 550, 360, 70);
+            ctx.fillStyle = "#64748b"; ctx.font = "bold 11px Pretendard";
+            ctx.fillText("🐚 해저 탄산칼슘 지층 (지구 내부 탄소 최대 저장소)", 410, 590);
+
+            // 3. 지권 및 토양층 영역
+            ctx.fillStyle = "#2d1a10"; ctx.fillRect(0, 220, 380, 400); 
+            ctx.fillStyle = "#15803d"; ctx.fillRect(0, 220, 380, 15);  
+            ctx.fillStyle = "rgba(245, 158, 11, 0.15)"; ctx.font = "bold 15px Pretendard";
+            ctx.fillText("지 권 (Geosphere) & 토양 지각 지층", 20, 410);
+
+            // 화석 연료 저장층
+            ctx.fillStyle = "#090d16"; ctx.fillRect(30, 460, 190, 60);
+            ctx.strokeStyle = "#475569"; ctx.lineWidth = 1.5; ctx.strokeRect(30, 460, 190, 60);
+            ctx.fillStyle = "#94a3b8"; ctx.font = "bold 11px Pretendard";
+            ctx.fillText("🛢️ 지하 화석 연료층 (석탄·석유)", 42, 495);
+
+            // 4. 생물권 오브젝트
+            ctx.fillStyle = "#78350f"; ctx.fillRect(290, 130, 12, 90);
+            ctx.fillStyle = "#16a34a"; ctx.beginPath(); ctx.arc(296, 110, 32, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "#f97316"; ctx.fillRect(190, 190, 22, 14); ctx.fillRect(206, 176, 6, 16); ctx.fillRect(192, 204, 3, 16); ctx.fillRect(207, 204, 3, 16);
+            ctx.fillStyle = "#22c55e"; ctx.font = "bold 11px Pretendard"; ctx.fillText("🌲 식물권", 310, 65);
+            ctx.fillStyle = "#f97316"; ctx.font = "bold 11px Pretendard"; ctx.fillText("🦌 동물권", 145, 195);
+
+            // 5. 공장 및 화산
+            ctx.fillStyle = "#475569"; ctx.fillRect(40, 180, 45, 40); ctx.fillRect(70, 145, 10, 35); ctx.fillStyle = "#e2e8f0"; ctx.font = "bold 9px Pretendard"; ctx.fillText("FACTORY", 44, 203);
+            ctx.fillStyle = "#1e293b"; ctx.beginPath(); ctx.moveTo(-20, 220); ctx.lineTo(15, 150); ctx.lineTo(35, 150); ctx.lineTo(60, 220); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = "#ef4444"; ctx.fillRect(16, 148, 18, 4); 
+        }
+
+        // 다중 파티클 중첩 분사 그래픽 렌더링 엔진
+        function handleGraphicsEngine() {
+            tick++;
+
+            // 켜져 있는 모든 루트의 이펙트를 다중으로 누적 분사
+            if (activeEvents.has("photosynthesis") && tick % 6 === 0) {
+                particles.push({ x: 180 + Math.random()*150, y: 40 + Math.random()*50, targetX: 296, targetY: 110, speed: 2, color: "#4ade80", size: 3, label: "CO₂" });
+            }
+            if (activeEvents.has("plant_respiration") && tick % 8 === 0) {
+                particles.push({ x: 296, y: 110, targetX: Math.random()*300 + 100, targetY: 40 + Math.random()*70, speed: 1.8, color: "#a7f3d0", size: 3, label: "CO₂" });
+            }
+            if (activeEvents.has("animal_respiration") && tick % 8 === 0) {
+                particles.push({ x: 200, y: 185, targetX: Math.random()*200 + 50, targetY: 50 + Math.random()*70, speed: 2, color: "#38bdf8", size: 3, label: "CO₂" });
+            }
+            if (activeEvents.has("ingestion") && tick % 12 === 0) {
+                particles.push({ x: 290, y: 180, targetX: 210, targetY: 195, speed: 1.5, color: "#fb923c", size: 3.5 });
+            }
+            if (activeEvents.has("decomposition") && tick % 9 === 0) {
+                let startX = Math.random() < 0.5 ? 200 : 296;
+                particles.push({ x: startX, y: 190, targetX: 240 + (Math.random()-0.5)*60, targetY: 275, speed: 1.2, color: "#a16207", size: 3 });
+            }
+            if (activeEvents.has("dissolution") && tick % 6 === 0) {
+                particles.push({ x: 420 + Math.random()*280, y: 60 + Math.random()*60, targetX: 420 + Math.random()*280, targetY: 230, speed: 2, color: "#0ea5e9", size: 3, label: "HCO₃⁻" });
+            }
+            if (activeEvents.has("release") && tick % 7 === 0) {
+                particles.push({ x: 420 + Math.random()*280, y: 225, targetX: 420 + Math.random()*280, targetY: 50 + Math.random()*80, speed: 1.6, color: "#f43f5e", size: 3, label: "CO₂" });
+            }
+            if (activeEvents.has("fossilization") && tick % 10 === 0) {
+                particles.push({ x: 220 + Math.random()*60, y: 285, targetX: 120, targetY: 480, speed: 1.4, color: "#78350f", size: 3.5 });
+            }
+            if (activeEvents.has("combustion")) {
+                if (tick % 5 === 0) particles.push({ x: 120, y: 460, targetX: 75, targetY: 145, speed: 3, color: "#ef4444", size: 2.5 });
+                if (Math.random() < 0.5) particles.push({ x: 75, y: 140, targetX: 120 + Math.random()*500, targetY: 30 + Math.random()*90, speed: 2.2, color: "rgba(120, 130, 140, 0.6)", size: Math.random()*5 + 3, isSmoke: true });
+            }
+            if (activeEvents.has("sedimentation") && tick % 7 === 0) {
+                particles.push({ x: 400 + Math.random()*300, y: 260 + Math.random()*120, targetX: 400 + Math.random()*300, targetY: 560, speed: 1.3, color: "#ffffff", size: 4, label: "CaCO₃" });
+            }
+            if (activeEvents.has("volcano")) {
+                if (tick % 6 === 0) particles.push({ x: 25, y: 380, targetX: 25, targetY: 148, speed: 2.5, color: "#f97316", size: 3 });
+                if (Math.random() < 0.4) particles.push({ x: 25, y: 146, targetX: 80 + Math.random()*450, targetY: 25 + Math.random()*80, speed: 2.8, color: "rgba(148, 163, 184, 0.7)", size: Math.random()*6 + 3, isSmoke: true });
+            }
+
+            // 파티클 선형 보간 비행 애니메이션 연산
+            particles.forEach((p, idx) => {
+                let dx = p.targetX - p.x; let dy = p.targetY - p.y; let dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 5) { particles.splice(idx, 1); return; }
+                p.x += (dx / dist) * p.speed; p.y += (dy / dist) * p.speed;
+
+                ctx.save();
+                ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+                if (p.label && !p.isSmoke && tick % 2 === 0) {
+                    ctx.fillStyle = "#cbd5e1"; ctx.font = "9px Pretendard"; ctx.fillText(p.label, p.x + 6, p.y + 3);
+                }
+                ctx.restore();
+            });
+        }
+
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawLayout();
+            handleGraphicsEngine();
+            requestAnimationFrame(loop);
+        }
+        loop();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>대멸종과 생물 다양성</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+:root{
+  --bg:#f5f8fc; --surface:#ffffff; --surface-2:#f1f5fa; --surface-3:#e6eef7;
+  --line:#e4eaf2; --line-2:#cfdbe8;
+  --text:#0b1420; --mid:#243141; --dim:#4a5a6b;
+  --accent:#0369a1; --warm:#9c5c00; --cool:#2563eb;
+  --good:#0b7d73; --bad:#dc2626; --violet:#7c3aed;
+  --pc:#8a5aa5; --pz:#3d8f74; --mz:#3f7fb8; --cz:#c08c1f;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',-apple-system,sans-serif;}
+body{background:var(--bg);color:var(--text);-webkit-text-size-adjust:100%;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+button{font:inherit;cursor:pointer;color:var(--text);}
+select,input,textarea{font:inherit;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.topbar{flex:0 0 54px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);}
+.topbar h1{font-size:.9rem;font-weight:800;letter-spacing:-.02em;white-space:nowrap;}
+.topbar h1 span{color:var(--accent);}
+.std{font-size:.66rem;color:var(--dim);background:var(--surface-2);border:1px solid var(--line);
+  padding:3px 8px;border-radius:5px;white-space:nowrap;}
+.tabs{display:flex;gap:3px;}
+.tab{padding:7px 12px;font-size:.79rem;font-weight:700;color:var(--dim);background:transparent;
+  border:1px solid transparent;border-radius:8px;transition:.15s;white-space:nowrap;}
+.tab:hover{color:var(--mid);background:var(--surface-2);}
+.tab.on{color:#ffffff;background:var(--accent);border-color:var(--accent);}
+.tab-n{opacity:.6;margin-right:4px;}
+
+.wrap{flex:1;min-height:0;}
+.page{display:none;height:100%;}
+.page.on{display:flex;}
+.scroll{overflow-y:auto;height:100%;width:100%;}
+.pane{padding:22px;max-width:1180px;margin:0 auto;}
+
+h2.sec{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+h3.sub3{font-size:.87rem;font-weight:800;margin:20px 0 7px;}
+p.sub{font-size:.82rem;color:var(--mid);line-height:1.75;margin-bottom:16px;word-break:keep-all;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.card+.card{margin-top:14px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr;}}
+label.lbl{display:block;font-size:.75rem;font-weight:700;color:var(--mid);margin-bottom:5px;
+  word-break:keep-all;line-height:1.6;}
+input[type=text],textarea,select{width:100%;padding:8px 10px;background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;color:var(--text);font-size:.85rem;}
+textarea{resize:vertical;min-height:64px;line-height:1.6;}
+.btn{padding:8px 14px;border:1px solid var(--line-2);border-radius:7px;background:var(--surface-2);
+  color:var(--text);font-size:.82rem;font-weight:700;transition:.15s;display:inline-block;}
+.btn:hover{background:var(--surface-3);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#ffffff;}
+.btn.sm{padding:5px 10px;font-size:.75rem;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.note{font-size:.76rem;color:var(--mid);line-height:1.75;word-break:keep-all;}
+.hl{color:var(--accent);font-weight:700;}
+.hl-w{color:var(--warm);font-weight:700;}
+.hl-b{color:var(--bad);font-weight:700;}
+.tagline{display:inline-block;font-size:.68rem;font-weight:800;padding:2px 7px;border-radius:5px;
+  background:var(--surface-3);color:var(--mid);border:1px solid var(--line-2);}
+.badge-live{display:inline-block;font-size:.66rem;font-weight:800;padding:3px 8px;border-radius:12px;}
+.badge-live.on{background:rgba(52,211,153,.15);color:var(--good);border:1px solid rgba(52,211,153,.45);}
+.badge-live.off{background:var(--surface-2);color:var(--dim);border:1px solid var(--line-2);}
+.badge-live.load{background:rgba(56,189,248,.13);color:var(--accent);border:1px solid rgba(56,189,248,.4);}
+
+table.dt{width:100%;border-collapse:collapse;font-size:.76rem;}
+table.dt th,table.dt td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:middle;}
+table.dt th{background:var(--surface-2);font-weight:700;color:var(--mid);white-space:nowrap;}
+table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+
+.verdict{margin-top:11px;padding:11px 13px;border-radius:9px;font-size:.79rem;line-height:1.8;
+  display:none;word-break:keep-all;}
+.verdict.show{display:block;}
+.verdict.ok{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.4);}
+.verdict.no{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.4);}
+.verdict.info{background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.35);}
+.verdict.warn{background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.35);}
+
+/* 다양성 곡선 */
+.curvebox{position:relative;background:var(--surface-2);border:1px solid var(--line-2);
+  border-radius:10px;padding:6px;}
+.curvebox svg{width:100%;height:auto;display:block;cursor:crosshair;}
+.findrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.findchip{padding:5px 10px;font-size:.72rem;font-weight:800;border-radius:20px;
+  background:var(--surface-2);border:1px dashed var(--line-2);color:var(--dim);}
+.findchip.got{background:rgba(248,113,113,.16);border:1px solid var(--bad);color:var(--bad);border-style:solid;}
+
+/* 멸종 카드 */
+.exlist{display:flex;flex-direction:column;gap:10px;}
+.excard{border:1px solid var(--line-2);border-radius:11px;overflow:hidden;background:var(--surface);}
+.exhead{display:flex;align-items:center;gap:11px;padding:11px 13px;cursor:pointer;
+  background:var(--surface-2);width:100%;text-align:left;border:0;}
+.exhead .no{flex:0 0 34px;height:34px;border-radius:9px;display:grid;place-items:center;
+  font-size:.95rem;font-weight:900;color:#ffffff;}
+.exhead .ti{flex:1;min-width:0;}
+.exhead .ti b{display:block;font-size:.85rem;}
+.exhead .ti span{font-size:.68rem;color:var(--dim);}
+.exhead .pc{flex:0 0 auto;text-align:right;}
+.exhead .pc b{font-size:1.05rem;font-weight:900;color:var(--bad);}
+.exhead .pc span{display:block;font-size:.62rem;color:var(--dim);}
+.exbody{padding:14px;display:none;}
+.exbody.on{display:block;}
+.lossbar{height:15px;border-radius:4px;background:var(--surface-3);overflow:hidden;border:1px solid var(--line);}
+.lossbar b{display:block;height:100%;background:linear-gradient(90deg,#dc2626,#b91c1c);}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px;}
+.pcard{background:var(--surface-2);border:1px solid var(--line-2);border-radius:9px;overflow:hidden;
+  padding:0;color:var(--text);width:100%;text-align:left;}
+.pcard img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#f8fafc;}
+.pcard .cap{padding:6px 8px;}
+.pcard .cap b{font-size:.74rem;display:block;}
+.pcard .cap span{font-size:.64rem;color:var(--dim);}
+
+/* 가설 평가 */
+.evwrap{display:grid;grid-template-columns:1fr;gap:11px;}
+.evcard{border:1px solid var(--line-2);border-radius:10px;background:var(--surface-2);padding:12px;}
+.evcard .eh{font-size:.81rem;font-weight:700;line-height:1.7;margin-bottom:9px;word-break:keep-all;}
+.evcard .eh i{font-style:normal;color:var(--warm);font-weight:800;margin-right:5px;}
+.hyprow{display:flex;gap:5px;flex-wrap:wrap;}
+.hyp{padding:6px 10px;font-size:.73rem;font-weight:700;border-radius:6px;
+  border:1px solid var(--line-2);background:var(--surface);color:var(--mid);}
+.hyp:hover:not(:disabled){background:var(--surface-3);color:var(--text);}
+.hyp.on{background:var(--accent);border-color:var(--accent);color:#ffffff;}
+.hyp.ok{background:var(--good);border-color:var(--good);color:#ffffff;}
+.hyp.no{background:var(--bad);border-color:var(--bad);color:#ffffff;}
+.hyp:disabled{cursor:default;}
+.exp{margin-top:9px;font-size:.75rem;line-height:1.8;color:var(--mid);display:none;word-break:keep-all;
+  padding:9px;border-radius:7px;background:var(--surface);border:1px solid var(--line);}
+.exp.show{display:block;}
+.tally{display:grid;grid-template-columns:130px 1fr 40px;gap:8px;align-items:center;margin-bottom:5px;}
+.tally .tn{font-size:.75rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tallytrack{height:17px;background:var(--surface-2);border-radius:4px;border:1px solid var(--line);overflow:hidden;}
+.tallytrack b{display:block;height:100%;}
+.evsel{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.evbtn{padding:8px 14px;font-size:.8rem;font-weight:800;border-radius:8px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--mid);}
+.evbtn.on{color:#ffffff;}
+
+/* 회복 */
+.stepflow{display:flex;flex-direction:column;gap:8px;}
+.stepitem{display:flex;gap:11px;align-items:flex-start;padding:11px;border-radius:9px;
+  background:var(--surface-2);border:1px solid var(--line);}
+.stepitem .n{flex:0 0 26px;height:26px;border-radius:8px;display:grid;place-items:center;
+  font-size:.78rem;font-weight:900;background:var(--accent);color:#ffffff;}
+.stepitem div b{display:block;font-size:.81rem;margin-bottom:3px;}
+
+.ans-item{padding:11px 13px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);
+  margin-bottom:9px;}
+.ans-item .q{font-size:.77rem;font-weight:700;color:var(--mid);margin-bottom:5px;word-break:keep-all;}
+.ans-item .a{font-size:.81rem;line-height:1.75;white-space:pre-wrap;word-break:keep-all;}
+.ans-item .a.empty{color:var(--dim);font-style:italic;}
+.chk{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);}
+.chk:last-child{border-bottom:0;}
+.chk input{flex:0 0 auto;width:16px;height:16px;margin-top:2px;accent-color:var(--good);}
+.chk label{font-size:.8rem;line-height:1.65;word-break:keep-all;cursor:pointer;}
+.sumblk{padding:12px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);margin-bottom:10px;}
+.sumblk h4{font-size:.84rem;font-weight:800;margin-bottom:6px;color:var(--accent);}
+.sumblk p{font-size:.78rem;line-height:1.8;color:var(--mid);word-break:keep-all;margin-bottom:4px;}
+.srcs{font-size:.7rem;color:var(--mid);line-height:1.9;word-break:keep-all;}
+.modal{position:fixed;inset:0;background:rgba(11,20,32,.55);color:var(--text);display:none;place-items:center;z-index:60;padding:20px;}
+.modal.on{display:grid;}
+.mbox{max-width:820px;width:100%;max-height:90vh;overflow-y:auto;background:var(--surface);
+  border:1px solid var(--line-2);border-radius:14px;padding:18px;}
+.mimgs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;}
+@media(max-width:700px){.mimgs{grid-template-columns:1fr;}}
+.mimgs figure{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;overflow:hidden;}
+.mimgs img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#f8fafc;}
+.mimgs figcaption{padding:6px 9px;font-size:.72rem;color:var(--mid);font-weight:700;}
+
+/* ═══════════ 모바일 대응 ═══════════ */
+@supports (height:100dvh){ body{height:100dvh;} }
+@media(max-width:820px){
+  .topbar{flex:0 0 auto;height:auto;flex-wrap:wrap;padding:8px 12px;gap:6px 8px;}
+  .topbar h1{font-size:.82rem;order:1;flex:1 1 auto;white-space:normal;line-height:1.35;}
+  .std{order:2;font-size:.58rem;}
+  .tabs{order:3;flex:1 1 100%;max-width:none;overflow-x:auto;scrollbar-width:none;
+        padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .tabs::-webkit-scrollbar{height:0;}
+  .tab{flex:0 0 auto;padding:8px 11px;font-size:.75rem;}
+  .pane{padding:14px 12px 34px;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+
+  table.dt{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.dt tbody{display:table;width:100%;min-width:460px;}
+  table.dt th,table.dt td{padding:5px 6px;}
+  h2.sec{font-size:.98rem;}
+  p.sub{font-size:.79rem;}
+  textarea{min-height:76px;}
+  .btn,.btn.sm{padding:8px 12px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1>💥 대멸종과 생물 다양성 <span>— 다섯 번의 대격변</span></h1>
+  <nav class="tabs">
+    <button class="tab on" data-tab="0"><span class="tab-n">0</span>대멸종이란</button>
+    <button class="tab" data-tab="1"><span class="tab-n">1</span>다섯 번의 대멸종</button>
+    <button class="tab" data-tab="2"><span class="tab-n">2</span>원인을 심판하다</button>
+    <button class="tab" data-tab="3"><span class="tab-n">3</span>그 이후에 일어난 일</button>
+    <button class="tab" data-tab="4"><span class="tab-n">4</span>총정리</button>
+  </nav>
+  <div class="std">[10통과2-01-01]</div>
+</header>
+
+<div class="wrap">
+
+<!-- ══════ 0 ══════ -->
+<section class="page on" data-page="0"><div class="scroll"><div class="pane">
+  <h2 class="sec">멸종은 늘 일어난다 — 그런데 가끔 한꺼번에 일어난다</h2>
+  <p class="sub">생물이 사라지는 일은 지질 시대 내내 꾸준히 있었습니다. 이것을 <b class="hl">배경 멸종</b>이라고 합니다.
+    그런데 어떤 시기에는 <b class="hl-b">짧은 시간 동안 넓은 지역에서 많은 종이 한꺼번에</b> 사라졌습니다.
+    이것이 <b class="hl-b">대멸종</b>이며, 지질 시대에 크게 다섯 번 있었습니다.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h3 class="sub3" style="margin-top:0">배경 멸종</h3>
+      <p class="note">환경에 적응하지 못한 종이 <b>조금씩 꾸준히</b> 사라집니다.
+        새로 생겨나는 종도 있어서 전체 종 수는 크게 흔들리지 않습니다.</p>
+    </div>
+    <div class="card" style="border-color:rgba(248,113,113,.4)">
+      <h3 class="sub3" style="margin-top:0;color:var(--bad)">대멸종</h3>
+      <p class="note"><b class="hl-b">짧은 시간</b> 동안 <b class="hl-b">넓은 지역</b>에서
+        <b class="hl-b">많은 종</b>이 한꺼번에 사라집니다. 새로 생겨나는 속도가 따라가지 못해
+        전체 종 수가 급격히 떨어집니다.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">이건 대멸종일까, 배경 멸종일까</h3>
+    <p class="note" style="margin-bottom:12px">다섯 가지 사례입니다. 하나씩 판정해 보세요.
+      생각보다 헷갈리는 것이 섞여 있습니다.</p>
+    <div id="bgHost"></div>
+    <div class="row" style="margin-top:11px">
+      <button class="btn sm" id="bgReset">다시 판정</button>
+      <span class="tagline">판정</span>
+      <b id="bgScore" style="font-size:.9rem;color:var(--accent)">0 / 5</b>
+    </div>
+    <div class="verdict" id="bgFinal"></div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:4px">
+      <h3 class="sub3" style="margin:0">곡선에서 대멸종을 직접 찾아보기</h3>
+      <span class="badge-live off" id="curveBadge">모식도</span>
+    </div>
+    <p class="note" style="margin-bottom:10px">아래는 시간에 따른 <b class="hl">생물 종류의 수</b> 변화입니다.
+      곡선이 <b class="hl-b">갑자기 뚝 떨어지는 곳</b>이 대멸종입니다.
+      다섯 군데를 찾아 곡선 위를 눌러 보세요.</p>
+    <div class="curvebox" id="curveBox"></div>
+    <div class="findrow" id="findRow"></div>
+    <div class="verdict" id="curveMsg"></div>
+    <div class="row" style="margin-top:11px">
+      <button class="btn sm" id="curveReset">다시 찾기</button>
+      <button class="btn sm" id="curveHint">힌트 보기</button>
+      <button class="btn sm" id="pbdbBtn">실제 화석 자료로 확인하기</button>
+    </div>
+    <div class="verdict" id="pbdbMsg"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">왜 하필 "넓은 지역"이 조건일까</h3>
+    <div class="stepflow">
+      <div class="stepitem"><span class="n">1</span><div><b>피난처가 남아 있으면 다시 퍼진다</b>
+        <span class="note">좁은 지역에서만 사라졌다면, 다른 곳에 살아남은 무리가 있습니다.
+        시간이 지나면 그들이 빈자리로 다시 퍼져 나갑니다. 지구 전체로 보면 <b>잃은 것이 없습니다</b>.
+        넓은 지역에서 <b>동시에</b> 일어나야 도망갈 곳이 없어집니다.</span></div></div>
+      <div class="stepitem"><span class="n">2</span><div><b>한 지역의 지층만 보면 속는다</b>
+        <span class="note">어떤 지층에서 화석이 더 이상 안 나온다고 그 생물이 멸종한 것은 아닙니다.
+        <b>다른 곳으로 옮겨 갔거나</b>, 그 지역 환경만 바뀌었을 수도 있습니다.
+        여러 대륙의 같은 시기 지층에서 <b>동시에</b> 사라져야 진짜 멸종입니다.</span></div></div>
+      <div class="stepitem"><span class="n">3</span><div><b>지질 시대의 경계가 되려면</b>
+        <span class="note">지질 시대는 <b>생물의 급격한 변화</b>로 나눕니다.
+        지구 전체의 생물 구성이 바뀌어야 전 세계 지층에서 그 경계를 알아볼 수 있습니다.
+        좁은 지역의 사건은 그 지역 지층에만 남습니다.</span></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q0a">Q1. 화산섬이 통째로 사라져 그 섬에만 살던 20여 종이 한꺼번에 없어졌습니다.
+      짧은 시간에 많은 종이 사라졌는데도 대멸종이라고 하지 않습니다. 그 이유를 설명하세요.</label>
+    <textarea id="q0a" data-q="Q1. 화산섬 사례가 대멸종이 아닌 이유"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q0b">Q2. 어떤 지층에서 특정 화석이 어느 층 위로 더 이상 나오지 않습니다.
+      이것만으로 "그 생물이 멸종했다"고 결론 내릴 수 없는 이유는 무엇이며,
+      확인하려면 무엇을 더 조사해야 할까요?</label>
+    <textarea id="q0b" data-q="Q2. 한 지층에서 화석이 사라진 것만으로 멸종을 단정할 수 없는 이유"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 1 ══════ -->
+<section class="page" data-page="1"><div class="scroll"><div class="pane">
+  <h2 class="sec">다섯 번의 대멸종</h2>
+  <p class="sub">각 사건의 이름은 <b class="hl">그 사건으로 끝난 기(紀)</b>에서 따옵니다.
+    카드를 눌러 자세히 살펴보세요. 사라진 생물과 살아남은 생물이 그다음 시대의 주인공을 결정했습니다.</p>
+  <div class="exlist" id="exList"></div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">한눈에 비교</h3>
+    <table class="dt" id="exTbl"></table>
+    <p class="note" style="margin-top:8px">종 손실률은 Barnosky 외(2011) <i>Nature</i>에 정리된 추정값입니다.
+      화석으로 남은 것만 셀 수 있으므로 연구에 따라 값이 조금씩 다릅니다.</p>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q1a">Q3. 다섯 번 중 <b>규모가 가장 큰</b> 대멸종은 언제였나요?
+      그리고 그 사건이 <b>고생대와 중생대를 나누는 경계</b>가 된 이유를 설명하세요.</label>
+    <textarea id="q1a" data-q="Q3. 가장 큰 대멸종과 그것이 대(代)의 경계가 된 이유"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q1b">Q4. 트라이아스기 말 대멸종이 없었다면 공룡의 시대는
+      오지 않았을 수도 있습니다. 왜 그런지 카드의 내용을 근거로 설명하세요.</label>
+    <textarea id="q1b" data-q="Q4. 트라이아스기 말 대멸종과 공룡 번성의 관계"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 2 ══════ -->
+<section class="page" data-page="2"><div class="scroll"><div class="pane">
+  <h2 class="sec">원인을 심판하다</h2>
+  <p class="sub">대멸종의 원인은 <b class="hl">지구 환경의 급격한 변화</b>입니다.
+    그런데 "무엇이 그 변화를 일으켰는가"에 대해서는 여러 가설이 경쟁합니다.
+    증거를 하나씩 살펴보고 <b class="hl">어느 가설을 뒷받침하는지</b> 직접 판정해 보세요.</p>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">환경을 뒤흔드는 세 가지 방아쇠</h3>
+    <div class="grid3" id="causeHost"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">대륙이 모이면 바다가 좁아진다</h3>
+    <p class="note" style="margin-bottom:12px">세 방아쇠 중 <b class="hl">대륙 이동</b>은 느리게 일어나서
+      눈에 잘 띄지 않지만, 바다 생물에게는 가장 근본적인 변화입니다.
+      아래는 시대별 대륙 배치입니다. <b class="hl-w">밝은 테두리가 대륙붕(얕은 바다)</b>으로,
+      바다 생물 대부분이 사는 곳입니다.</p>
+    <div class="grid2" id="pgHost"></div>
+    <h3 class="sub3">배치가 바뀌면 무엇이 달라지나</h3>
+    <table class="dt" id="pgTbl"></table>
+    <div class="verdict warn show" style="margin-top:12px">
+      <b>페름기 말에 무슨 일이 있었는가</b><br>
+      모든 대륙이 하나로 붙어 <b>판게아</b>가 되자, 해안선이 짧아지면서 얕은 바다가 크게 줄었습니다.
+      바다 생물 대부분은 햇빛이 닿는 얕은 바다에 사는데, <b class="hl-w">그 집이 통째로 좁아진 것</b>입니다.
+      게다가 대륙이 하나로 막아서면서 바닷물이 도는 길이 끊겨,
+      깊은 바다에 산소가 잘 공급되지 않게 되었습니다.<br><br>
+      즉 페름기 말 생태계는 <b>이미 벼랑 끝에 서 있었습니다.</b>
+      거기에 시베리아의 초대형 화산 폭발이 방아쇠를 당긴 것입니다.
+      <b class="hl">판게아가 무대를 만들고, 화산이 결정타를 날렸습니다.</b>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">사건을 골라 증거를 판정하세요</h3>
+    <div class="evsel" id="caseBtns"></div>
+    <div id="caseInfo"></div>
+    <div class="evwrap" id="evHost"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn sm" id="evReset">다시 판정</button>
+      <span class="tagline">판정한 증거</span>
+      <b id="evScore" style="font-size:.9rem;color:var(--accent)">0 / 0</b>
+    </div>
+    <h3 class="sub3">내 판정 결과</h3>
+    <div id="tallyHost"></div>
+    <div class="verdict" id="caseVerdict"></div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q2a">Q5. 백악기 말 대멸종에서 소행성 충돌설과 화산 폭발설은 아직도 논쟁 중입니다.
+      두 사건이 <b>거의 같은 시기</b>에 일어났기 때문인데, 이것이 왜 판정을 어렵게 만드는지 설명하세요.</label>
+    <textarea id="q2a" data-q="Q5. 충돌과 화산이 같은 시기라 판정이 어려운 이유"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q2b">Q6. 만약 어떤 과학자가 "페름기 말 대멸종도 소행성 충돌 때문이다"라고
+      주장한다면, 그 주장을 확인하기 위해 <b>무엇을 찾아야</b> 할까요? 두 가지 이상 쓰세요.</label>
+    <textarea id="q2b" data-q="Q6. 페름기 말 충돌설을 검증하려면 무엇을 찾아야 하는가"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 3 ══════ -->
+<section class="page" data-page="3"><div class="scroll"><div class="pane">
+  <h2 class="sec">그 이후에 일어난 일</h2>
+  <p class="sub">대멸종은 끝이 아니었습니다. 사라진 자리는 비어 있지 않았고,
+    살아남은 생물이 그 자리를 채우며 <b class="hl">전혀 새로운 생물 다양성</b>이 만들어졌습니다.</p>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">대멸종 이후의 네 단계</h3>
+    <div class="stepflow" id="stepHost"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">빈자리가 만든 새 주인공</h3>
+    <p class="note" style="margin-bottom:11px">대멸종 직후에는 종 수가 크게 줄지만,
+      시간이 지나면 이전보다 <b class="hl">더 다양해지는</b> 경우가 많습니다. 실제 사례로 확인해 보세요.</p>
+    <table class="dt" id="afterTbl"></table>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">지금은 여섯 번째 대멸종일까</h3>
+    <p class="note">오늘날 종이 사라지는 속도가 배경 멸종보다 훨씬 빠르다는 연구가 많습니다.
+      다만 지난 다섯 번과 다른 점이 하나 있습니다. 원인이 <b class="hl-w">화산이나 소행성이 아니라 사람</b>이라는 것입니다.</p>
+    <div class="verdict warn show" style="margin-top:11px">
+      <b>생각해 볼 점</b> — 과거 다섯 번의 대멸종은 인류가 손쓸 수 없는 일이었습니다.
+      그러나 여섯 번째가 진행 중이라면, 그것은 인류가 <b>속도를 늦출 수 있는</b> 최초의 대멸종이기도 합니다.
+    </div>
+    <label class="lbl" style="margin-top:14px" for="q3a">Q7. 대멸종 뒤에 오히려 생물 다양성이 더 커지기도 합니다.
+      어떤 과정을 거쳐 그렇게 되는지 <b>빈자리 · 적응 · 진화</b>라는 말을 모두 써서 설명하세요.</label>
+    <textarea id="q3a" data-q="Q7. 대멸종 이후 생물 다양성이 커지는 과정"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q3b">Q8. 지금 진행 중일지 모르는 여섯 번째 대멸종이
+      과거 다섯 번과 결정적으로 다른 점은 무엇인가요? 그것이 왜 중요한지도 함께 쓰세요.</label>
+    <textarea id="q3b" data-q="Q8. 여섯 번째 대멸종이 과거와 다른 점과 그 의미"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 4 ══════ -->
+<section class="page" data-page="4"><div class="scroll"><div class="pane">
+  <h2 class="sec">활동 총정리</h2>
+  <p class="sub">작성한 답안과 활동 결과를 모았습니다. 확인한 뒤 학습지로 저장하거나 인쇄하세요.</p>
+  <div class="card"><h3 class="sub3" style="margin-top:0">활동 기록</h3><table class="dt" id="scoretbl"></table></div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">내가 쓴 답안</h3><div id="anshost"></div></div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">스스로 점검</h3><div id="chkhost"></div></div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">핵심 정리</h3><div id="summaryhost"></div></div>
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">학습지 저장 · 인쇄</h3>
+    <div style="max-width:280px;margin-bottom:12px">
+      <label class="lbl" for="whoName">학번 · 이름</label>
+      <input type="text" id="whoName" placeholder="예: 10512 김지구">
+    </div>
+    <div id="ws-actions"></div>
+  </div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">자료 출처</h3>
+    <div class="srcs">
+      · 대멸종 규모 — Barnosky et al. (2011), <i>Nature</i> 471:51–57<br>
+      · 지질 연대 — International Commission on Stratigraphy, 국제 연대층서표 2024/12<br>
+      · 이리듐 이상 — Alvarez et al. (1980), <i>Science</i> 208:1095–1108<br>
+      · 화석 산출 자료 — The Paleobiology Database (paleobiodb.org)<br>
+      · 화석 사진 — 활동 폴더 내 images/
+    </div>
+  </div>
+</div></div></section>
+
+</div>
+
+<div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
+
+<script src="worksheet.js?v=7"></script>
+<script>
+/* ══════════════ 공통 ══════════════ */
+const esc = s => String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    document.querySelector('.page[data-page="'+t.dataset.tab+'"]').classList.add('on');
+    if(t.dataset.tab==='4') renderSummaryTab();
+  });
+});
+
+/* 화석 사진 */
+const PHOTOS = {
+  trilobite:{n:'삼엽충', era:'고생대', pair:true, d:'고생대 바다를 대표하던 절지동물입니다. 페름기 말 대멸종으로 완전히 사라졌습니다.'},
+  graptolite:{n:'필석', era:'고생대 전기', pair:false, d:'바다에 떠다니던 군체 생물입니다. 오르도비스기 말 대멸종으로 큰 타격을 입었습니다.'},
+  ostracoderm:{n:'갑주어', era:'고생대', pair:false, d:'턱이 없는 원시 어류입니다. 데본기 후기 대멸종으로 사라졌습니다.'},
+  brachiopod:{n:'완족류', era:'고생대 번성 · 현재도 생존', pair:true, d:'고생대에 크게 번성했고 페름기 말에 큰 타격을 입었지만 <b>절멸하지는 않았습니다</b>. 지금도 살아 있습니다.'},
+  ammonite:{n:'암모나이트', era:'중생대', pair:true, d:'중생대 바다를 대표한 연체동물입니다. 백악기 말 대멸종으로 사라졌습니다.'},
+  crurotarsi:{n:'원시 악어류', era:'중생대 초기', pair:false, d:'트라이아스기에 공룡과 경쟁하던 파충류입니다. 트라이아스기 말 대멸종으로 크게 줄었고, 그 빈자리를 공룡이 차지했습니다.'},
+  dinosaur:{n:'공룡', era:'중생대', pair:false, d:'중생대 육상의 지배자였습니다. 백악기 말 대멸종으로 대부분 사라졌지만, 한 갈래가 살아남아 오늘날의 새가 되었습니다.'},
+  dino_tracks:{n:'공룡 발자국', era:'중생대', pair:true, d:'공룡이 걸어간 흔적입니다. 우리나라 경상도 일대에 세계적인 산지가 있습니다.'},
+  mammoth:{n:'매머드', era:'신생대 후기', pair:true, d:'공룡이 사라진 뒤 번성한 포유류의 하나입니다. 빙하기의 추운 초원에 살았습니다.'},
+  nummulites:{n:'화폐석', era:'신생대 전기', pair:true, d:'대멸종 이후 새로 번성한 생물입니다. 신생대 전기 따뜻한 바다를 가득 채웠습니다.'}
+};
+function photoCard(id){
+  const p=PHOTOS[id]; if(!p) return '';
+  const src = p.pair ? 'images/'+id+'_restore.jpeg' : 'images/'+id+'.jpeg';
+  return '<button class="pcard" data-ph="'+id+'"><img src="'+src+'" alt="'+p.n+'" loading="lazy" '+
+    'onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')">'+
+    '<div class="cap"><b>'+p.n+'</b><span>'+p.era+'</span></div></button>';
+}
+function openPhoto(id){
+  const p=PHOTOS[id]; if(!p) return;
+  const imgs = p.pair
+    ? '<figure><img src="images/'+id+'_restore.jpeg" onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')"><figcaption>살아 있을 때의 모습 (복원도)</figcaption></figure>'+
+      '<figure><img src="images/'+id+'_real.jpeg" onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')"><figcaption>실제 화석</figcaption></figure>'
+    : '<figure><img src="images/'+id+'.jpeg" onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')"><figcaption>'+p.n+'</figcaption></figure>';
+  document.getElementById('mbox').innerHTML =
+    '<div class="row" style="justify-content:space-between"><h3 style="font-size:1rem;font-weight:800">'+p.n+'</h3>'+
+    '<button class="btn sm" id="mClose">닫기 ✕</button></div>'+
+    '<div class="note" style="margin-top:2px">'+p.era+'</div>'+
+    '<div class="mimgs">'+imgs+'</div><p class="note">'+p.d+'</p>';
+  document.getElementById('modal').classList.add('on');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-ph]'); if(b) openPhoto(b.dataset.ph);
+});
+document.getElementById('modal').addEventListener('click',e=>{
+  if(e.target.id==='modal'||e.target.id==='mClose') document.getElementById('modal').classList.remove('on');
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.getElementById('modal').classList.remove('on');
+});
+
+/* ══════════════ 탭 0 : 배경 멸종 vs 대멸종 ══════════════ */
+const BGCASES=[
+ {t:'<b>도도새</b> — 인도양 모리셔스 섬에만 살던 새로, 1600년대에 사람이 들여온 동물과 사냥 때문에 사라졌습니다.',
+  a:'배경 멸종',
+  w:'안타까운 일이지만 <b>한 섬</b>에 살던 <b>한 종</b>의 이야기입니다. 지구 전체 생물 구성은 거의 달라지지 않았습니다. 이렇게 개별 종이 사라지는 일은 지질 시대 내내 꾸준히 있었습니다.'},
+ {t:'<b>한 화산섬이 분화로 통째로 사라지면서</b>, 그 섬에만 살던 생물 20여 종이 <b>몇 달 만에</b> 한꺼번에 없어졌습니다.',
+  a:'배경 멸종',
+  w:'이것이 핵심 사례입니다. <b>짧은 시간</b>과 <b>많은 종</b>이라는 조건은 만족하지만 <b>넓은 지역</b>이 아닙니다.<br>왜 그것이 중요할까요? 섬 하나가 사라져도 지구의 다른 바다와 육지는 멀쩡합니다. 시간이 지나면 다른 곳의 생물이 그 자리로 퍼져 나갑니다. 즉 <b>지구 전체로 보면 회복이 가능</b>합니다. 대멸종은 <b>도망갈 곳이 없을 때</b> 성립합니다.'},
+ {t:'강원도의 어느 지층에서 특정 조개 화석이 <b>어느 층 위로는 나오지 않습니다.</b> 그런데 같은 시기에 쌓인 <b>북아메리카 지층</b>에서는 그 화석이 계속 나옵니다.',
+  a:'멸종이 아님',
+  w:'그 생물은 살아 있습니다. 강원도 <b>그 지역에서만</b> 사라진 것입니다. 바닷물의 깊이나 온도가 바뀌어 서식지가 옮겨 갔을 수 있습니다.<br>이것이 <b>지층 하나만 보고 멸종을 단정하면 안 되는</b> 이유입니다. 진짜 멸종을 확인하려면 <b>여러 대륙의 같은 시기 지층</b>을 함께 조사해야 합니다.'},
+ {t:'<b>전 세계 모든 대륙</b>의 같은 시기 지층에서 삼엽충이 <b>동시에</b> 사라졌고, 그 위 지층에서는 어디에서도 다시 나오지 않습니다.',
+  a:'대멸종',
+  w:'짧은 시간 · 넓은 지역 · 많은 종이라는 조건을 모두 만족합니다. 피난처가 없었다는 뜻이고, 실제로 삼엽충은 다시 돌아오지 못했습니다. 이 층준이 바로 <b>고생대와 중생대의 경계</b>입니다.'},
+ {t:'오스트레일리아 일부 지역에만 살던 <b>태즈메이니아 늑대</b>가 1936년에 마지막 개체가 죽으며 사라졌습니다.',
+  a:'배경 멸종',
+  w:'분포 지역이 좁았고 한 종의 사건입니다. 다만 오늘날 이런 일이 <b>동시다발적으로 매우 빠르게</b> 일어나고 있어서, 과학자들은 이것이 쌓여 여섯 번째 대멸종이 되는 것은 아닌지 지켜보고 있습니다.'}
+];
+const BGOPTS=['배경 멸종','대멸종','멸종이 아님'];
+let bgAns={};
+function drawBG(){
+  document.getElementById('bgHost').innerHTML=BGCASES.map((c,i)=>{
+    const a=bgAns[i];
+    return '<div class="evcard" style="margin-bottom:10px"><div class="eh"><i>사례 '+(i+1)+'</i>'+c.t+'</div>'+
+      '<div class="hyprow" data-i="'+i+'">'+BGOPTS.map(o=>{
+        let cls='hyp';
+        if(a){ if(o===a) cls+=(o===c.a?' ok':' no'); else if(o===c.a) cls+=' ok'; }
+        return '<button class="'+cls+'" data-o="'+o+'"'+(a?' disabled':'')+'>'+o+'</button>';
+      }).join('')+'</div>'+
+      (a?'<div class="exp show"><b>'+(a===c.a?'맞습니다.':'정답은 「'+c.a+'」입니다.')+'</b> '+c.w+'</div>':'')+
+      '</div>';
+  }).join('');
+  const right=BGCASES.filter((c,i)=>bgAns[i]===c.a).length;
+  const done=BGCASES.filter((c,i)=>bgAns[i]).length;
+  document.getElementById('bgScore').textContent=right+' / '+BGCASES.length;
+  const v=document.getElementById('bgFinal');
+  if(done<BGCASES.length){ v.className='verdict'; return; }
+  v.className='verdict '+(right===BGCASES.length?'ok':'warn')+' show';
+  v.innerHTML='<b>'+right+' / '+BGCASES.length+' 정확했습니다.</b><br><br>'+
+    '다섯 사례로 <b>대멸종의 세 조건</b>을 하나씩 걸러 냈습니다.<br><br>'+
+    '<b>사례 1 · 5</b> (도도새, 태즈메이니아 늑대) — 사라진 것이 <b>한 종</b>이고 살던 곳도 좁았습니다. '+
+      '"많은 종"과 "넓은 지역" 두 조건이 어긋납니다.<br>'+
+    '<b>사례 2</b> (화산섬) — <b>짧은 시간</b>에 <b>많은 종</b>이 사라졌습니다. 두 조건은 맞습니다. '+
+      '그런데 <b>좁은 지역</b>이라 대멸종이 아닙니다. 세 조건 중 하나만 빠져도 안 된다는 것을 보여 주는 사례입니다.<br>'+
+    '<b>사례 3</b> — 다른 대륙에서는 계속 나오므로 <b>멸종 자체가 아닙니다</b>. 그 지역에서만 사라진 것입니다.<br>'+
+    '<b>사례 4</b> — 짧은 시간 · 넓은 지역 · 많은 종이 <b>모두</b> 갖춰진 유일한 경우입니다.<br><br>'+
+    '특히 사례 2와 3을 다시 보세요. <b>"넓은 지역"이라는 조건이 왜 필요한지</b>가 이 둘에 담겨 있습니다. '+
+    '아래 카드에서 그 이유를 정리했습니다.';
+}
+drawBG();
+document.getElementById('bgHost').addEventListener('click',e=>{
+  const b=e.target.closest('.hyp'); if(!b||b.disabled) return;
+  bgAns[+b.parentElement.dataset.i]=b.dataset.o; drawBG();
+});
+document.getElementById('bgReset').addEventListener('click',()=>{ bgAns={}; drawBG(); });
+
+/* ══════════════ 탭 0 : 다양성 곡선 ══════════════ */
+const T0=541, CURVE=[
+ [541,6],[520,20],[505,24],[490,22],[470,38],[458,50],[450,52],[444,26],[438,30],[428,40],
+ [420,44],[410,47],[395,50],[385,52],[375,50],[372,30],[365,32],[359,34],[345,44],[330,50],
+ [315,54],[300,57],[285,59],[270,62],[260,64],[254,62],[252,12],[249,10],[243,20],[235,30],
+ [225,38],[210,46],[203,47],[201,24],[197,28],[190,34],[175,44],[160,52],[145,58],[130,63],
+ [110,70],[90,76],[75,80],[68,80],[66,40],[63,44],[58,52],[50,62],[40,68],[30,74],[20,82],
+ [10,90],[0,100]];
+const DIPS=[
+ {ma:444,n:'오르도비스기 말'},{ma:372,n:'데본기 후기'},{ma:252,n:'페름기 말'},
+ {ma:201,n:'트라이아스기 말'},{ma:66,n:'백악기 말'}];
+const ERABANDS=[{n:'고생대',a:541,z:252,c:'#3d8f74'},{n:'중생대',a:252,z:66,c:'#3f7fb8'},
+                {n:'신생대',a:66,z:0,c:'#c08c1f'}];
+let found=new Set(), liveCurve=null, showHint=false;
+
+function drawCurve(){
+  const W=760,H=300,L=44,R=14,TP=16,BT=44;
+  const pts = liveCurve || CURVE;
+  const maxV = Math.max(...pts.map(p=>p[1]));
+  const X=ma=>L+(T0-ma)/T0*(W-L-R);
+  const Y=v=>TP+(1-v/maxV)*(H-TP-BT);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" id="curveSvg">';
+  ERABANDS.forEach(e=>{
+    s+='<rect x="'+X(e.a)+'" y="'+TP+'" width="'+(X(e.z)-X(e.a))+'" height="'+(H-TP-BT)+
+       '" fill="'+e.c+'" opacity=".08"/>'+
+       '<text x="'+((X(e.a)+X(e.z))/2)+'" y="'+(H-26)+'" text-anchor="middle" font-size="11.5" '+
+       'font-weight="800" fill="'+e.c+'">'+e.n+'</text>';
+  });
+  [500,400,300,200,100,0].forEach(t=>{
+    s+='<line x1="'+X(t)+'" y1="'+TP+'" x2="'+X(t)+'" y2="'+(H-BT)+'" stroke="#e4eaf2" stroke-width="1"/>'+
+       '<text x="'+X(t)+'" y="'+(H-BT+14)+'" text-anchor="middle" font-size="10" fill="#4a5a6b">'+t+'</text>';
+  });
+  s+='<text x="'+(W/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10.5" fill="#4a5a6b">← 과거   시간 (백만 년 전)   현재 →</text>';
+  s+='<text x="12" y="'+(TP+70)+'" font-size="11" font-weight="700" fill="#243141">생<tspan x="12" dy="14">물</tspan><tspan x="12" dy="14">종</tspan><tspan x="12" dy="14">수</tspan></text>';
+  s+='<polyline fill="none" stroke="#03699f" stroke-width="2.4" stroke-linejoin="round" points="'+
+     pts.map(p=>X(p[0])+','+Y(p[1])).join(' ')+'"/>';
+  DIPS.forEach(d=>{
+    const p=pts.reduce((a,b)=>Math.abs(b[0]-d.ma)<Math.abs(a[0]-d.ma)?b:a);
+    const on=found.has(d.ma);
+    if(on||showHint){
+      s+='<circle cx="'+X(p[0])+'" cy="'+Y(p[1])+'" r="'+(on?7:5)+'" fill="'+(on?'#dc2626':'none')+
+         '" stroke="#dc2626" stroke-width="2"'+(on?'':' stroke-dasharray="3 2"')+'/>';
+      if(on) s+='<text x="'+X(p[0])+'" y="'+(Y(p[1])-13)+'" text-anchor="middle" font-size="10" '+
+         'font-weight="800" fill="#dc2626">'+d.n+'</text>';
+    }
+  });
+  s+='<rect x="'+L+'" y="'+TP+'" width="'+(W-L-R)+'" height="'+(H-TP-BT)+'" fill="transparent" id="curveHit"/>';
+  s+='</svg>';
+  document.getElementById('curveBox').innerHTML=s;
+  document.getElementById('findRow').innerHTML=DIPS.map(d=>
+    '<span class="findchip'+(found.has(d.ma)?' got':'')+'">'+
+    (found.has(d.ma)?'✔ '+d.n:'？ 미발견')+'</span>').join('');
+}
+drawCurve();
+document.getElementById('curveBox').addEventListener('click',e=>{
+  const svg=document.getElementById('curveSvg'); if(!svg) return;
+  const r=svg.getBoundingClientRect();
+  const W=760,L=44,R=14;
+  const px=(e.clientX-r.left)/r.width*W;
+  const ma=T0-(px-L)/(W-L-R)*T0;
+  const msg=document.getElementById('curveMsg');
+  const hit=DIPS.find(d=>Math.abs(d.ma-ma)<=16);
+  if(hit && !found.has(hit.ma)){
+    found.add(hit.ma); drawCurve();
+    msg.className='verdict ok show';
+    msg.innerHTML='<b>찾았습니다 — '+hit.n+' 대멸종</b> (약 '+hit.ma+'백만 년 전)<br>'+
+      (found.size===5
+        ? '다섯 군데를 모두 찾았습니다. 곡선이 뚝 떨어진 뒤 <b>다시 올라가는</b> 모습에 주목하세요. '+
+          '멸종으로 비워진 자리를 살아남은 생물이 채우면서 다양성이 회복된 것입니다. '+
+          '3번 탭에서 그 과정을 자세히 살펴봅니다.'
+        : '남은 곳은 '+(5-found.size)+'군데입니다.');
+  } else if(hit){
+    msg.className='verdict info show';
+    msg.innerHTML='이미 찾은 곳입니다 — '+hit.n;
+  } else {
+    msg.className='verdict no show';
+    msg.innerHTML='여기는 곡선이 완만합니다. 약 '+Math.round(ma)+'백만 년 전 부근이네요. '+
+      '<b>수직으로 뚝 떨어지는</b> 지점을 찾아보세요.';
+  }
+});
+document.getElementById('curveReset').addEventListener('click',()=>{
+  found.clear(); showHint=false; drawCurve();
+  document.getElementById('curveMsg').className='verdict';
+});
+document.getElementById('curveHint').addEventListener('click',()=>{
+  showHint=!showHint; drawCurve();
+});
+
+/* PBDB 실제 다양성 곡선 */
+function fetchWithTimeout(url,ms){
+  return new Promise((res,rej)=>{
+    const t=setTimeout(()=>rej(new Error('timeout')),ms);
+    fetch(url).then(r=>{clearTimeout(t); r.ok?res(r.json()):rej(new Error('HTTP '+r.status));})
+              .catch(e=>{clearTimeout(t); rej(e);});
+  });
+}
+document.getElementById('pbdbBtn').addEventListener('click',async()=>{
+  const badge=document.getElementById('curveBadge'), msg=document.getElementById('pbdbMsg');
+  const btn=document.getElementById('pbdbBtn');
+  if(liveCurve){ liveCurve=null; drawCurve(); badge.className='badge-live off';
+    badge.textContent='모식도'; msg.className='verdict'; btn.textContent='실제 화석 자료로 확인하기'; return; }
+  badge.className='badge-live load'; badge.textContent='불러오는 중…'; btn.disabled=true;
+  msg.className='verdict info show';
+  msg.innerHTML='전 세계 화석 산출 기록에서 시대별 생물 종류 수를 세는 중입니다…';
+  try{
+    const j=await fetchWithTimeout('https://paleobiodb.org/data1.2/occs/diversity.json'+
+      '?base_name=Animalia&count=genera&reso=epoch&time_rule=major&vocab=pbdb', 15000);
+    const rows=(j&&j.records)||[];
+    const out=[];
+    rows.forEach(r=>{
+      const mx=+(r.max_ma??r.eag), mn=+(r.min_ma??r.lag);
+      const v=+(r.sampled_in_bin??r.X_sib??r.n_occs??NaN);
+      if(isFinite(mx)&&isFinite(mn)&&isFinite(v)&&mx<=T0) out.push([(mx+mn)/2, v]);
+    });
+    if(out.length<8) throw new Error('too few');
+    out.sort((a,b)=>b[0]-a[0]);
+    liveCurve=out;
+    drawCurve();
+    badge.className='badge-live on'; badge.textContent='PBDB 실제 자료';
+    btn.textContent='모식도로 되돌리기';
+    msg.className='verdict ok show';
+    msg.innerHTML='<b>'+out.length+'개 시기의 실제 자료를 불러왔습니다.</b><br>'+
+      '세로축은 그 시기에 <b>화석으로 확인된 생물 종류(속)의 수</b>입니다. '+
+      '모식도보다 울퉁불퉁한데, 화석이 잘 남은 시기와 그렇지 못한 시기가 있기 때문입니다. '+
+      '<b>이것이 진짜 자료의 모습</b>입니다. 그래도 페름기 말과 백악기 말의 급락은 그대로 보입니다.';
+  }catch(e){
+    badge.className='badge-live off'; badge.textContent='모식도';
+    msg.className='verdict no show';
+    msg.innerHTML='<b>데이터베이스에 연결하지 못했습니다.</b> '+
+      '위 곡선은 실제 연구 결과의 모양을 본떠 그린 <b>모식도</b>이며, 대멸종의 위치와 상대적 크기는 실제와 같습니다.';
+  }
+  btn.disabled=false;
+});
+
+/* ══════════════ 탭 1 : 다섯 번의 대멸종 ══════════════ */
+const EXTS=[
+ {no:1,name:'오르도비스기 말',ma:'약 4.44억 년 전',loss:86,c:'#3d8f74',
+  cause:'급격한 빙하기와 해수면 하강',
+  story:'곤드와나 대륙이 남극 쪽으로 이동하면서 거대한 빙하가 자랐습니다. 바닷물이 얼음에 갇혀 해수면이 크게 낮아졌고, 얕은 바다에 살던 생물의 서식지가 통째로 사라졌습니다. 얼마 뒤 빙하가 녹으면서 해수면이 다시 올라가 두 번째 타격을 주었습니다.',
+  gone:'필석 대부분 · 삼엽충 여러 무리 · 완족류 큰 타격',
+  left:'바다 생태계는 유지되었고, 이후 산호와 어류가 늘어남',
+  photos:['graptolite','trilobite'],
+  note:'다섯 번 중 유일하게 <b>바다 생물만</b> 영향을 받았습니다. 당시 육지에는 아직 생물이 거의 없었기 때문입니다.'},
+ {no:2,name:'데본기 후기',ma:'약 3.72억 년 전',loss:75,c:'#35806a',
+  cause:'바다의 산소 부족과 한랭화',
+  story:'육상 식물이 크게 번성하면서 뿌리가 땅을 깊이 파고들었습니다. 그 결과 흙 속 영양분이 강을 타고 바다로 많이 흘러들어 조류가 폭발적으로 늘었고, 바닷속 산소가 고갈되었습니다. 동시에 식물이 이산화 탄소를 많이 흡수해 기후가 차가워졌습니다.',
+  gone:'갑주어 등 원시 어류 · 산호초 대부분',
+  left:'턱이 있는 어류, 그리고 육지로 올라온 최초의 네발 동물',
+  photos:['ostracoderm'],
+  note:'원인이 <b>다른 생물(육상 식물)의 번성</b>이었다는 점이 독특합니다. 생물도 지구 환경을 바꿉니다.'},
+ {no:3,name:'페름기 말',ma:'약 2.52억 년 전',loss:96,c:'#dc2626',
+  cause:'판게아 형성 + 시베리아 초대형 화산 폭발',
+  story:'먼저 모든 대륙이 하나로 합쳐져 판게아가 되면서 얕은 바다가 크게 줄고 바닷물 순환이 막혔습니다. 바다 생태계는 이미 약해져 있었습니다. 그 상태에서 지금의 시베리아에서 상상하기 어려운 규모의 용암이 수십만 년 동안 뿜어져 나왔습니다. 엄청난 양의 이산화 탄소와 이산화 황이 대기로 들어가 급격한 온난화, 바다의 산성화, 산소 부족이 한꺼번에 닥쳤습니다.',
+  gone:'삼엽충 완전 절멸 · 방추충 절멸 · 바다 생물 대부분',
+  left:'살아남은 소수의 파충류와 어류가 중생대 생태계의 씨앗이 됨',
+  photos:['trilobite','brachiopod'],
+  note:'지구 역사상 <b>가장 큰 대멸종</b>입니다. 원인이 <b>두 겹</b>이라는 점이 중요합니다 — 판게아가 무대를 만들고, 화산이 결정타를 날렸습니다. 이 사건을 경계로 고생대가 끝나고 중생대가 시작되며, 회복에만 수백만 년이 걸렸습니다.'},
+ {no:4,name:'트라이아스기 말',ma:'약 2.01억 년 전',loss:80,c:'#3f7fb8',
+  cause:'판게아 분열과 대규모 화산 활동',
+  story:'초대륙 판게아가 갈라지기 시작하면서 지금의 대서양이 열리는 자리에서 대규모 화산 활동이 일어났습니다. 온실기체가 늘어 기후가 급변했고 바다 환경도 크게 바뀌었습니다.',
+  gone:'원시 악어류 등 대형 파충류 다수 · 암모나이트 큰 타격',
+  left:'공룡이 살아남아 빈자리를 차지',
+  photos:['crurotarsi','dinosaur'],
+  note:'이 사건이 없었다면 <b>공룡의 시대는 오지 않았을 수도</b> 있습니다. 경쟁자가 사라진 자리를 공룡이 채우면서 쥐라기에 크게 번성했습니다.'},
+ {no:5,name:'백악기 말',ma:'약 0.66억 년 전',loss:76,c:'#c08c1f',
+  cause:'소행성 충돌 (그리고 화산 활동)',
+  story:'지름 10 km 남짓한 소행성이 지금의 멕시코 유카탄 반도에 떨어졌습니다. 먼지와 그을음이 하늘을 덮어 햇빛을 가렸고, 광합성이 멈추면서 먹이사슬이 아래부터 무너졌습니다. 같은 시기 인도에서는 데칸 트랩이라 불리는 거대한 화산 활동도 진행 중이었습니다.',
+  gone:'공룡(새 제외) · 암모나이트 · 대형 해양 파충류',
+  left:'포유류 · 새 · 속씨식물',
+  photos:['ammonite','dinosaur','dino_tracks'],
+  note:'다섯 번 중 <b>지구 밖에서 온 원인</b>이 확실하게 확인된 유일한 사건입니다. 이 멸종이 없었다면 포유류는 작은 동물로 남았을 것이고, 인류도 없었을 것입니다.'}
+];
+let exOpen=null;
+function drawExts(){
+  document.getElementById('exList').innerHTML=EXTS.map(x=>
+    '<div class="excard"><button class="exhead" data-x="'+x.no+'">'+
+      '<span class="no" style="background:'+x.c+'">'+x.no+'</span>'+
+      '<span class="ti"><b>'+x.name+' 대멸종</b><span>'+x.ma+' · '+x.cause+'</span></span>'+
+      '<span class="pc"><b>'+x.loss+'%</b><span>종 손실률</span></span></button>'+
+    '<div class="exbody'+(exOpen===x.no?' on':'')+'" id="exb'+x.no+'">'+
+      '<div class="lossbar"><b style="width:'+x.loss+'%"></b></div>'+
+      '<p class="note" style="margin-top:9px">'+x.story+'</p>'+
+      '<table class="dt" style="margin-top:10px">'+
+        '<tr><th style="width:110px">사라진 생물</th><td>'+x.gone+'</td></tr>'+
+        '<tr><th>살아남은 생물</th><td>'+x.left+'</td></tr></table>'+
+      '<div class="verdict info show" style="margin-top:10px">'+x.note+'</div>'+
+      '<div class="gal">'+x.photos.map(photoCard).join('')+'</div>'+
+    '</div></div>').join('');
+}
+drawExts();
+document.getElementById('exList').addEventListener('click',e=>{
+  const b=e.target.closest('.exhead'); if(!b) return;
+  const n=+b.dataset.x; exOpen = exOpen===n ? null : n; drawExts();
+});
+document.getElementById('exTbl').innerHTML=
+  '<tr><th>순서</th><th>시기</th><th>연대</th><th>종 손실률</th><th>주된 원인</th><th>대표적으로 사라진 생물</th></tr>'+
+  EXTS.map(x=>'<tr><td><b>'+x.no+'차</b></td><td style="color:'+x.c+';font-weight:700">'+x.name+'</td>'+
+    '<td class="num">'+x.ma+'</td><td class="num"><b>'+x.loss+'%</b></td><td>'+x.cause+'</td>'+
+    '<td>'+x.gone.split(' · ')[0]+'</td></tr>').join('');
+
+/* ══════════════ 탭 2 : 가설 평가 ══════════════ */
+const CAUSES=[
+ {i:'🌏',h:'대륙 이동',d:'대륙이 움직이면 수륙 분포와 해류가 바뀌고, 빙하가 자라거나 녹으며 <b>해수면이 크게 변합니다</b>. 얕은 바다에 살던 생물은 서식지를 통째로 잃습니다.'},
+ {i:'☄️',h:'소행성 충돌',d:'충돌로 생긴 <b>먼지구름이 햇빛을 가려</b> 광합성이 멈춥니다. 식물이 죽으면 먹이사슬이 아래부터 차례로 무너집니다.'},
+ {i:'🌋',h:'화산 폭발',d:'화산재가 햇빛을 가려 일시적으로 추워지고, 뿜어져 나온 <b>온실기체는 오래 남아 지구를 덥힙니다</b>. 바다는 산성화되고 산소가 줄어듭니다.'}
+];
+document.getElementById('causeHost').innerHTML=CAUSES.map(c=>
+  '<div style="padding:13px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line)">'+
+  '<div style="font-size:1.5rem;margin-bottom:5px">'+c.i+'</div>'+
+  '<b style="font-size:.84rem;display:block;margin-bottom:5px">'+c.h+'</b>'+
+  '<span class="note">'+c.d+'</span></div>').join('');
+
+/* 시대별 대륙 배치 (모식도) */
+const PG=[
+ {t:'고생대 전기', ma:'약 5억 년 전', d:'여러 대륙이 흩어져 있음',
+  p:['32,44 58,34 74,48 66,66 40,63','96,26 122,21 136,40 118,53 100,46',
+     '152,58 182,50 198,68 180,86 154,78','58,88 96,80 118,98 92,116 60,108',
+     '176,102 202,97 212,114 192,124 173,118']},
+ {t:'페름기 말', ma:'약 2.5억 년 전', d:'모든 대륙이 하나로 — 판게아', hot:true,
+  p:['74,20 156,18 178,38 146,50 133,68 154,79 180,98 152,122 80,120 57,93 54,48']},
+ {t:'백악기', ma:'약 1억 년 전', d:'판게아가 갈라지는 중',
+  p:['44,28 100,23 114,48 96,68 48,62','126,30 178,26 194,52 170,70 128,60',
+     '52,82 106,76 120,102 92,120 55,112','142,84 192,80 208,104 182,122 146,114']},
+ {t:'현재', ma:'', d:'다시 흩어진 배치',
+  p:['26,26 62,20 74,42 58,60 28,52','50,70 78,66 84,94 62,122 46,100',
+     '98,24 126,20 132,38 106,44','104,52 140,48 148,82 120,106 100,80',
+     '138,18 202,16 218,44 176,56 140,42','182,94 212,90 220,110 190,118']}
+];
+document.getElementById('pgHost').innerHTML=PG.map(g=>
+  '<div style="border:1px solid '+(g.hot?'rgba(248,113,113,.5)':'var(--line-2)')+
+    ';border-radius:10px;overflow:hidden;background:var(--surface-2)">'+
+  '<svg viewBox="0 0 240 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">'+
+    '<rect width="240" height="140" fill="#eef5fc"/>'+
+    g.p.map(pl=>'<polygon points="'+pl+'" fill="none" stroke="#2b6f95" stroke-width="9" stroke-linejoin="round"/>').join('')+
+    g.p.map(pl=>'<polygon points="'+pl+'" fill="#a8916b" stroke="#c4b08a" stroke-width="1"/>').join('')+
+  '</svg>'+
+  '<div style="padding:8px 10px"><b style="font-size:.8rem'+(g.hot?';color:var(--bad)':'')+'">'+g.t+
+    (g.ma?' <span class="note">('+g.ma+')</span>':'')+'</b>'+
+    '<div class="note" style="margin-top:2px">'+g.d+'</div></div></div>').join('')+
+  '<div class="note" style="grid-column:1/-1">대륙의 모양은 실제와 다른 <b>모식도</b>입니다. '+
+  '중요한 것은 <b>흩어졌는가 모였는가</b>, 그리고 그에 따라 <b>밝은 테두리(얕은 바다)의 총량</b>이 어떻게 달라지는가입니다.</div>';
+
+document.getElementById('pgTbl').innerHTML=
+  '<tr><th>시기</th><th>대륙 배치</th><th>해안선 · 얕은 바다</th><th>바닷물 순환</th><th>바다 생물에게</th></tr>'+
+  [['고생대 전기','여러 대륙이 흩어짐','길고 넓다','활발','살 곳이 많다'],
+   ['페름기 말','판게아 하나로 합쳐짐','짧고 매우 좁다','대륙에 막혀 정체','살 곳이 급격히 줄어듦'],
+   ['백악기','판게아가 갈라짐','다시 길어짐','되살아남','살 곳이 늘어남'],
+   ['현재','흩어진 배치','길고 넓다','활발','살 곳이 많다']]
+  .map((r,i)=>'<tr'+(i===1?' style="background:rgba(248,113,113,.08)"':'')+'>'+
+    r.map((c,j)=>'<td'+(j===0?' style="font-weight:700"':'')+'>'+c+'</td>').join('')+'</tr>').join('');
+
+const NONE='어느 가설도 뒷받침하지 않음';
+const CASES=[
+ {id:'kpg',name:'백악기 말 (약 6,600만 년 전)',c:'#c08c1f',
+  intro:'공룡과 암모나이트가 사라진 사건입니다. 원인을 두고 세 가설이 경쟁했고, 지금도 논쟁이 완전히 끝나지 않았습니다.',
+  hyps:['소행성 충돌설','화산 폭발설(데칸 트랩)','해수면 변화설'],
+  evs:[
+   {t:'경계 점토층에서 <b>이리듐</b>이 배경값의 약 30배로 검출된다. 이리듐은 지각에는 매우 드물지만 운석에는 흔한 원소다.',
+    a:'소행성 충돌설',
+    w:'이리듐은 지구 표면에 거의 없고 운석에 많습니다. 그것이 전 세계 같은 층에서 한꺼번에 많이 나온다면 <b>지구 밖에서 온 물질이 뿌려졌다</b>는 뜻입니다. 이 발견(Alvarez 외, 1980)이 충돌설의 출발점이었습니다.'},
+   {t:'멕시코 유카탄 반도에서 지름 약 180 km의 <b>거대한 충돌 크레이터</b>가 발견되었고, 그 연대가 6,605만 년 전으로 경계와 일치한다.',
+    a:'소행성 충돌설',
+    w:'가설이 예측한 <b>"그렇다면 크레이터가 있어야 한다"</b>가 실제로 확인된 경우입니다. 크기와 연대가 모두 맞아떨어져 충돌설의 결정적 증거가 되었습니다.'},
+   {t:'경계층에서 <b>충격 석영</b>과 유리 방울이 발견된다. 이런 구조는 아주 강한 충격을 받아야만 만들어진다.',
+    a:'소행성 충돌설',
+    w:'화산 분출로는 이 정도 압력이 나오지 않습니다. 서로 다른 종류의 증거가 <b>같은 결론을 가리키는 것</b>을 증거의 수렴이라고 하며, 가설의 신뢰도를 크게 높입니다.'},
+   {t:'인도 데칸 지역에 이 시기의 <b>거대한 용암층</b>이 있고, 분출이 특히 활발해진 시점이 경계와 거의 겹친다.',
+    a:'화산 폭발설(데칸 트랩)',
+    w:'데칸 트랩은 실재하는 거대 화산 지형이고 시기도 맞습니다. 그래서 화산설을 완전히 버릴 수 없습니다. 현재 다수 의견은 <b>충돌이 결정타, 화산은 이미 약해져 있던 생태계를 더 몰아붙인 요인</b>이라는 것입니다.'},
+   {t:'백악기 후기 내내 해수면이 여러 차례 오르내렸지만, 그때마다 대멸종이 일어나지는 않았다.',
+    a:NONE,
+    w:'해수면 변화설을 <b>약하게 만드는</b> 증거입니다. 같은 원인이 여러 번 있었는데 결과는 한 번만 나타났다면, 그것을 주된 원인으로 보기 어렵습니다. 이렇게 <b>가설을 반박하는 증거</b>도 판정에 꼭 필요합니다.'},
+   {t:'바다 표면에 살던 미생물은 거의 전멸했지만, 깊은 바닥에서 <b>가라앉은 유기물을 먹고 살던 생물</b>은 상대적으로 잘 살아남았다.',
+    a:'소행성 충돌설',
+    w:'햇빛이 갑자기 끊기면 <b>광합성에 의존하는 생물부터</b> 무너집니다. 반대로 이미 죽은 유기물을 먹던 생물은 버틸 수 있습니다. 멸종의 <b>선택적 양상</b>이 "햇빛 차단"이라는 원인과 잘 맞습니다.'}
+  ],
+  concl:'현재 과학계의 다수 의견은 <b>소행성 충돌이 주된 원인</b>이라는 것입니다. 이리듐 · 크레이터 · 충격 석영 · 멸종의 양상이 모두 같은 방향을 가리키기 때문입니다. 다만 데칸 트랩 화산 활동도 같은 시기에 진행 중이었고, 이것이 생태계를 미리 약하게 만들었다는 견해가 널리 받아들여집니다. <b>즉 이 논쟁의 결론은 "둘 중 하나"가 아니라 "주범과 공범"입니다.</b>'},
+
+ {id:'ptr',name:'페름기 말 (약 2억 5,200만 년 전)',c:'#dc2626',
+  intro:'지구 역사상 가장 큰 대멸종입니다. 바다 생물의 대부분이 사라졌습니다. 여기서도 세 가설을 비교해 봅시다.',
+  hyps:['화산 폭발설(시베리아 트랩)','소행성 충돌설','판게아 형성설'],
+  evs:[
+   {t:'시베리아에 이 시기의 <b>초대형 용암층</b>이 있고, 분출이 시작된 때가 멸종보다 약 30만 년 앞선다.',
+    a:'화산 폭발설(시베리아 트랩)',
+    w:'원인은 결과보다 <b>먼저</b> 일어나야 합니다. 분출이 멸종에 앞서 시작되었다는 순서가 확인된 것이 이 가설의 강한 근거입니다.'},
+   {t:'멸종 시기에 <b>바닷물 온도가 크게 올라간</b> 흔적이 화석의 성분에 남아 있다.',
+    a:'화산 폭발설(시베리아 트랩)',
+    w:'화산이 내뿜은 이산화 탄소가 온실 효과를 일으켰다는 예측과 맞습니다. 따뜻해진 바닷물은 <b>산소를 적게 머금기</b> 때문에 바다 생물에게 치명적이었습니다.'},
+   {t:'같은 시기 지층에서 <b>산소가 거의 없는 바다</b>에서만 만들어지는 퇴적물이 전 세계적으로 나타난다.',
+    a:'화산 폭발설(시베리아 트랩)',
+    w:'온난화 → 바닷물의 산소 감소 → 질식이라는 <b>연쇄 고리</b>를 뒷받침합니다. 원인 하나가 여러 단계를 거쳐 생물권에 도달하는 전형적인 모습입니다.'},
+   {t:'이 시기 경계층에서는 <b>이리듐 이상이 뚜렷하게 나타나지 않는다.</b>',
+    a:NONE,
+    w:'충돌설을 <b>약하게 만드는</b> 증거입니다. 백악기 말에는 이리듐이 뚜렷했는데 여기서는 그렇지 않습니다. <b>있어야 할 증거가 없다는 사실도 훌륭한 증거</b>입니다.'},
+   {t:'이 시기에 만들어진 <b>큰 충돌 크레이터가 아직 발견되지 않았다.</b>',
+    a:NONE,
+    w:'역시 충돌설에 불리합니다. 다만 "아직 못 찾았을 뿐"일 가능성도 남아 있어, 과학자들은 이 가설을 완전히 폐기하지는 않고 <b>보류</b>합니다.'},
+   {t:'판게아가 만들어지면서 <b>대륙붕(얕은 바다)의 면적이 크게 줄고</b> 해안선이 짧아졌다. 또 대륙이 바닷물의 흐름을 막아 깊은 바다에 산소가 잘 공급되지 않게 되었다.',
+    a:'판게아 형성설',
+    w:'바다 생물 대부분은 햇빛이 닿는 <b>얕은 바다</b>에 삽니다. 판게아가 만들어지자 그 집이 통째로 좁아졌고, 바닷물이 도는 길까지 막혔습니다. 위쪽 대륙 배치 그림에서 <b>밝은 테두리가 가장 얇은 때</b>가 바로 페름기 말입니다.'},
+   {t:'판게아는 멸종보다 <b>훨씬 이전부터 서서히</b> 만들어졌는데, 멸종은 지질학적으로 매우 짧은 시간에 일어났다.',
+    a:NONE,
+    w:'판게아 형성설 <b>하나만으로는</b> 설명이 안 된다는 뜻입니다. 서서히 진행된 변화로 <b>갑작스러운</b> 멸종을 설명할 수 없기 때문입니다.<br>그렇다고 앞의 증거가 무의미해지는 것은 아닙니다. 두 증거를 합치면 이렇게 됩니다 — <b>판게아가 생태계를 미리 약하게 만들어 두었고(무대), 화산이 결정타를 날렸다(방아쇠).</b> 하나의 대멸종에 원인이 여러 겹으로 쌓여 있는 것입니다.'}
+  ],
+  concl:'현재 다수 의견은 <b>시베리아 트랩의 거대한 화산 활동</b>이 방아쇠였다는 것입니다. 시기 · 온난화 · 무산소 바다가 모두 일관되게 맞아떨어집니다.<br><br>다만 이 사건은 원인이 <b>두 겹</b>이라는 점이 중요합니다. 판게아 형성으로 얕은 바다가 줄고 바닷물 순환이 막혀 생태계가 이미 벼랑 끝에 있었고, 거기에 화산이 결정타를 날렸습니다. <b>같은 규모의 화산 폭발이 다른 시기에 일어났다면 피해가 이만큼 크지 않았을 수도 있습니다.</b><br><br>백악기 말과 비교해 보세요. 같은 "대멸종"이지만 원인도, 판정에 쓰인 증거의 종류도 전혀 달랐습니다. 그래서 <b>사건마다 따로 증거를 모아 평가해야</b> 합니다.'}
+];
+let caseIdx=0, evAns={};
+function drawCase(){
+  document.getElementById('caseBtns').innerHTML=CASES.map((c,i)=>
+    '<button class="evbtn'+(i===caseIdx?' on':'')+'" data-i="'+i+'"'+
+    (i===caseIdx?' style="background:'+c.c+';border-color:'+c.c+'"':'')+'>'+c.name+'</button>').join('');
+  const C=CASES[caseIdx];
+  document.getElementById('caseInfo').innerHTML=
+    '<div class="verdict info show" style="margin-top:0">'+C.intro+'<br><br><b>경쟁하는 가설</b> — '+
+    C.hyps.map((h,i)=>'가설 '+String.fromCharCode(65+i)+'. '+h).join(' / ')+'</div>';
+  const opts=C.hyps.concat([NONE]);
+  document.getElementById('evHost').innerHTML=C.evs.map((e,i)=>{
+    const key=C.id+i, a=evAns[key];
+    return '<div class="evcard"><div class="eh"><i>증거 '+(i+1)+'</i>'+e.t+'</div>'+
+      '<div class="hyprow" data-k="'+key+'">'+opts.map(o=>{
+        let cls='hyp';
+        if(a){ if(o===a) cls+=(o===e.a?' ok':' no'); else if(o===e.a) cls+=' ok'; }
+        return '<button class="'+cls+'" data-o="'+esc(o)+'"'+(a?' disabled':'')+'>'+o+'</button>';
+      }).join('')+'</div>'+
+      (a?'<div class="exp show"><b>'+(a===e.a?'맞습니다.':'정답은 「'+e.a+'」입니다.')+'</b> '+e.w+'</div>':'')+
+      '</div>';
+  }).join('');
+  const done=C.evs.filter((e,i)=>evAns[C.id+i]).length;
+  document.getElementById('evScore').textContent=done+' / '+C.evs.length;
+  drawTally();
+}
+function drawTally(){
+  const C=CASES[caseIdx];
+  const opts=C.hyps.concat([NONE]);
+  const mine={}, real={};
+  opts.forEach(o=>{mine[o]=0; real[o]=0;});
+  C.evs.forEach((e,i)=>{ const a=evAns[C.id+i]; if(a) mine[a]++; real[e.a]++; });
+  const done=C.evs.filter((e,i)=>evAns[C.id+i]).length;
+  const max=C.evs.length;
+  const cols=['#03699f','#7c3aed','#9c5c00','#4a5a6b'];
+  document.getElementById('tallyHost').innerHTML=opts.map((o,i)=>
+    '<div class="tally"><div class="tn" title="'+o+'">'+o+'</div>'+
+    '<div class="tallytrack"><b style="width:'+(mine[o]/max*100)+'%;background:'+cols[i]+'"></b></div>'+
+    '<div class="note" style="text-align:right">'+mine[o]+'</div></div>').join('')+
+    '<div class="note" style="margin-top:6px">막대는 <b>내가 그 가설을 뒷받침한다고 판정한 증거의 수</b>입니다.</div>';
+  const v=document.getElementById('caseVerdict');
+  if(done<max){ v.className='verdict'; return; }
+  const right=C.evs.filter((e,i)=>evAns[C.id+i]===e.a).length;
+  v.className='verdict '+(right===max?'ok':'warn')+' show';
+  v.innerHTML='<b>'+right+' / '+max+' 정확했습니다.</b><br><br>'+
+    '<b>정답 집계</b> — '+opts.map(o=>o+' '+real[o]+'건').join(' · ')+'<br><br>'+C.concl;
+}
+drawCase();
+document.getElementById('caseBtns').addEventListener('click',e=>{
+  const b=e.target.closest('.evbtn'); if(!b) return; caseIdx=+b.dataset.i; drawCase();
+});
+document.getElementById('evHost').addEventListener('click',e=>{
+  const b=e.target.closest('.hyp'); if(!b||b.disabled) return;
+  evAns[b.parentElement.dataset.k]=b.dataset.o; drawCase();
+});
+document.getElementById('evReset').addEventListener('click',()=>{
+  const C=CASES[caseIdx]; C.evs.forEach((e,i)=>delete evAns[C.id+i]); drawCase();
+});
+
+/* ══════════════ 탭 3 ══════════════ */
+const STEPS=[
+ {h:'① 급격한 환경 변화',d:'화산 · 충돌 · 대륙 이동 등으로 기후와 바다가 짧은 시간에 크게 바뀝니다. 적응하지 못한 종이 한꺼번에 사라집니다.'},
+ {h:'② 빈자리 발생',d:'사라진 생물이 차지하던 <b>먹이와 공간</b>이 비게 됩니다. 생태계에 커다란 구멍이 생기는 셈입니다.'},
+ {h:'③ 적응',d:'살아남은 생물이 그 빈자리로 퍼져 나갑니다. 새로운 먹이와 환경에 맞는 <b>변이</b>를 가진 개체가 더 잘 살아남습니다.'},
+ {h:'④ 진화 → 생물 다양성 증가',d:'적응이 오랜 세월 쌓이면서 하나였던 무리가 <b>여러 종으로 갈라집니다</b>. 그 결과 대멸종 이전보다 오히려 다양해지기도 합니다.'}
+];
+document.getElementById('stepHost').innerHTML=STEPS.map((s,i)=>
+  '<div class="stepitem"><span class="n">'+(i+1)+'</span><div><b>'+s.h+'</b>'+
+  '<span class="note">'+s.d+'</span></div></div>').join('');
+const AFTER=[
+ ['페름기 말','삼엽충 · 방추충 등 고생대 바다 생물','파충류 · 새로운 무리의 해양 생물','중생대 생태계가 열림'],
+ ['트라이아스기 말','원시 악어류 등 대형 파충류','공룡','쥐라기 공룡 시대가 열림'],
+ ['백악기 말','공룡 · 암모나이트','포유류 · 새 · 속씨식물','신생대가 열리고, 끝내 인류가 등장']
+];
+document.getElementById('afterTbl').innerHTML=
+  '<tr><th>대멸종</th><th>사라진 주인공</th><th>빈자리를 채운 생물</th><th>결과</th></tr>'+
+  AFTER.map(r=>'<tr>'+r.map((c,i)=>'<td'+(i===0?' style="font-weight:700"':'')+'>'+c+'</td>').join('')+'</tr>').join('');
+
+/* ══════════════ 탭 4 ══════════════ */
+const QIDS=['q0a','q0b','q1a','q1b','q2a','q2b','q3a','q3b'];
+const CHECKS=[
+ '대멸종을 배경 멸종과 구분해 정의할 수 있다.',
+ '대멸종의 정의에 "넓은 지역"이 들어가는 이유를 피난처와 연결해 설명할 수 있다.',
+ '한 지역 지층에서 화석이 사라진 것만으로 멸종을 단정할 수 없음을 안다.',
+ '대륙 배치가 바뀌면 얕은 바다의 면적과 바닷물 순환이 달라짐을 설명할 수 있다.',
+ '페름기 말 대멸종에서 판게아가 배경, 화산이 방아쇠였음을 설명할 수 있다.',
+ '대멸종이 지질 시대에 다섯 번 있었고, 각각 어느 기(紀) 말에 일어났는지 말할 수 있다.',
+ '가장 규모가 큰 대멸종이 페름기 말이며, 그것이 고생대와 중생대의 경계임을 안다.',
+ '대륙 이동 · 소행성 충돌 · 화산 폭발이 어떤 경로로 생물을 멸종시키는지 설명할 수 있다.',
+ '하나의 증거가 어느 가설을 뒷받침하는지 판정할 수 있다.',
+ '가설을 반박하는 증거, 그리고 있어야 할 증거가 없다는 사실도 판정에 쓰임을 안다.',
+ '백악기 말과 페름기 말의 주된 원인이 서로 달랐음을 증거를 들어 설명할 수 있다.',
+ '대멸종 이후 빈자리 · 적응 · 진화를 거쳐 생물 다양성이 커지는 과정을 설명할 수 있다.',
+ '오늘날의 멸종이 과거 다섯 번과 무엇이 다른지 말할 수 있다.'
+];
+let chkState={};
+function collectAnswers(){
+  return QIDS.map(id=>{const el=document.getElementById(id);
+    return {q:el.dataset.q, a:el.value.trim(), lines:4};});
+}
+function scoreRows(){
+  const bgR=BGCASES.filter((c,i)=>bgAns[i]===c.a).length;
+  const bgD=BGCASES.filter((c,i)=>bgAns[i]).length;
+  const rows=[['배경 멸종·대멸종 사례 판정', bgD? bgR+' / '+BGCASES.length : '미실시'],
+              ['다양성 곡선에서 대멸종 찾기', found.size+' / 5']];
+  CASES.forEach(C=>{
+    const r=C.evs.filter((e,i)=>evAns[C.id+i]===e.a).length;
+    const d=C.evs.filter((e,i)=>evAns[C.id+i]).length;
+    rows.push([C.name+' 증거 판정', d? r+' / '+C.evs.length : '미실시']);
+  });
+  return rows;
+}
+const SUMMARY=[
+ {h:'1. 대멸종이란',
+  body:['생물이 사라지는 일은 늘 있습니다(<b>배경 멸종</b>). 그러나 <b>짧은 시간</b> 동안 <b>넓은 지역</b>에서 <b>많은 종</b>이 한꺼번에 사라지는 일이 지질 시대에 다섯 번 있었고, 이것을 <b>대멸종</b>이라 합니다.',
+        '세 조건 중 하나만 빠져도 대멸종이 아닙니다. 화산섬 하나가 사라져 그 섬의 20여 종이 몇 달 만에 없어졌다면 짧고 많지만 <b>좁습니다</b>. 도도새는 한 섬의 한 종이었습니다.',
+        '<b>왜 "넓은 지역"이 필요한가</b> — ① 좁은 지역이면 다른 곳에 살아남은 무리가 있어 다시 퍼집니다. 넓은 지역에서 동시에 일어나야 <b>피난처가 없어집니다</b>. ② 한 지역 지층에서 화석이 사라진 것은 다른 곳으로 옮겨 갔을 뿐일 수 있으므로, <b>여러 대륙에서 동시에</b> 사라져야 진짜 멸종입니다. ③ 지구 전체의 생물 구성이 바뀌어야 지질 시대의 경계가 됩니다.',
+        '대멸종은 지질 시대를 나누는 경계가 됩니다. 생물이 크게 바뀌기 때문입니다.']},
+ {h:'2. 다섯 번의 대멸종',
+  body:['각 사건은 그 사건으로 끝난 기(紀)의 이름을 따서 부릅니다.'],
+  table:[['순서','시기','연대','종 손실률','주된 원인'],
+         ['1차','오르도비스기 말','약 4.44억 년 전','86%','빙하기와 해수면 하강'],
+         ['2차','데본기 후기','약 3.72억 년 전','75%','바다의 산소 부족과 한랭화'],
+         ['3차','페름기 말','약 2.52억 년 전','96%','시베리아 초대형 화산 폭발'],
+         ['4차','트라이아스기 말','약 2.01억 년 전','80%','판게아 분열과 화산 활동'],
+         ['5차','백악기 말','약 0.66억 년 전','76%','소행성 충돌(과 화산 활동)']]},
+ {h:'3. 대멸종의 원인',
+  body:['근본 원인은 <b>지구 환경의 급격한 변화</b>이며, 그 방아쇠는 크게 세 가지입니다.',
+        '<b>대륙 이동</b> — 수륙 분포와 해수면이 바뀌어 서식지가 사라집니다. 특히 대륙이 하나로 모이면 해안선이 짧아져 <b>얕은 바다(대륙붕)가 크게 줄고</b>, 대륙이 물길을 막아 <b>바닷물 순환이 정체</b>됩니다. 바다 생물 대부분이 얕은 바다에 살기 때문에 치명적입니다.',
+        '<b>소행성 충돌</b> — 먼지구름이 햇빛을 가려 광합성이 멈추고 먹이사슬이 무너집니다.',
+        '<b>화산 폭발</b> — 화산재가 햇빛을 가리고, 온실기체가 늘어 기후가 급변하며 바다가 산성화됩니다.']},
+ {h:'4. 가설의 타당성을 평가하는 법',
+  body:['같은 대멸종이라도 원인은 사건마다 다릅니다. 그래서 <b>사건마다 따로</b> 증거를 모아 평가해야 합니다.',
+        '좋은 판정에는 세 가지가 필요합니다. ① 원인이 결과보다 <b>먼저</b> 일어났는가(시간 순서) ② 서로 다른 종류의 증거가 <b>같은 결론</b>을 가리키는가(수렴) ③ 가설이 예측한 것이 실제로 <b>발견되는가</b>.',
+        '가설을 <b>반박하는</b> 증거도 똑같이 중요합니다. 페름기 말에 이리듐 이상이 없다는 사실은 충돌설을 약하게 만듭니다. <b>있어야 할 증거가 없다는 것도 증거입니다.</b>',
+        '백악기 말은 소행성 충돌이 주된 원인이고 데칸 트랩 화산이 악화 요인이었습니다. 페름기 말은 시베리아 트랩 화산 폭발이 방아쇠였으나, 그 전에 <b>판게아 형성으로 얕은 바다가 줄고 바닷물 순환이 막혀</b> 생태계가 이미 약해져 있었습니다.',
+        '즉 하나의 대멸종에 원인이 <b>여러 겹</b>으로 쌓여 있을 수 있습니다. "무대를 만든 것"과 "방아쇠를 당긴 것"을 나누어 보는 눈이 필요합니다.']},
+ {h:'5. 대멸종 이후의 변화',
+  body:['<b>급격한 환경 변화 → 빈자리 발생 → 적응 → 진화</b>의 순서로 진행됩니다.',
+        '대멸종 직후에는 생물 종의 수가 크게 줄지만, 살아남은 생물이 빈자리로 퍼져 나가며 새로운 종으로 갈라집니다. 그 결과 <b>이전보다 오히려 다양해지기도</b> 합니다.',
+        '트라이아스기 말 멸종이 공룡의 시대를, 백악기 말 멸종이 포유류의 시대를 열었습니다. 대멸종은 끝이면서 동시에 시작이었습니다.',
+        '오늘날 종이 사라지는 속도가 매우 빠르다는 연구가 많습니다. 과거 다섯 번과 다른 점은 <b>원인이 사람</b>이라는 것이고, 그래서 인류가 속도를 늦출 수 있는 최초의 대멸종이기도 합니다.']}
+];
+function renderSummaryTab(){
+  document.getElementById('scoretbl').innerHTML='<tr><th>활동</th><th>결과</th></tr>'+
+    scoreRows().map(r=>'<tr><td>'+r[0]+'</td><td class="num"><b>'+r[1]+'</b></td></tr>').join('');
+  document.getElementById('anshost').innerHTML=collectAnswers().map(x=>
+    '<div class="ans-item"><div class="q">'+x.q+'</div><div class="a'+(x.a?'':' empty')+'">'+
+    (x.a?esc(x.a):'아직 작성하지 않았습니다.')+'</div></div>').join('');
+  document.getElementById('chkhost').innerHTML=CHECKS.map((t,i)=>
+    '<div class="chk"><input type="checkbox" id="ck'+i+'" data-i="'+i+'"'+(chkState[i]?' checked':'')+'>'+
+    '<label for="ck'+i+'">'+t+'</label></div>').join('');
+  document.getElementById('summaryhost').innerHTML=SUMMARY.map(s=>
+    '<div class="sumblk"><h4>'+s.h+'</h4>'+s.body.map(p=>'<p>'+p+'</p>').join('')+
+    (s.table?'<table class="dt" style="margin-top:7px">'+s.table.map((row,ri)=>
+      '<tr>'+row.map(c=>ri===0?'<th>'+c+'</th>':'<td>'+c+'</td>').join('')+'</tr>').join('')+'</table>':'')+
+    '</div>').join('');
+}
+document.getElementById('chkhost').addEventListener('change',e=>{
+  if(e.target.type==='checkbox') chkState[+e.target.dataset.i]=e.target.checked;
+});
+function wsConfig(blank){
+  const who=(document.getElementById('whoName').value||'').trim();
+  return {
+    blank:!!blank, who:who,
+    title:'대멸종과 생물 다양성',
+    subtitle:'통합과학2 「변화와 다양성」 · 지질시대 환경 변화와 대멸종',
+    standard:'[10통과2-01-01] 지질 시대를 통해 지구 환경이 끊임없이 변화해 왔으며 이러한 환경 변화가 생물 다양성에 미치는 영향을 추론할 수 있다. <탐구 활동> 생물 대멸종의 원인과 그 이후의 변화를 설명하는 여러 가설들의 타당성 평가하기',
+    records:[
+      {type:'table', h:'활동 기록', head:['활동','결과'], rows:scoreRows()},
+      {type:'table', h:'다섯 번의 대멸종', head:['순서','시기','연대','종 손실률','주된 원인'],
+       rows:EXTS.map(x=>[x.no+'차', x.name, x.ma, x.loss+'%', x.cause])}
+    ],
+    answers:collectAnswers(),
+    checks:CHECKS.map((t,i)=>({t:t, ok:!!chkState[i]})),
+    summary:SUMMARY.map(s=>({h:s.h, body:s.body.map(p=>p.replace(/<[^>]+>/g,'')), table:s.table}))
+  };
+}
+if(window.Worksheet){
+  window.Worksheet.mount('ws-actions', wsConfig, ()=>{
+    const who=(document.getElementById('whoName').value||'').trim();
+    return (who?who+'_':'')+'대멸종과생물다양성';
+  });
+}else{
+  document.getElementById('ws-actions').innerHTML=
+    '<div class="note">worksheet.js를 불러오지 못했습니다. 이 파일이 다른 활동 파일과 같은 폴더에 있는지 확인해 주세요.</div>';
+}
+</script>
+</body>
+</html>

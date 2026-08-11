@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>지구 시스템 — 하나의 사건이 지구 전체를 흔든다</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+:root{
+  --bg:#f5f8fc; --surface:#ffffff; --surface-2:#f1f5fa; --surface-3:#e6eef7;
+  --line:#e4eaf2; --line-2:#cfdbe8;
+  --text:#0b1420; --mid:#243141; --dim:#4a5a6b;
+  --accent:#0369a1; --warm:#9c5c00; --cool:#2563eb;
+  --good:#0b7d73; --bad:#dc2626; --violet:#7c3aed;
+  --atm:#03699f; --geo:#9c5c00; --hyd:#0ea5e9; --bio:#0b7d73;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',-apple-system,sans-serif;}
+body{background:var(--bg);color:var(--text);-webkit-text-size-adjust:100%;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+button{font:inherit;cursor:pointer;color:var(--text);}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.topbar{flex:0 0 54px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);}
+.topbar h1{font-size:.9rem;font-weight:800;letter-spacing:-.02em;white-space:nowrap;}
+.topbar h1 span{color:var(--accent);}
+.std{font-size:.66rem;color:var(--dim);background:var(--surface-2);border:1px solid var(--line);
+  padding:3px 8px;border-radius:5px;white-space:nowrap;}
+.tabs{display:flex;gap:3px;}
+.tab{padding:7px 12px;font-size:.79rem;font-weight:700;color:var(--dim);background:transparent;
+  border:1px solid transparent;border-radius:8px;transition:.15s;white-space:nowrap;}
+.tab:hover{color:var(--mid);background:var(--surface-2);}
+.tab.on{color:#ffffff;background:var(--accent);border-color:var(--accent);}
+.tab-n{opacity:.6;margin-right:4px;}
+
+.wrap{flex:1;min-height:0;}
+.page{display:none;height:100%;overflow-y:auto;}
+.page.on{display:block;}
+.pane{padding:24px;max-width:1060px;margin:0 auto;}
+
+h2.sec{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+p.sub{font-size:.82rem;color:var(--mid);line-height:1.75;margin-bottom:16px;word-break:keep-all;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+label.lbl{display:block;font-size:.75rem;font-weight:700;color:var(--mid);margin-bottom:5px;}
+input[type=text],textarea{width:100%;padding:8px 10px;background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;color:var(--text);font-size:.85rem;}
+textarea{resize:vertical;min-height:62px;line-height:1.6;}
+.btn{padding:8px 14px;border:1px solid var(--line-2);border-radius:7px;background:var(--surface-2);
+  font-size:.82rem;font-weight:700;transition:.15s;}
+.btn:hover{background:var(--surface-3);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#ffffff;}
+.btn.sm{padding:5px 10px;font-size:.75rem;}
+
+/* ---- 0. 성층 구조 ---- */
+.sph-pick{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;}
+.sph{padding:9px 18px;font-size:.86rem;font-weight:800;border-radius:9px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--mid);transition:.15s;}
+.sph:hover{background:var(--surface-3);}
+.sph.on{color:#ffffff;}
+.strat{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.layers{display:flex;flex-direction:column;gap:5px;}
+.ly{border:1px solid var(--line);border-radius:9px;padding:11px 13px;cursor:pointer;transition:.15s;
+  background:var(--surface);}
+.ly:hover{border-color:var(--line-2);}
+.ly.on{background:var(--surface-2);}
+.ly-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.ly-n{font-size:.88rem;font-weight:800;}
+.ly-r{font-size:.72rem;color:var(--mid);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.ly-d{font-size:.77rem;color:var(--mid);line-height:1.7;margin-top:6px;
+  display:none;word-break:keep-all;}
+.ly.on .ly-d{display:block;}
+.prof{background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:12px;}
+#profile{display:block;width:100%;}
+.crit{margin-top:12px;padding:11px 13px;background:rgba(56,189,248,.08);
+  border:1px solid rgba(56,189,248,.3);border-radius:9px;font-size:.8rem;
+  line-height:1.75;color:#bae6fd;word-break:keep-all;}
+.crit b{color:#fff;}
+
+/* ---- 1. 에너지 ---- */
+.ebars{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.eb{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:13px 15px;}
+.eb-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:7px;}
+.eb-n{font-size:.9rem;font-weight:800;}
+.eb-v{font-size:.78rem;font-weight:800;font-variant-numeric:tabular-nums;}
+.eb-track{height:12px;background:var(--surface-2);border-radius:4px;overflow:hidden;}
+.eb-fill{display:block;height:100%;border-radius:4px;}
+.eb-d{font-size:.77rem;color:var(--mid);line-height:1.7;margin-top:8px;word-break:keep-all;}
+.eb-d b{color:var(--text);}
+/* 에너지원 분류 */
+.sort-wrap{display:flex;flex-direction:column;gap:14px;}
+.sort-pool{display:flex;flex-wrap:wrap;gap:7px;min-height:44px;padding:12px;
+  background:var(--surface);border:1px dashed var(--line-2);border-radius:11px;}
+.sc{padding:7px 13px;font-size:.8rem;font-weight:700;border-radius:8px;
+  border:1px solid var(--line-2);background:var(--surface-2);transition:.15s;}
+.sc:hover{background:var(--surface-3);}
+.sc.pick{outline:2px solid var(--accent);outline-offset:1px;}
+.sc.ok{border-color:var(--good);background:rgba(52,211,153,.15);color:#a7f3d0;}
+.sort-bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;}
+.bin{background:var(--surface);border:1px solid;border-radius:11px;padding:13px;min-height:110px;}
+.bin h5{font-size:.84rem;font-weight:800;margin-bottom:9px;}
+.bin .items{display:flex;flex-wrap:wrap;gap:6px;}
+
+/* ---- 2. 매트릭스 ---- */
+.mx-wrap{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:14px;}
+.matrix{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px;}
+.mrow{display:grid;grid-template-columns:52px repeat(4,1fr);gap:4px;margin-bottom:4px;}
+.mhead{font-size:.68rem;font-weight:800;text-align:center;align-self:center;}
+.pad{aspect-ratio:1.25;border:1px solid var(--line-2);border-radius:6px;background:var(--surface-2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  padding:3px;transition:.12s;}
+.pad:hover{background:var(--surface-3);border-color:var(--accent);}
+.pad.on{background:rgba(56,189,248,.16);border-color:var(--accent);}
+.pad.lit{border-color:var(--violet);background:rgba(192,132,252,.18);}
+.pad-t{font-size:.66rem;font-weight:700;text-align:center;line-height:1.25;word-break:keep-all;color:var(--mid);}
+.pad.on .pad-t,.pad.lit .pad-t{color:#fff;}
+.scene{background:#f1f5fa;border:1px solid var(--line);border-radius:11px;overflow:hidden;}
+#scene{display:block;width:100%;}
+.expl{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:14px;}
+.expl h4{font-size:.9rem;font-weight:800;color:var(--warm);margin-bottom:7px;}
+.expl p{font-size:.81rem;color:var(--mid);line-height:1.8;word-break:keep-all;}
+.expl b{color:var(--text);}
+
+/* ---- 3. 사건 추적 ---- */
+.ev-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:9px;margin-bottom:18px;}
+.ev{padding:13px 12px;border-radius:11px;border:1px solid var(--line-2);background:var(--surface-2);
+  text-align:left;transition:.15s;}
+.ev:hover{background:var(--surface-3);}
+.ev.on{border-color:var(--accent);background:rgba(56,189,248,.12);}
+.ev .y{font-size:.68rem;color:var(--dim);font-weight:700;}
+.ev .t{font-size:.85rem;font-weight:800;margin-top:3px;line-height:1.35;}
+.chain{display:flex;flex-direction:column;gap:9px;}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:13px 15px;}
+.step.done{border-color:var(--good);background:rgba(52,211,153,.07);}
+.st-h{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap;}
+.st-n{width:22px;height:22px;border-radius:7px;background:var(--surface-3);color:var(--dim);
+  font-size:.68rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step.done .st-n{background:var(--good);color:#ffffff;}
+.st-tag{font-size:.66rem;font-weight:800;padding:2px 8px;border-radius:5px;
+  background:var(--surface-3);color:var(--mid);white-space:nowrap;}
+.st-q{font-size:.83rem;font-weight:700;line-height:1.6;word-break:keep-all;}
+.st-opts{display:flex;flex-direction:column;gap:6px;margin-top:9px;}
+.st-o{text-align:left;padding:9px 12px;font-size:.8rem;border-radius:8px;border:1px solid var(--line-2);
+  background:var(--surface-2);color:var(--mid);line-height:1.6;transition:.15s;word-break:keep-all;}
+.st-o:hover{background:var(--surface-3);color:var(--text);}
+.st-o.ok{border-color:var(--good);background:rgba(52,211,153,.14);color:#a7f3d0;}
+.st-o.no{border-color:var(--bad);background:rgba(248,113,113,.12);color:#fca5a5;}
+.st-a{margin-top:9px;padding:10px 12px;border-radius:8px;background:var(--surface-2);
+  border-left:3px solid var(--good);font-size:.81rem;line-height:1.75;color:var(--mid);word-break:keep-all;}
+.st-a b{color:var(--text);}
+.ev-out{margin-top:14px;padding:14px 16px;border-radius:11px;
+  background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);}
+.ev-out h4{font-size:.88rem;font-weight:800;color:var(--bad);margin-bottom:7px;}
+.ev-out p{font-size:.81rem;color:var(--mid);line-height:1.8;word-break:keep-all;}
+
+/* ---- 총정리 공통 ---- */
+.sum-hero{background:linear-gradient(180deg,rgba(56,189,248,.09),rgba(56,189,248,.02));
+  border:1px solid rgba(56,189,248,.28);border-radius:14px;padding:22px;margin-bottom:24px;}
+.sum-hero h1{font-size:1.4rem;font-weight:800;letter-spacing:-.03em;margin-bottom:8px;}
+.sum-hero p{font-size:.85rem;color:var(--mid);line-height:1.85;word-break:keep-all;}
+.concept{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:13px;margin-bottom:26px;}
+.cc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.cc-n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;
+  background:var(--accent);color:#ffffff;font-size:.72rem;font-weight:800;margin-bottom:9px;}
+.cc h4{font-size:.92rem;font-weight:800;margin-bottom:8px;word-break:keep-all;}
+.cc p{font-size:.79rem;color:var(--mid);line-height:1.8;word-break:keep-all;}
+.cc p+p{margin-top:7px;}
+.cc b{color:var(--text);}
+.cc .link{margin-top:10px;padding:9px 11px;background:var(--surface-2);border-left:3px solid var(--warm);
+  border-radius:0 7px 7px 0;font-size:.75rem;color:var(--warm);line-height:1.65;word-break:keep-all;}
+.ftable{width:100%;border-collapse:collapse;font-size:.77rem;margin-top:8px;}
+.ftable th,.ftable td{padding:7px 8px;border:1px solid var(--line);text-align:left;line-height:1.5;}
+.ftable th{background:var(--surface-2);color:var(--dim);font-size:.71rem;font-weight:700;}
+.ftable td b{color:var(--text);}
+.chk{display:flex;flex-direction:column;gap:8px;}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;background:var(--surface);
+  border:1px solid var(--line);border-radius:9px;font-size:.82rem;line-height:1.6;color:var(--mid);
+  cursor:pointer;transition:.15s;word-break:keep-all;}
+.chk label:hover{border-color:var(--line-2);}
+.chk input{accent-color:var(--good);margin-top:3px;flex-shrink:0;}
+.chk input:checked+span{color:var(--good);}
+.qa-item{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:12px;}
+.qa-item.deep{border-left-color:var(--violet);}
+.qa-q{font-size:.85rem;font-weight:700;margin-bottom:9px;line-height:1.6;word-break:keep-all;}
+.qa-q em{font-style:normal;color:var(--accent);}
+.qa-tag{display:inline-block;font-size:.66rem;font-weight:800;padding:2px 7px;border-radius:4px;
+  background:var(--surface-3);color:var(--dim);margin-right:6px;vertical-align:2px;}
+.ans-block{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-bottom:9px;}
+.ans-q{font-size:.79rem;font-weight:700;color:var(--mid);margin-bottom:6px;line-height:1.55;}
+.ans-a{font-size:.83rem;color:var(--text);line-height:1.75;white-space:pre-wrap;word-break:break-word;}
+.empty{padding:32px;text-align:center;color:var(--dim);font-size:.83rem;line-height:1.85;}
+@media(max-width:860px){ .strat,.mx-wrap{grid-template-columns:1fr;} .pane{padding:16px;}
+  .topbar{flex-wrap:wrap;height:auto;flex:0 0 auto;padding:8px 12px;} .std{display:none;} }
+
+/* ═══════════ 모바일 대응 ═══════════ */
+@supports (height:100dvh){ body{height:100dvh;} }
+@media(max-width:820px){
+  .topbar{flex:0 0 auto;height:auto;flex-wrap:wrap;padding:8px 12px;gap:6px 8px;}
+  .topbar h1{font-size:.82rem;order:1;flex:1 1 auto;white-space:normal;line-height:1.35;}
+  .std{order:2;font-size:.58rem;}
+  .tabs{order:3;flex:1 1 100%;max-width:none;overflow-x:auto;scrollbar-width:none;
+        padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .tabs::-webkit-scrollbar{height:0;}
+  .tab{flex:0 0 auto;padding:8px 11px;font-size:.75rem;}
+  .pane{padding:14px 12px 34px;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+
+  table.dt{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.dt tbody{display:table;width:100%;min-width:460px;}
+  table.dt th,table.dt td{padding:5px 6px;}
+  h2.sec{font-size:.98rem;}
+  p.sub{font-size:.79rem;}
+  textarea{min-height:76px;}
+  .btn,.btn.sm{padding:8px 12px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1>지구 시스템 <span>· 하나의 사건이 지구 전체를 흔든다</span></h1>
+  <span class="std">[10통과1-03-01]</span>
+  <nav class="tabs">
+    <button class="tab on" data-tab="0"><span class="tab-n">0</span>권역의 층 구조</button>
+    <button class="tab" data-tab="1"><span class="tab-n">1</span>에너지 흐름</button>
+    <button class="tab" data-tab="2"><span class="tab-n">2</span>상호작용 16가지</button>
+    <button class="tab" data-tab="3"><span class="tab-n">3</span>사건 추적</button>
+    <button class="tab" data-tab="4"><span class="tab-n">4</span>총정리</button>
+  </nav>
+</header>
+
+<div class="wrap">
+
+<!-- ===== 0. 성층 구조 ===== -->
+<section class="page on" id="page0"><div class="pane">
+  <h2 class="sec">권역은 층으로 나뉘어 있다</h2>
+  <p class="sub">
+    기권·수권·지권은 각각 <b>몇 개의 층</b>으로 나뉩니다. 그런데 <b>무엇을 기준으로</b> 나눈 것일까요?
+    오른쪽 그래프를 보면 층의 경계가 왜 하필 그 자리인지 알 수 있습니다. 층을 눌러 보세요.
+  </p>
+
+  <div class="sph-pick" id="sph-pick"></div>
+
+  <div class="strat">
+    <div class="layers" id="layers"></div>
+    <div>
+      <div class="prof"><canvas id="profile" width="520" height="420"></canvas></div>
+      <div class="crit" id="crit">—</div>
+    </div>
+  </div>
+
+  <div id="extra" style="margin-top:20px;"></div>
+
+  <div class="card" style="margin-top:18px;">
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">비교</span>세 권역의 층을 나누는 기준을 각각 적고,
+      <em>왜 그 기준으로 나누는 것이 타당한지</em> 설명해 보세요.
+    </div>
+    <textarea id="q0" placeholder="기권은 …을 기준으로, 수권은 …을 기준으로, 지권은 …을 기준으로 나눕니다."></textarea>
+  </div>
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="1">1단계로 →</button></div>
+</div></section>
+
+<!-- ===== 1. 에너지 ===== -->
+<section class="page" id="page1"><div class="pane">
+  <h2 class="sec">지구를 움직이는 세 가지 에너지</h2>
+  <p class="sub">지구 시스템에서 일어나는 모든 현상은 결국 이 셋 중 하나에서 옵니다. 크기 차이가 엄청납니다.</p>
+
+  <div class="ebars" id="ebars"></div>
+
+  <h2 class="sec" style="margin-top:26px;">이 현상은 어느 에너지에서 왔을까</h2>
+  <p class="sub">
+    아래 현상들을 <b>어느 에너지원에서 온 것인지</b> 분류해 보세요.
+    셋은 서로 섞이지 않습니다. 화산은 태양이 만든 것이 아닙니다.
+  </p>
+  <div class="sort-wrap">
+    <div class="sort-pool" id="sort-pool"></div>
+    <div class="sort-bins" id="sort-bins"></div>
+  </div>
+  <div class="crit" id="sort-msg" style="margin-top:12px;">현상 카드를 누른 뒤 아래 상자를 고르세요.</div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="qa-q" style="margin-bottom:8px;">
+      <span class="qa-tag">추론</span>위도별로 받는 태양 에너지의 양이 다릅니다.
+      그런데도 <em>적도가 계속 뜨거워지지 않고 극지방이 계속 차가워지지 않는</em> 까닭은 무엇일까요?
+    </div>
+    <textarea id="q1" placeholder="남는 곳에서 모자란 곳으로 무엇인가가 옮겨 간다면…"></textarea>
+  </div>
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="2">2단계로 →</button></div>
+</div></section>
+
+<!-- ===== 2. 상호작용 ===== -->
+<section class="page" id="page2"><div class="pane">
+  <h2 class="sec">권역끼리 주고받는 16가지</h2>
+  <p class="sub">
+    가로는 <b>원인</b>이 되는 권역, 세로는 <b>결과</b>가 나타나는 권역입니다.
+    칸을 눌러 어떤 일이 일어나는지 확인하세요. 3단계에서 이 격자를 다시 씁니다.
+  </p>
+
+  <div class="mx-wrap">
+    <div class="matrix" id="matrix"></div>
+    <div>
+      <div class="scene"><canvas id="scene" width="620" height="380"></canvas></div>
+      <div class="expl" id="expl">
+        <h4>칸을 눌러 보세요</h4>
+        <p>원인과 결과가 만나는 자리를 고르면, 그 상호작용이 어떻게 일어나는지 보여 줍니다.</p>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:16px;"><button class="btn primary" data-goto="3">3단계로 →</button></div>
+</div></section>
+
+<!-- ===== 3. 사건 추적 ===== -->
+<section class="page" id="page3"><div class="pane">
+  <h2 class="sec">하나의 사건이 지구 전체를 흔든다</h2>
+  <p class="sub">
+    실제로 일어난 사건입니다. <b>그다음에 무슨 일이 벌어졌을지</b> 단계마다 골라 연쇄 고리를 완성하세요.
+    고를 때마다 왼쪽 격자에 <b style="color:var(--violet)">그 상호작용이 표시</b>됩니다.
+  </p>
+
+  <div class="ev-pick" id="ev-pick"></div>
+
+  <div class="mx-wrap">
+    <div>
+      <div class="matrix" id="matrix2"></div>
+      <div class="card" style="margin-top:12px;">
+        <div style="font-size:.78rem;color:var(--dim);line-height:1.7;">
+          내가 완성한 연쇄가 격자 위에 <b style="color:var(--violet)">보라색</b>으로 쌓입니다.
+          하나의 사건이 <b style="color:var(--text)">몇 개의 권역</b>을 거쳐 가는지 세어 보세요.
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="chain" id="chain"></div>
+      <div id="ev-tail"></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ===== 4. 총정리 ===== -->
+<section class="page" id="page4"><div class="pane">
+  <div class="sum-hero">
+    <h1>오늘 배운 것을 한 장으로</h1>
+    <p>
+      지구는 기권·지권·수권·생물권이 <b>서로 물질과 에너지를 주고받는 하나의 시스템</b>입니다.
+      우리는 층 구조로 각 권역을 들여다보고, 에너지가 어디서 와서 어디로 가는지 따라갔으며,
+      실제 사건이 <b>어떤 고리를 거쳐 지구 전체로 번지는지</b> 직접 추적했습니다.
+      한 곳의 변화는 결코 그 자리에 머물지 않습니다.
+    </p>
+  </div>
+
+  <h2 class="sec">개념 총정리</h2>
+  <div class="concept">
+    <div class="cc"><span class="cc-n">1</span><h4>지구 시스템과 그 자리</h4>
+      <p>지구 시스템은 <b>기권·지권·수권·생물권</b>으로 이루어지며,
+         이 넷은 끊임없이 물질과 에너지를 주고받습니다.</p>
+      <p>지구 시스템 자체도 더 큰 <b>태양계라는 시스템의 구성 요소</b>입니다.
+         그래서 태양의 활동이 곧 지구의 현상이 됩니다.</p>
+      <div class="link">한 권역의 변화가 다른 권역으로 번지는 것이 상호작용입니다.</div></div>
+
+    <div class="cc"><span class="cc-n">2</span><h4>권역을 나누는 기준</h4>
+      <table class="ftable">
+        <tr><th>권역</th><th>층</th><th>나누는 기준</th></tr>
+        <tr><td><b>기권</b></td><td>대류권·성층권<br>중간권·열권</td><td>높이에 따른<br><b>기온 변화</b></td></tr>
+        <tr><td><b>수권</b></td><td>혼합층·수온약층<br>심해층</td><td>깊이에 따른<br><b>수온 변화</b></td></tr>
+        <tr><td><b>지권</b></td><td>지각·맨틀<br>외핵·내핵</td><td><b>지진파 속도</b>의<br>급변</td></tr>
+      </table>
+      <div class="link">오늘 확인한 것 — 그래프에서 기울기가 꺾이는 자리가 곧 층의 경계였습니다.</div></div>
+
+    <div class="cc"><span class="cc-n">3</span><h4>지구를 움직이는 세 에너지</h4>
+      <table class="ftable">
+        <tr><th>에너지원</th><th>크기</th><th>일으키는 현상</th></tr>
+        <tr><td><b>태양 복사</b></td><td>압도적 1위</td><td>대기·해수 순환, 날씨,<br>풍화·침식, 광합성</td></tr>
+        <tr><td><b>지구 내부</b></td><td>약 1/4000</td><td>맨틀 대류, 판 운동,<br>지진·화산</td></tr>
+        <tr><td><b>조력</b></td><td>가장 작음</td><td>밀물과 썰물</td></tr>
+      </table>
+      <div class="link">셋은 서로 <b>섞이지 않습니다.</b> 화산은 태양이 만든 것이 아닙니다.</div></div>
+
+    <div class="cc"><span class="cc-n">4</span><h4>위도별 불균형이 순환을 낳는다</h4>
+      <p>적도는 태양 에너지를 많이 받고 극지방은 적게 받습니다.
+         그런데도 적도가 계속 뜨거워지지 않는 것은,
+         <b>남는 에너지가 고위도로 옮겨 가기 때문</b>입니다.</p>
+      <p>그 운반을 맡는 것이 <b>대기 대순환</b>과 <b>해수 순환</b>입니다.</p>
+      <div class="link">바람과 해류는 지구가 에너지를 나누는 방식입니다.</div></div>
+
+    <div class="cc"><span class="cc-n">5</span><h4>사건은 한 권역에 머물지 않는다</h4>
+      <p>화산이 터지면 지권에서 끝나지 않습니다. 기권으로 가스가 들어가고,
+         햇빛이 가려져 기온이 내려가고, 농작물이 자라지 못합니다.</p>
+      <p>지구 시스템의 균형이 깨지면 그 영향은 <b>결국 사람에게 돌아옵니다.</b>
+         우리가 지구 시스템을 이해해야 하는 이유입니다.</p>
+      <div class="link">오늘 추적한 사건들은 모두 <b>3개 이상의 권역</b>을 거쳤습니다.</div></div>
+  </div>
+
+  <h2 class="sec">스스로 점검하기</h2>
+  <div class="chk" id="chk" style="margin-bottom:26px;">
+    <label><input type="checkbox"><span>지구 시스템을 이루는 네 권역을 들고, 지구 시스템이 태양계의 구성 요소임을 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>기권·수권·지권의 층 구조와 각각을 나누는 기준을 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>지구 시스템의 세 에너지원을 들고, 각각이 어떤 현상을 일으키는지 짝지을 수 있다.</span></label>
+    <label><input type="checkbox"><span>위도별 에너지 불균형이 대기·해수의 순환을 일으킨다는 것을 설명할 수 있다.</span></label>
+    <label><input type="checkbox"><span>권역 사이의 상호작용 사례를 원인과 결과로 나누어 들 수 있다.</span></label>
+    <label><input type="checkbox"><span>실제 사건이 여러 권역을 거쳐 번지는 과정을 근거를 들어 논증할 수 있다.</span></label>
+    <label><input type="checkbox"><span>지구 시스템의 균형이 깨졌을 때 피해를 줄일 방안을 제안할 수 있다.</span></label>
+  </div>
+
+  <h2 class="sec">내가 쓴 답안 모아보기</h2>
+  <div id="ans-wrap" style="margin-bottom:22px;"><div class="empty">아직 쓴 답이 없습니다.</div></div>
+
+  <div class="card">
+    <label class="lbl" for="who">학번 · 이름</label>
+    <input type="text" id="who" placeholder="예: 10101 홍길동" style="max-width:220px;margin-bottom:12px;">
+    <div id="ws-actions"></div>
+  </div>
+</div></section>
+</div>
+
+<script src="worksheet.js?v=7"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function goTab(n){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===n));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  $('page'+n).classList.add('on');
+  if(n==='0') drawProfile();
+  if(n==='4') renderAnswers();
+  document.querySelector('.page.on').scrollTop=0;
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>goTab(t.dataset.tab)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.goto)));
+
+/* ============ 0. 성층 구조 ============ */
+const SPHERES={
+ atm:{nm:'기권',col:'var(--atm)',c:'#03699f',unit:'km',
+   axis:'기온 (℃)',ymax:100,ylab:'높이 (km)',
+   crit:'<b>높이에 따른 기온 변화</b>를 기준으로 나눕니다. 기온이 내려가다 올라가고, 다시 내려가다 올라가는 지점이 곧 경계입니다.',
+   layers:[
+     {n:'열권',   a:80,b:100,c:'#7c3aed',e:'N₂ · O₂ · O',d:'태양의 X선과 자외선을 직접 흡수해 위로 갈수록 온도가 크게 올라갑니다. 공기가 매우 희박하며 오로라가 나타납니다.'},
+     {n:'중간권', a:50,b:80, c:'#2563eb',e:'N₂ · O₂',d:'위로 갈수록 온도가 내려갑니다. 대류는 일어나지만 수증기가 거의 없어 기상 현상은 없습니다. 유성이 타는 곳입니다.'},
+     {n:'성층권', a:11,b:50, c:'#0b7d73',e:'N₂ · O₂ · O₃',d:'오존이 자외선을 흡수해 위로 갈수록 온도가 올라갑니다. 위가 따뜻하고 아래가 차가워 대류가 일어나지 않아 매우 안정하며, 그래서 비행기 항로로 쓰입니다.'},
+     {n:'대류권', a:0, b:11, c:'#b45f06',e:'N₂ · O₂ · H₂O',d:'위로 갈수록 온도가 내려갑니다. 대류가 활발하고 수증기가 있어 구름·비 같은 기상 현상이 일어납니다. 대기 질량의 약 75%가 여기 있습니다.'}],
+   prof:[[15,0],[-56,11],[-56,20],[-44,32],[-2,50],[-30,65],[-92,80],[200,95],[600,100]]},
+ hyd:{nm:'수권',col:'var(--hyd)',c:'#0ea5e9',unit:'m',
+   axis:'수온 (℃)',ymax:2000,ylab:'깊이 (m)',rev:true,
+   crit:'<b>깊이에 따른 수온 변화</b>를 기준으로 나눕니다. 태양 에너지가 닿는 깊이와 바람이 섞어 주는 깊이가 층을 만듭니다.',
+   layers:[
+     {n:'혼합층',   a:0,b:200,   c:'#b45f06',e:'H₂O · Cl⁻ · Na⁺',d:'태양 에너지로 데워지고 <b>바람이 섞어 주어</b> 수온이 거의 일정합니다. 바람이 강할수록 두꺼워집니다.'},
+     {n:'수온 약층',a:200,b:1000,c:'#dc2626',e:'H₂O · 용존 산소 적음',d:'깊이에 따라 수온이 급격히 낮아집니다. 아래가 차고 무거워 매우 안정하며, <b>혼합층과 심해층 사이의 물질 교환을 막습니다.</b>'},
+     {n:'심해층',   a:1000,b:2000,c:'#2563eb',e:'H₂O · 영양염류 많음',d:'태양 에너지가 닿지 않아 수온이 낮고 거의 일정합니다. 위도에 따른 차이도 거의 없습니다.'}],
+   prof:[[22,0],[22,150],[20,200],[12,400],[6,700],[4,1000],[3,1500],[2.5,2000]],
+   lats:[
+     {n:'저위도',c:'#dc2626',p:[[28,0],[28,80],[26,120],[16,300],[9,500],[5,800],[3.5,1200],[3,2000]],
+      d:'표층은 가장 따뜻하지만 <b>바람이 약해 혼합층이 얇습니다.</b> 표층과 심층의 온도 차가 커서 <b>수온 약층이 가장 뚜렷</b>합니다.'},
+     {n:'중위도',c:'#b45f06',p:[[18,0],[18,250],[17,300],[11,500],[7,800],[4.5,1200],[3,2000]],
+      d:'<b>편서풍이 강해 혼합층이 가장 두껍습니다.</b> 수온 약층도 뚜렷하게 나타납니다.'},
+     {n:'고위도',c:'#2563eb',p:[[3,0],[2.8,200],[2.5,500],[2.2,1000],[2,2000]],
+      d:'표층 수온이 이미 낮아 심층과 <b>차이가 거의 없습니다.</b> 그래서 <b>수온 약층이 거의 나타나지 않습니다.</b>'}]},
+ geo:{nm:'지권',col:'var(--geo)',c:'#9c5c00',unit:'km',
+   axis:'P파 속도 (km/s)',ymax:6400,ylab:'깊이 (km)',rev:true,
+   crit:'<b>지진파 속도가 갑자기 변하는 곳</b>을 경계로 삼습니다. 속도가 변한다는 것은 물질의 종류나 상태가 바뀌었다는 뜻입니다.',
+   layers:[
+     {n:'지각', a:0,b:35,      c:'#b45f06',e:'O · Si · Al · Fe',
+      d:'가장 바깥의 딱딱한 껍질입니다. 대륙 지각은 약 35 km, 해양 지각은 약 5 km로 얇습니다. <b>규산염 광물</b>로 이루어져 있습니다.'},
+     {n:'맨틀', a:35,b:2900,   c:'#dc2626',e:'O · Si · Mg · Fe',
+      d:'지구 부피의 약 80%를 차지합니다. 지각보다 <b>마그네슘과 철이 많은</b> 감람암질 암석입니다. 고체이지만 아주 느리게 흐르며, 이 대류가 판을 움직입니다.'},
+     {n:'외핵', a:2900,b:5100, c:'#7c3aed',e:'Fe · Ni (액체)',
+      d:'철과 니켈로 이루어진 <b>액체</b>입니다. S파가 통과하지 못해 액체임을 알아냈습니다. 이곳의 흐름이 <b>지구 자기장</b>을 만듭니다.'},
+     {n:'내핵', a:5100,b:6400, c:'#2563eb',e:'Fe · Ni (고체)',
+      d:'외핵보다 훨씬 뜨겁지만 <b>엄청난 압력</b> 때문에 다시 고체가 된 철·니켈 덩어리입니다.'}],
+   prof:[[6.5,0],[8.0,35],[8.4,200],[11.4,1000],[13.7,2890],[8.0,2900],[10.0,4500],[11.0,5150],[11.3,6400]],
+   elems:[
+     {n:'지각',  c:'#b45f06', d:[['O',46.6],['Si',27.7],['Al',8.1],['Fe',5.0],['기타',12.6]]},
+     {n:'맨틀',  c:'#dc2626', d:[['O',44.0],['Mg',23.0],['Si',21.0],['Fe',8.0],['기타',4.0]]},
+     {n:'핵',    c:'#7c3aed', d:[['Fe',85.0],['Ni',5.5],['기타',9.5]]}]}
+};
+let curSph='atm', curLy=-1;
+$('sph-pick').innerHTML=Object.entries(SPHERES).map(([k,s])=>
+  `<button class="sph ${k==='atm'?'on':''}" data-s="${k}"
+    style="${k==='atm'?`background:${s.c};border-color:${s.c}`:''}">${s.nm}</button>`).join('');
+$('sph-pick').querySelectorAll('.sph').forEach(b=>b.addEventListener('click',()=>{
+  curSph=b.dataset.s; curLy=-1;
+  $('sph-pick').querySelectorAll('.sph').forEach(x=>{
+    const on=x.dataset.s===curSph, c=SPHERES[x.dataset.s].c;
+    x.classList.toggle('on',on);
+    x.style.background=on?c:''; x.style.borderColor=on?c:'';
+  });
+  renderLayers();
+}));
+function renderLayers(){
+  const s=SPHERES[curSph];
+  $('layers').innerHTML=s.layers.map((l,i)=>`
+    <div class="ly ${i===curLy?'on':''}" data-i="${i}" style="${i===curLy?`border-color:${l.c}`:''}">
+      <div class="ly-h"><span class="ly-n" style="color:${l.c}">${l.n}</span>
+        <span class="ly-r">${l.a.toLocaleString()} ~ ${l.b.toLocaleString()} ${s.unit}</span></div>
+      ${l.e?`<div style="font-size:.71rem;color:var(--dim);margin-top:3px;">주요 성분 · <b style="color:${l.c}">${l.e}</b></div>`:''}
+      <div class="ly-d">${l.d}</div></div>`).join('');
+  $('layers').querySelectorAll('.ly').forEach(el=>el.addEventListener('click',()=>{
+    curLy=(curLy===+el.dataset.i)?-1:+el.dataset.i; renderLayers();
+  }));
+  $('crit').innerHTML=s.crit;
+  renderExtra();
+  drawProfile();
+}
+
+/* ---- 권역별 심화 패널 ----
+   권역을 바꾸면 DOM이 새로 그려지므로, 답안은 EX 에 따로 보관했다가 되살린다. */
+const EX={};
+function renderExtra(){
+  const E=$('extra');
+  if(curSph==='atm'){
+    E.innerHTML=`
+      <h2 class="sec">생각해 볼 것 — 오존은 20~30 km에 가장 많은데</h2>
+      <p class="sub">오존이 자외선을 흡수해 성층권이 데워진다면, 오존이 가장 많은 20~30 km가 가장 뜨거워야 하지 않을까요?
+        그런데 실제로는 성층권 <b>꼭대기(약 50 km)</b>가 가장 뜨겁습니다. 아래 그래프에서 까닭을 찾아보세요.</p>
+      <div class="prof"><canvas id="ozone" width="880" height="330"></canvas></div>
+      <div class="crit" style="margin-top:12px;">
+        <b>단위 질량당 가열률</b>을 보아야 합니다. 자외선은 <b>위에서 내려오므로 위쪽일수록 강하고</b>,
+        내려오면서 흡수되어 약해집니다. 오존이 많은 20~30 km에 이르면 강한 자외선은 이미 위에서 상당히 흡수된 뒤입니다.<br><br>
+        게다가 위로 갈수록 <b>공기가 희박</b>해서, 같은 에너지를 흡수해도 데울 공기가 적어
+        <b>온도가 훨씬 크게 올라갑니다.</b> 이 둘이 겹쳐 가열은 성층권 <b>위쪽</b>에서 가장 효과적입니다.
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div class="qa-q" style="margin-bottom:8px;">
+          <span class="qa-tag">추론</span>오존이 가장 많은 고도와 <em>가장 뜨거운 고도가 다른</em> 까닭을,
+          자외선의 세기와 공기의 밀도를 들어 설명해 보세요.
+        </div>
+        <textarea id="q-ozone" placeholder="자외선은 위에서 내려오므로 …, 또 위로 갈수록 공기가 희박해서 …"></textarea>
+      </div>`;
+    drawOzone();
+  } else if(curSph==='hyd'){
+    E.innerHTML=`
+      <h2 class="sec">생각해 볼 것 — 위도에 따라 층이 달라진다</h2>
+      <p class="sub">같은 바다라도 위도에 따라 수온 분포가 전혀 다릅니다. 세 곡선을 견주어 보세요.</p>
+      <div class="prof"><canvas id="lats" width="880" height="380"></canvas></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;">
+        ${SPHERES.hyd.lats.map(l=>`<div class="card" style="border-left:3px solid ${l.c}">
+          <div style="font-size:.85rem;font-weight:800;color:${l.c};margin-bottom:6px;">${l.n}</div>
+          <div style="font-size:.78rem;color:var(--mid);line-height:1.75;word-break:keep-all;">${l.d}</div>
+        </div>`).join('')}
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div class="qa-q" style="margin-bottom:8px;">
+          <span class="qa-tag">추론</span><em>고위도에는 왜 수온 약층이 거의 없을까요?</em>
+          그리고 혼합층이 가장 두꺼운 곳이 저위도가 아니라 <em>중위도인 까닭</em>은 무엇일까요?
+        </div>
+        <textarea id="q-lat" placeholder="고위도는 표층 수온이 이미 …, 혼합층의 두께를 정하는 것은 태양이 아니라 …"></textarea>
+      </div>`;
+    drawLats();
+  } else {
+    E.innerHTML=`
+      <h2 class="sec">층마다 무엇으로 이루어져 있나</h2>
+      <p class="sub">지진파 속도가 갑자기 변하는 것은 <b>물질이 달라졌기 때문</b>입니다. 층별 주요 원소를 보면 그 까닭이 보입니다.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
+        ${SPHERES.geo.elems.map(g=>`
+          <div class="card" style="border-left:3px solid ${g.c}">
+            <div style="font-size:.9rem;font-weight:800;color:${g.c};margin-bottom:10px;">${g.n}</div>
+            ${g.d.map(([e,v])=>`
+              <div style="display:flex;align-items:center;gap:8px;font-size:.78rem;margin-bottom:5px;">
+                <span style="flex:0 0 42px;font-weight:700;">${e}</span>
+                <span style="flex:1;height:13px;background:var(--surface-2);border-radius:4px;overflow:hidden;">
+                  <span style="display:block;height:100%;width:${v}%;background:${g.c};border-radius:4px;"></span></span>
+                <span style="flex:0 0 44px;text-align:right;color:var(--dim);font-variant-numeric:tabular-nums;">${v}%</span>
+              </div>`).join('')}
+          </div>`).join('')}
+      </div>
+      <div class="crit" style="margin-top:12px;">
+        바깥에서 안으로 갈수록 <b>가벼운 규소·알루미늄</b>에서 <b>무거운 철·니켈</b>로 바뀝니다.
+        지구가 생길 때 아직 녹아 있던 시기에 <b>무거운 물질이 가라앉고 가벼운 물질이 떠오른</b> 결과입니다.
+        이것을 <b>층상 구조의 형성</b>이라고 합니다.
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div class="qa-q" style="margin-bottom:8px;">
+          <span class="qa-tag">추론</span>지각에서 핵으로 갈수록 <em>무거운 원소의 비율이 높아지는</em> 까닭은 무엇일까요?
+        </div>
+        <textarea id="q-geo" placeholder="지구가 처음 만들어질 때 …"></textarea>
+      </div>`;
+  }
+  /* 보관해 둔 답안 되살리기 */
+  E.querySelectorAll('textarea').forEach(ta=>{
+    ta.value = EX[ta.id] || '';
+    ta.addEventListener('input', e => EX[ta.id] = e.target.value);
+  });
+}
+function drawProfile(){
+  const cv=$('profile'), c=cv.getContext('2d');
+  const r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  cv.width=r.width*dpr; cv.height=420*dpr; cv.style.height='420px';
+  c.setTransform(dpr,0,0,dpr,0,0);
+  const W=r.width,H=420,L=54,R=14,T=26,B=34;
+  c.clearRect(0,0,W,H);
+  const s=SPHERES[curSph];
+  const xs=s.prof.map(p=>p[0]);
+  let x0=Math.min(...xs),x1=Math.max(...xs);
+  const m=(x1-x0)*0.1; x0-=m; x1+=m;
+  const X=v=>L+(v-x0)/(x1-x0)*(W-L-R);
+  const Y=d=>s.rev? T+(d/s.ymax)*(H-T-B) : H-B-(d/s.ymax)*(H-T-B);
+
+  /* 층 띠 */
+  s.layers.forEach((l,i)=>{
+    const y1=Y(l.a), y2=Y(l.b);
+    c.fillStyle=l.c+(i===curLy?'33':'14');
+    c.fillRect(L,Math.min(y1,y2),W-L-R,Math.abs(y2-y1));
+    c.strokeStyle=l.c+'66'; c.lineWidth=i===curLy?1.8:1;
+    c.beginPath(); c.moveTo(L,y2); c.lineTo(W-R,y2); c.stroke();
+    c.fillStyle=l.c; c.font=(i===curLy?'bold ':'')+'11px Pretendard'; c.textAlign='right';
+    c.fillText(l.n, W-R-6, (y1+y2)/2+4);
+  });
+  /* 축 */
+  c.strokeStyle='#cfdbe8'; c.lineWidth=1;
+  c.beginPath(); c.moveTo(L,T); c.lineTo(L,H-B); c.lineTo(W-R,H-B); c.stroke();
+  c.fillStyle='#4a5a6b'; c.font='10px Pretendard'; c.textAlign='center';
+  for(let i=0;i<=4;i++){ const v=x0+(x1-x0)*i/4;
+    c.fillText(v.toFixed(Math.abs(x1)<20?1:0), X(v), H-B+15); }
+  c.fillText(s.axis, (L+W-R)/2, H-6);
+  c.textAlign='right';
+  for(let i=0;i<=4;i++){ const d=s.ymax*i/4;
+    c.fillText(d>=1000?(d/1000).toFixed(1)+'k':d, L-6, Y(d)+3); }
+  c.save(); c.translate(13,(T+H-B)/2); c.rotate(-Math.PI/2);
+  c.textAlign='center'; c.fillText(s.ylab,0,0); c.restore();
+  /* 곡선 */
+  c.strokeStyle='#0b1420'; c.lineWidth=2.2; c.beginPath();
+  s.prof.forEach((p,i)=>{ const x=X(p[0]),y=Y(p[1]); i?c.lineTo(x,y):c.moveTo(x,y); });
+  c.stroke();
+  c.fillStyle='#0b1420';
+  s.prof.forEach(p=>{ c.beginPath(); c.arc(X(p[0]),Y(p[1]),2.6,0,Math.PI*2); c.fill(); });
+}
+/* ---- 오존 · 자외선 · 가열률 ---- */
+function drawOzone(){
+  const cv=$('ozone'); if(!cv) return;
+  const c=cv.getContext('2d'), r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  cv.width=r.width*dpr; cv.height=330*dpr; cv.style.height='330px';
+  c.setTransform(dpr,0,0,dpr,0,0);
+  const W=r.width,H=330,L=50,R=140,T=18,B=34;
+  c.clearRect(0,0,W,H);
+  const Y=h=>H-B-(h/60)*(H-T-B);            /* 0~60 km */
+  const X=v=>L+v*(W-L-R);                    /* 0~1 정규화 */
+  /* 성층권 띠 */
+  c.fillStyle='rgba(52,211,153,.10)'; c.fillRect(L,Y(50),W-L-R,Y(11)-Y(50));
+  c.fillStyle='rgba(52,211,153,.7)'; c.font='bold 10px Pretendard'; c.textAlign='left';
+  c.fillText('성층권 11 ~ 50 km', L+8, Y(50)+14);
+  /* 축 */
+  c.strokeStyle='#cfdbe8'; c.lineWidth=1;
+  c.beginPath(); c.moveTo(L,T); c.lineTo(L,H-B); c.lineTo(W-R,H-B); c.stroke();
+  c.fillStyle='#4a5a6b'; c.font='10px Pretendard'; c.textAlign='right';
+  for(let h=0;h<=60;h+=10) c.fillText(h, L-6, Y(h)+3);
+  c.save(); c.translate(13,(T+H-B)/2); c.rotate(-Math.PI/2);
+  c.textAlign='center'; c.fillText('고도 (km)',0,0); c.restore();
+  c.textAlign='center'; c.fillText('상대적인 크기 →',(L+W-R)/2,H-8);
+
+  const curves=[
+    {n:'오존 농도',      c:'#0b7d73', f:h=>Math.exp(-(((h-25)/11)**2))},
+    {n:'자외선 세기',    c:'#7c3aed', f:h=>1/(1+Math.exp(-(h-33)/7))},
+    {n:'단위 질량당 가열률', c:'#9c5c00', w:3,
+     f:h=>Math.exp(-(((h-25)/11)**2))/(1+Math.exp(-(h-33)/7))*Math.exp(h/16)}
+  ];
+  curves.forEach(cu=>{
+    const vals=[]; for(let h=0;h<=60;h+=0.5) vals.push([h,cu.f(h)]);
+    const mx=Math.max(...vals.map(v=>v[1]));
+    c.strokeStyle=cu.c; c.lineWidth=cu.w||2; c.beginPath();
+    vals.forEach((v,i)=>{ const x=X(v[1]/mx),y=Y(v[0]); i?c.lineTo(x,y):c.moveTo(x,y); });
+    c.stroke();
+    /* 최대 지점 표시 */
+    const pk=vals.reduce((a,b)=>b[1]>a[1]?b:a);
+    c.fillStyle=cu.c; c.beginPath(); c.arc(X(pk[1]/mx),Y(pk[0]),4,0,Math.PI*2); c.fill();
+    c.font='bold 10px Pretendard'; c.textAlign='left';
+    c.fillText(`${pk[0].toFixed(0)} km`, X(pk[1]/mx)+7, Y(pk[0])+3);
+  });
+  /* 범례 */
+  c.textAlign='left'; c.font='bold 11px Pretendard';
+  curves.forEach((cu,i)=>{ const y=T+18+i*22;
+    c.fillStyle=cu.c; c.fillRect(W-R+8,y-8,12,3);
+    c.fillText(cu.n, W-R+26, y-3); });
+  c.fillStyle='#4a5a6b'; c.font='9.5px Pretendard';
+  c.fillText('● 표시 = 최대인 고도', W-R+8, T+18+3*22-3);
+}
+
+/* ---- 위도별 수온 분포 ---- */
+function drawLats(){
+  const cv=$('lats'); if(!cv) return;
+  const c=cv.getContext('2d'), r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  cv.width=r.width*dpr; cv.height=380*dpr; cv.style.height='380px';
+  c.setTransform(dpr,0,0,dpr,0,0);
+  const W=r.width,H=380,L=52,R=120,T=20,B=34;
+  c.clearRect(0,0,W,H);
+  const X=t=>L+(t/30)*(W-L-R), Y=d=>T+(d/2000)*(H-T-B);
+  c.strokeStyle='#cfdbe8'; c.lineWidth=1;
+  c.beginPath(); c.moveTo(L,T); c.lineTo(L,H-B); c.lineTo(W-R,H-B); c.stroke();
+  c.fillStyle='#4a5a6b'; c.font='10px Pretendard'; c.textAlign='center';
+  for(let t=0;t<=30;t+=10) c.fillText(t+'℃', X(t), H-B+15);
+  c.fillText('수온 (℃)',(L+W-R)/2,H-6);
+  c.textAlign='right';
+  for(let d=0;d<=2000;d+=500) c.fillText(d, L-6, Y(d)+3);
+  c.save(); c.translate(13,(T+H-B)/2); c.rotate(-Math.PI/2);
+  c.textAlign='center'; c.fillText('깊이 (m)',0,0); c.restore();
+  c.strokeStyle='#e2e8f0';
+  for(let d=500;d<2000;d+=500){ c.beginPath(); c.moveTo(L,Y(d)); c.lineTo(W-R,Y(d)); c.stroke(); }
+
+  SPHERES.hyd.lats.forEach((l,i)=>{
+    c.strokeStyle=l.c; c.lineWidth=2.4; c.beginPath();
+    l.p.forEach((p,j)=>{ const x=X(p[0]),y=Y(p[1]); j?c.lineTo(x,y):c.moveTo(x,y); });
+    c.stroke();
+    c.fillStyle=l.c;
+    l.p.forEach(p=>{ c.beginPath(); c.arc(X(p[0]),Y(p[1]),2.4,0,Math.PI*2); c.fill(); });
+    c.font='bold 11px Pretendard'; c.textAlign='left';
+    c.fillRect(W-R+8,T+18+i*22-8,12,3);
+    c.fillText(l.n, W-R+26, T+18+i*22-3);
+  });
+  c.fillStyle='#4a5a6b'; c.font='9.5px Pretendard'; c.textAlign='left';
+  c.fillText('곡선이 수직인 구간', W-R+8, T+18+3*22+2);
+  c.fillText('= 수온이 일정 = 혼합층', W-R+8, T+18+3*22+16);
+}
+
+window.addEventListener('resize',()=>{
+  if($('page0').classList.contains('on')){ drawProfile(); drawOzone(); drawLats(); }
+});
+renderLayers();
+
+/* ============ 1. 에너지 ============ */
+const ENERGY=[
+ {n:'태양 복사 에너지',v:'약 1.7 × 10¹⁷ W',w:100,c:'#b45f06',
+  d:'지구가 받는 에너지의 <b>99.98%</b>입니다. 대기와 해수의 순환, 날씨, 풍화와 침식, 광합성이 모두 여기서 옵니다.'},
+ {n:'지구 내부 에너지',v:'약 4 × 10¹³ W',w:14,c:'#dc2626',
+  d:'지구가 만들어질 때의 열과 <b>방사성 원소가 붕괴하며 내는 열</b>입니다. 맨틀 대류를 일으켜 판을 움직이고 지진·화산·조산 운동을 일으킵니다.'},
+ {n:'조력 에너지',v:'약 3 × 10¹² W',w:6,c:'#2563eb',
+  d:'달과 태양이 바닷물을 끌어당겨 생깁니다. 밀물과 썰물을 만들며, 셋 중 가장 작습니다.'}
+];
+$('ebars').innerHTML=ENERGY.map(e=>`
+  <div class="eb">
+    <div class="eb-h"><span class="eb-n" style="color:${e.c}">${e.n}</span>
+      <span class="eb-v" style="color:${e.c}">${e.v}</span></div>
+    <span class="eb-track"><span class="eb-fill" style="width:${e.w}%;background:${e.c}"></span></span>
+    <div class="eb-d">${e.d}</div>
+  </div>`).join('')
+  +`<div style="font-size:.76rem;color:var(--dim);line-height:1.7;padding:0 4px;">
+      ※ 막대는 <b style="color:var(--mid)">로그 눈금</b>입니다. 실제 크기 차이는 태양이 내부 에너지의 약 <b style="color:var(--mid)">4,000배</b>입니다.</div>`;
+
+/* ---- 에너지원 분류 활동 ---- */
+const BINS=[{k:'sun',n:'태양 복사 에너지',c:'#b45f06'},
+            {k:'in', n:'지구 내부 에너지',c:'#dc2626'},
+            {k:'tid',n:'조력 에너지',     c:'#2563eb'}];
+const CARDS=[
+ {t:'바람',k:'sun'},{t:'해류',k:'sun'},{t:'비와 구름',k:'sun'},
+ {t:'풍화와 침식',k:'sun'},{t:'광합성',k:'sun'},{t:'대기 대순환',k:'sun'},
+ {t:'화산 분출',k:'in'},{t:'지진',k:'in'},{t:'습곡 산맥 형성',k:'in'},
+ {t:'맨틀 대류',k:'in'},{t:'판의 이동',k:'in'},
+ {t:'밀물과 썰물',k:'tid'},{t:'갯벌 형성',k:'tid'}];
+let sortState=CARDS.map(()=>null), pick=-1;
+function renderSort(){
+  $('sort-pool').innerHTML=CARDS.map((c,i)=>sortState[i]?'':
+    `<button class="sc ${pick===i?'pick':''}" data-i="${i}">${c.t}</button>`).join('')
+    || '<span style="font-size:.78rem;color:var(--dim);">모두 분류했습니다.</span>';
+  $('sort-bins').innerHTML=BINS.map(b=>`
+    <div class="bin" style="border-color:${b.c}55">
+      <h5 style="color:${b.c}">${b.n}</h5>
+      <div class="items">${CARDS.map((c,i)=>sortState[i]===b.k?
+        `<span class="sc ok" style="cursor:default">${c.t}</span>`:'').join('')}</div>
+      <button class="btn sm" data-bin="${b.k}" style="margin-top:9px;width:100%;">여기에 넣기</button>
+    </div>`).join('');
+  $('sort-pool').querySelectorAll('.sc').forEach(b=>b.addEventListener('click',()=>{
+    pick=(pick===+b.dataset.i)?-1:+b.dataset.i; renderSort();
+  }));
+  $('sort-bins').querySelectorAll('[data-bin]').forEach(b=>b.addEventListener('click',()=>{
+    if(pick<0){ $('sort-msg').innerHTML='먼저 위에서 <b>현상 카드</b>를 하나 고르세요.'; return; }
+    const ok=CARDS[pick].k===b.dataset.bin;
+    if(ok){ sortState[pick]=b.dataset.bin;
+      $('sort-msg').innerHTML=`<b>${CARDS[pick].t}</b> — 맞습니다.`;
+      pick=-1;
+    } else {
+      $('sort-msg').innerHTML=`<b>${CARDS[pick].t}</b>은(는) 그 에너지에서 오지 않습니다. 다시 생각해 보세요.`;
+    }
+    const left=sortState.filter(s=>!s).length;
+    if(!left) $('sort-msg').innerHTML=`<b>모두 분류했습니다.</b> 태양 에너지는 지표와 대기·해양에서 일어나는 일을,
+      지구 내부 에너지는 <b>땅속에서 올라오는</b> 일을, 조력은 <b>달과 태양의 인력</b>이 바닷물을 끌어당기는 일을 맡습니다.`;
+    renderSort();
+  }));
+}
+renderSort();
+
+/* ============ 2. 상호작용 매트릭스 ============ */
+const REG={A:{n:'기권',c:'#03699f'},G:{n:'지권',c:'#9c5c00'},
+           H:{n:'수권',c:'#0ea5e9'},B:{n:'생물권',c:'#0b7d73'}};
+const ORD=['A','G','H','B'];
+const IX={
+ A_A:{t:'대기 대순환',d:'위도별로 받는 태양 에너지가 다르기 때문에 생긴 불균형을 해소하려고 대기가 순환합니다. 북반구 기준으로 해들리·페렐·극 순환의 세 개 세포가 만들어지고, 그 결과 무역풍·편서풍·극동풍이 붑니다.'},
+ A_G:{t:'풍화와 침식',d:'바람이 모래알을 실어 날라 암석을 깎습니다. 아래쪽일수록 모래가 많이 날리므로 바위 밑동이 더 많이 깎여 <b>버섯바위</b>가 됩니다.'},
+ A_H:{t:'표층 해류',d:'대기 대순환으로 일정하게 부는 바람이 해수면과 마찰하여 표층 해류를 만듭니다. 그래서 <b>표층 해류의 방향은 바람의 방향과 거의 일치</b>합니다.'},
+ A_B:{t:'기체 교환',d:'식물은 대기의 이산화탄소를 흡수해 광합성을 하고, 생물은 대기의 산소를 마셔 호흡합니다.'},
+ G_A:{t:'화산 가스 분출',d:'화산이 분출하며 수증기·이산화탄소·이산화황을 대기로 내보냅니다. 화산재는 햇빛을 가려 <b>기온을 낮추기도</b> 합니다.'},
+ G_G:{t:'판의 운동',d:'맨틀 대류로 판이 움직이며 서로 충돌해 산맥을 만들거나, 쌓인 힘이 한꺼번에 풀리며 지진을 일으킵니다.'},
+ G_H:{t:'해양 염류 공급',d:'육지의 암석이 풍화되어 나온 나트륨·마그네슘 등이 강물을 타고 바다로 들어갑니다. 다만 해수에 가장 많은 <b>염화 이온은 화산 가스에서</b> 나온 것입니다.'},
+ G_B:{t:'토양과 서식지',d:'암석이 풍화되어 만들어진 토양이 식물에 양분과 뿌리 내릴 자리를 주고, 지형이 생물의 서식지를 결정합니다.'},
+ H_A:{t:'수증기 공급',d:'바다에서 물이 증발해 대기로 들어갑니다. 이 수증기가 구름과 비의 재료가 되고, 응결할 때 <b>숨은열을 내놓아 대기를 데웁니다.</b>'},
+ H_G:{t:'해안 침식과 퇴적',d:'파도가 해안 절벽을 깎아 해식애와 파식대를 만들고, 깎여 나온 물질은 다른 곳에 쌓여 해안 지형을 만듭니다.'},
+ H_H:{t:'심층 순환',d:'극지방에서 해수가 차가워지고 결빙으로 염분이 높아져 밀도가 커지면 가라앉습니다. 밀도를 정하는 것은 수온과 염분인데, <b>수온의 영향이 더 큽니다.</b>'},
+ H_B:{t:'수생 생물의 터전',d:'물의 큰 비열이 온도 변화를 막아 주고, 녹아 있는 산소와 영양염류가 수중 생물을 살립니다.'},
+ B_A:{t:'대기 조성 변화',d:'약 27억 년 전 남세균의 광합성이 대기에 산소를 채웠고, 그 산소가 <b>오존층</b>을 만들어 생물이 육지로 올라올 수 있게 했습니다.'},
+ B_G:{t:'화석 연료와 석회암',d:'생물의 유해가 땅에 묻혀 석탄·석유가 되고, 조개껍데기와 산호가 쌓여 석회암이 됩니다.'},
+ B_H:{t:'수질에 미치는 영향',d:'생물의 배설물과 유해가 하천과 바다로 들어가 영양염류가 됩니다. 지나치면 플랑크톤이 폭증해 <b>적조나 녹조</b>가 생깁니다.'},
+ B_B:{t:'먹이 사슬',d:'생산자가 만든 유기물이 소비자를 거쳐 분해자에게 이르며 에너지가 흐릅니다.'}
+};
+function matrixHTML(id){
+  let h=`<div class="mrow"><div class="mhead" style="color:var(--dim);font-size:.6rem">원인 ↓ / 결과 →</div>`
+    + ORD.map(k=>`<div class="mhead" style="color:${REG[k].c}">${REG[k].n}</div>`).join('') + `</div>`;
+  ORD.forEach(r=>{
+    h+=`<div class="mrow"><div class="mhead" style="color:${REG[r].c}">${REG[r].n}</div>`;
+    ORD.forEach(cc=>{ const k=r+'_'+cc;
+      h+=`<button class="pad" data-k="${k}" data-m="${id}"><span class="pad-t">${IX[k].t}</span></button>`; });
+    h+=`</div>`;
+  });
+  return h;
+}
+$('matrix').innerHTML=matrixHTML('m1');
+$('matrix2').innerHTML=matrixHTML('m2');
+
+let curIX=null;
+$('matrix').querySelectorAll('.pad').forEach(b=>b.addEventListener('click',()=>{
+  curIX=b.dataset.k;
+  $('matrix').querySelectorAll('.pad').forEach(x=>x.classList.toggle('on',x.dataset.k===curIX));
+  const [f,t]=curIX.split('_');
+  $('expl').innerHTML=`<h4>${REG[f].n} → ${REG[t].n} · ${IX[curIX].t}</h4><p>${IX[curIX].d}</p>`;
+}));
+
+/* --- 장면 캔버스 : 상호작용마다 다른 그림 --- */
+const sc=$('scene'), sx=sc.getContext('2d');
+let tick=0;
+const W=620, H=380;
+
+/* 그리기 도우미 */
+const P={
+  sky(y0,y1,a,b){ const g=sx.createLinearGradient(0,y0,0,y1);
+    g.addColorStop(0,a||'#e8f0f9'); g.addColorStop(1,b||'#e8f0f9');
+    sx.fillStyle=g; sx.fillRect(0,y0,W,y1-y0); },
+  land(y){ sx.fillStyle='#3a2410'; sx.fillRect(0,y,W,H-y);
+    sx.fillStyle='#241505'; sx.fillRect(0,y+70,W,H-y-70); },
+  sea(x,y){ sx.fillStyle='#7dd3fc'; sx.fillRect(x,y,W-x,H-y); },
+  wave(x0,x1,y,amp,sp,col,lw){ sx.strokeStyle=col||'#03699f'; sx.lineWidth=lw||2;
+    sx.beginPath();
+    for(let x=x0;x<=x1;x+=4){ const yy=y+Math.sin((x-tick*sp)*0.05)*amp;
+      x===x0?sx.moveTo(x,yy):sx.lineTo(x,yy); } sx.stroke(); },
+  arrow(x1,y1,x2,y2,col,w){ sx.strokeStyle=col; sx.lineWidth=w||2.5;
+    sx.beginPath(); sx.moveTo(x1,y1); sx.lineTo(x2,y2); sx.stroke();
+    const a=Math.atan2(y2-y1,x2-x1); sx.save(); sx.translate(x2,y2); sx.rotate(a);
+    sx.fillStyle=col; sx.beginPath(); sx.moveTo(0,0); sx.lineTo(-8,-4); sx.lineTo(-8,4);
+    sx.closePath(); sx.fill(); sx.restore(); },
+  /* 흐르는 바람 선 */
+  wind(y,x0,x1,sp,col,n){ sx.strokeStyle=col||'rgba(56,189,248,.55)'; sx.lineWidth=2;
+    for(let i=0;i<(n||3);i++){
+      const off=((tick*sp+i*90)%(x1-x0+120))-60;
+      sx.beginPath(); sx.moveTo(x0+off,y+i*13); sx.lineTo(x0+off+46,y+i*13); sx.stroke(); } },
+  tree(x,y,s){ s=s||1;
+    sx.fillStyle='#78350f'; sx.fillRect(x-3*s,y-26*s,6*s,26*s);
+    sx.fillStyle='#22c55e'; sx.beginPath(); sx.arc(x,y-34*s,16*s,0,Math.PI*2); sx.fill(); },
+  fish(x,y,col){ sx.fillStyle=col||'#fb7185';
+    sx.beginPath(); sx.ellipse(x,y,11,6,0,0,Math.PI*2); sx.fill();
+    sx.beginPath(); sx.moveTo(x+11,y); sx.lineTo(x+20,y-6); sx.lineTo(x+20,y+6); sx.closePath(); sx.fill(); },
+  cloud(x,y,s,col){ s=s||1; sx.fillStyle=col||'rgba(226,232,240,.75)';
+    sx.beginPath(); sx.arc(x,y,17*s,0,Math.PI*2); sx.arc(x+22*s,y-8*s,22*s,0,Math.PI*2);
+    sx.arc(x+46*s,y,17*s,0,Math.PI*2); sx.fill(); },
+  sun(x,y){ sx.fillStyle='#b45f06'; sx.beginPath(); sx.arc(x,y,17,0,Math.PI*2); sx.fill();
+    sx.strokeStyle='rgba(251,191,36,.55)'; sx.lineWidth=2;
+    for(let i=0;i<8;i++){ const a=i*Math.PI/4+tick*0.004;
+      sx.beginPath(); sx.moveTo(x+Math.cos(a)*22,y+Math.sin(a)*22);
+      sx.lineTo(x+Math.cos(a)*30,y+Math.sin(a)*30); sx.stroke(); } },
+  volcano(x,y,h,w){ sx.fillStyle='#241505'; sx.beginPath();
+    sx.moveTo(x-w,y); sx.lineTo(x-13,y-h); sx.lineTo(x+13,y-h); sx.lineTo(x+w,y); sx.closePath(); sx.fill();
+    sx.fillStyle='#ef4444'; sx.fillRect(x-11,y-h-3,22,6); },
+  txt(x,y,t,col,sz,al){ sx.fillStyle=col||'#0b1420';
+    sx.font=`bold ${sz||12}px Pretendard`; sx.textAlign=al||'center'; sx.fillText(t,x,y); },
+  /* 순환하는 점들 */
+  flow(pts,col,n,sp,r){ for(let i=0;i<(n||8);i++){
+      const t=((tick*sp+i*(1/(n||8))*1000)%1000)/1000;
+      const seg=t*(pts.length-1), k=Math.floor(seg), f=seg-k;
+      const a=pts[k], b=pts[Math.min(k+1,pts.length-1)];
+      sx.fillStyle=col; sx.beginPath();
+      sx.arc(a[0]+(b[0]-a[0])*f, a[1]+(b[1]-a[1])*f, r||3.2, 0, Math.PI*2); sx.fill(); } }
+};
+/* 상호작용마다 전용 장면 */
+const SCENE={
+ A_A(){ P.sky(0,H,'#f8fafc','#e8f0f9');
+   const bands=[[70,'극순환','#7c3aed',-1],[160,'페렐 순환 · 편서풍','#03699f',1],[275,'해들리 순환 · 무역풍','#b45f06',-1]];
+   bands.forEach(([y,nm,col,dir])=>{
+     sx.strokeStyle=col+'66'; sx.lineWidth=2;
+     sx.beginPath(); sx.ellipse(W/2,y,190,38,0,0,Math.PI*2); sx.stroke();
+     for(let i=0;i<7;i++){ const a=(tick*0.012*dir+i*Math.PI*2/7)%(Math.PI*2);
+       sx.fillStyle=col; sx.beginPath();
+       sx.arc(W/2+Math.cos(a)*190, y+Math.sin(a)*38, 3.4,0,Math.PI*2); sx.fill(); }
+     P.txt(W/2,y+5,nm,col,12);
+   });
+   P.txt(W/2,26,'위도별 열 불균형이 세 개의 순환 세포를 만든다','#243141',12);
+ },
+ A_G(){ P.sky(0,250); P.land(250);
+   P.wind(120,0,W,2.2,'rgba(251,191,36,.5)',3);
+   /* 버섯바위 */
+   sx.fillStyle='#78350f'; sx.beginPath();
+   sx.moveTo(255,190); sx.bezierCurveTo(240,140,340,140,325,190);
+   sx.bezierCurveTo(312,215,305,225,305,250); sx.lineTo(275,250);
+   sx.bezierCurveTo(275,225,268,215,255,190); sx.closePath(); sx.fill();
+   /* 모래 입자 — 아래쪽에 집중 */
+   for(let i=0;i<26;i++){ const x=((tick*3+i*47)%(W+60))-30;
+     const y=212+Math.sin(i*2.1+tick*0.05)*16;
+     sx.fillStyle='rgba(251,146,60,.85)'; sx.beginPath(); sx.arc(x,y,2.2,0,Math.PI*2); sx.fill(); }
+   P.txt(W/2,300,'모래는 무거워 낮게 날린다 → 바위 밑동이 집중적으로 깎인다','#fb923c',12);
+ },
+ A_H(){ P.sky(0,190); P.sea(0,190);
+   P.wind(80,0,W,3,'rgba(56,189,248,.6)',3);
+   P.arrow(120,130,300,130,'#03699f',3); P.txt(210,120,'바람','#03699f');
+   for(let k=0;k<4;k++) P.wave(0,W,196+k*13,5-k,2.2,`rgba(96,165,250,${.7-k*.13})`,2.5);
+   P.flow([[60,250],[200,246],[360,252],[520,248],[580,250]],'#0ea5e9',10,0.6,4);
+   P.arrow(150,300,470,300,'#0ea5e9',3);
+   P.txt(310,330,'바람이 해수면을 끌어 표층 해류가 생긴다','#0ea5e9',12);
+ },
+ A_B(){ P.sky(0,250); P.land(250); P.sun(540,60);
+   P.tree(300,250,1.9);
+   P.flow([[120,120],[220,150],[290,175]],'#03699f',5,0.5,4.5);
+   P.txt(150,105,'CO₂','#03699f',13);
+   P.flow([[320,175],[420,140],[500,115]],'#059669',5,0.5,4.5);
+   P.txt(500,100,'O₂','#059669',13);
+   P.txt(W/2,320,'식물은 CO₂를 흡수해 유기물을 만들고 O₂를 내놓는다','#243141',12);
+ },
+ G_A(){ P.sky(0,270); P.land(270); P.volcano(300,270,120,80);
+   for(let i=0;i<30;i++){ const t=((tick*1.4+i*33)%300)/300;
+     const x=300+Math.sin(i*3+t*4)*(18+t*70), y=148-t*140, r=4+t*16;
+     sx.fillStyle=`rgba(148,163,184,${(1-t)*0.6})`;
+     sx.beginPath(); sx.arc(x,y,r,0,Math.PI*2); sx.fill(); }
+   P.txt(470,120,'H₂O · CO₂ · SO₂','#dc2626',12);
+   P.txt(W/2,330,'화산 가스와 화산재가 기권으로 들어간다','#dc2626',12);
+ },
+ G_G(){ P.sky(0,150); sx.fillStyle='#3a2410'; sx.fillRect(0,150,W,H-150);
+   const push=Math.sin(tick*0.02)*8;
+   /* 습곡 산맥 */
+   sx.fillStyle='#5b3a18'; sx.beginPath(); sx.moveTo(200,150);
+   sx.lineTo(310,80-push); sx.lineTo(420,150); sx.closePath(); sx.fill();
+   sx.fillStyle='#241505'; sx.fillRect(0,240,W,H-240);
+   P.arrow(90,195,190,195,'#9c5c00',4); P.arrow(530,195,430,195,'#9c5c00',4);
+   /* 지진파 */
+   sx.strokeStyle='rgba(248,113,113,.5)'; sx.lineWidth=2;
+   for(let i=0;i<3;i++){ const r=((tick*2+i*50)%150);
+     sx.beginPath(); sx.arc(310,250,r,0,Math.PI*2); sx.stroke(); }
+   P.txt(310,300,'맨틀 대류 → 판 충돌 → 습곡 산맥과 지진','#9c5c00',12);
+ },
+ G_H(){ P.sky(0,120); sx.fillStyle='#3a2410';
+   sx.beginPath(); sx.moveTo(0,120); sx.lineTo(150,120); sx.lineTo(330,290);
+   sx.lineTo(0,290); sx.closePath(); sx.fill();
+   P.sea(330,250);
+   /* 강물 */
+   sx.strokeStyle='#03699f'; sx.lineWidth=5;
+   sx.beginPath(); sx.moveTo(90,130); sx.lineTo(200,205); sx.lineTo(335,262); sx.stroke();
+   P.flow([[90,130],[200,205],[335,262],[470,270]],'#b45f06',9,0.55,4);
+   P.txt(140,110,'암석 풍화','#b45f06',12);
+   P.txt(470,240,'Na⁺ · Mg²⁺ 유입','#b45f06',12);
+   P.txt(W/2,340,'단, 가장 많은 염화 이온(Cl⁻)은 화산 가스에서 온다','#dc2626',12);
+ },
+ G_B(){ P.sky(0,200); sx.fillStyle='#5b3a18'; sx.fillRect(0,200,W,60);
+   sx.fillStyle='#3a2410'; sx.fillRect(0,260,W,H-260);
+   P.tree(200,200,1.7); P.tree(400,200,1.3);
+   sx.strokeStyle='#854d0e'; sx.lineWidth=2.5;
+   [[200,-1],[200,1],[400,-1],[400,1]].forEach(([x,d])=>{
+     sx.beginPath(); sx.moveTo(x,200); sx.quadraticCurveTo(x+d*24,228,x+d*36,256); sx.stroke(); });
+   P.flow([[100,250],[200,215]],'#059669',4,0.5,3.5);
+   P.txt(90,290,'풍화로 만들어진 토양','#9c5c00',12,'left');
+   P.txt(W/2,340,'암석이 부서져 토양이 되고, 토양이 생물을 살린다','#243141',12);
+ },
+ H_A(){ P.sky(0,240); P.sea(0,240); P.sun(70,60);
+   P.cloud(390,90,1.2);
+   for(let i=0;i<16;i++){ const t=((tick*1.6+i*40)%240)/240;
+     const x=200+i*18+Math.sin(t*6+i)*10, y=240-t*150;
+     sx.fillStyle=`rgba(125,211,252,${(1-t)*0.8})`;
+     sx.beginPath(); sx.arc(x,y,3,0,Math.PI*2); sx.fill(); }
+   for(let k=0;k<3;k++) P.wave(0,W,246+k*12,4,1.8,`rgba(96,165,250,${.6-k*.15})`,2);
+   P.txt(300,200,'증발','#0ea5e9',13);
+   P.txt(W/2,330,'수증기가 응결할 때 숨은열을 내놓아 대기를 데운다','#0ea5e9',12);
+ },
+ H_G(){ P.sky(0,150);
+   /* 절벽 */
+   const cut=Math.sin(tick*0.02)*4;
+   sx.fillStyle='#3a2410'; sx.beginPath();
+   sx.moveTo(0,150); sx.lineTo(250+cut,150); sx.lineTo(250+cut,270);
+   sx.lineTo(300,300); sx.lineTo(0,300); sx.closePath(); sx.fill();
+   sx.fillStyle='#241505'; sx.fillRect(0,300,W,H-300);
+   P.sea(250,240);
+   for(let k=0;k<3;k++) P.wave(255,W,248+k*11,6-k,-3,`rgba(96,165,250,${.8-k*.2})`,2.5);
+   P.arrow(430,262,275+cut,262,'#2563eb',3.5);
+   P.txt(180,200,'해식애','#9c5c00',12);
+   P.txt(300,325,'파식대','#9c5c00',11);
+   P.txt(W/2,355,'파도가 절벽 밑동을 때려 깎아 낸다','#2563eb',12);
+ },
+ H_H(){ P.sky(0,90); P.sea(0,90);
+   sx.fillStyle='rgba(255,255,255,.8)';
+   sx.beginPath(); sx.moveTo(0,90); sx.lineTo(120,90); sx.lineTo(80,60); sx.closePath(); sx.fill();
+   P.txt(60,50,'극지방','#e2e8f0',12);
+   P.flow([[70,100],[75,200],[110,300],[300,330],[520,320],[560,180],[540,110]],'#2563eb',14,0.35,4);
+   P.arrow(75,140,75,270,'#2563eb',3);
+   P.txt(150,180,'차가워지고 결빙으로 염분↑ → 밀도↑ → 침강','#2563eb',12,'left');
+   P.txt(W/2,358,'밀도를 정하는 것은 수온과 염분, 그중 수온의 영향이 더 크다','#243141',11.5);
+ },
+ H_B(){ P.sky(0,90); P.sea(0,90);
+   sx.fillStyle='#16a34a';
+   for(let i=0;i<5;i++){ const x=70+i*115;
+     sx.beginPath(); sx.moveTo(x,H);
+     sx.quadraticCurveTo(x+Math.sin(tick*0.03+i)*18,270,x+Math.sin(tick*0.03+i)*8,200);
+     sx.lineWidth=7; sx.strokeStyle='#16a34a'; sx.stroke(); }
+   [[0.03,0,'#fb7185'],[0.022,90,'#b45f06'],[0.035,180,'#059669']].forEach(([sp,ph,col],i)=>{
+     P.fish(120+((tick*sp*40+ph)%420), 160+i*55, col); });
+   for(let i=0;i<10;i++){ const t=((tick*2+i*60)%280)/280;
+     sx.fillStyle=`rgba(226,232,240,${(1-t)*.5})`;
+     sx.beginPath(); sx.arc(80+i*55, 330-t*220, 2.6,0,Math.PI*2); sx.fill(); }
+   P.txt(W/2,60,'큰 비열이 온도 변화를 막고, 녹은 산소가 생물을 살린다','#0ea5e9',12);
+ },
+ B_A(){ const k=Math.min(1,(tick%400)/400);
+   P.sky(0,250, `rgb(${Math.round(20-10*k)},${Math.round(30+40*k)},${Math.round(50+90*k)})`, '#e8f0f9');
+   P.land(250); P.tree(160,250,1.6); P.tree(430,250,1.3);
+   for(let i=0;i<14;i++){ const t=((tick*1.8+i*45)%250)/250;
+     sx.fillStyle=`rgba(74,222,128,${(1-t)*0.8})`;
+     sx.beginPath(); sx.arc(160+((i*37)%300), 250-t*210, 3.4,0,Math.PI*2); sx.fill(); }
+   P.txt(W/2,40,'광합성 → 대기에 산소 축적 → 오존층 형성','#059669',13);
+   P.txt(W/2,320,'약 27억 년 전 남세균이 지구의 대기를 바꿔 놓았다','#243141',12);
+ },
+ B_G(){ P.sky(0,150); sx.fillStyle='#5b3a18'; sx.fillRect(0,150,W,50);
+   sx.fillStyle='#3a2410'; sx.fillRect(0,200,W,100);
+   sx.fillStyle='#241505'; sx.fillRect(0,300,W,H-300);
+   sx.fillStyle='#f8fafc'; sx.fillRect(60,255,290,26);
+   sx.strokeStyle='#475569'; sx.lineWidth=1.5; sx.strokeRect(60,255,290,26);
+   P.txt(205,272,'석탄 · 석유','#41505f',12);
+   P.tree(430,150,1.2);
+   P.flow([[430,130],[400,190],[330,250]],'#a16207',6,0.4,4);
+   P.arrow(500,175,500,250,'#dc2626',3);
+   P.txt(545,215,'고온·고압','#dc2626',11,'left');
+   P.txt(W/2,345,'생물의 유해가 묻혀 화석 연료가 된다','#243141',12);
+ },
+ B_H(){ P.sky(0,150); sx.fillStyle='#3a2410';
+   sx.beginPath(); sx.moveTo(0,150); sx.lineTo(230,150); sx.lineTo(300,250); sx.lineTo(0,250); sx.closePath(); sx.fill();
+   const bloom=Math.min(1,(tick%420)/420);
+   sx.fillStyle=`rgb(${Math.round(12+120*bloom)},${Math.round(74-20*bloom)},${Math.round(110-60*bloom)})`;
+   sx.fillRect(300,200,W-300,H-200);
+   sx.strokeStyle='#b45309'; sx.lineWidth=5;
+   sx.beginPath(); sx.moveTo(120,160); sx.quadraticCurveTo(230,205,305,225); sx.stroke();
+   P.flow([[120,160],[230,205],[305,225],[430,240]],'#b45309',8,0.5,4);
+   for(let i=0;i<Math.round(bloom*22);i++){
+     sx.fillStyle='rgba(220,80,60,.7)';
+     sx.beginPath(); sx.arc(330+((i*53)%270), 230+((i*37)%110), 4,0,Math.PI*2); sx.fill(); }
+   P.txt(150,140,'영양염류 유입','#b45309',12);
+   P.txt(W/2,350,'지나치면 플랑크톤이 폭증해 적조·녹조가 된다','#dc2626',12);
+ },
+ B_B(){ P.sky(0,250); P.land(250);
+   const nodes=[[130,230,'풀 (생산자)','#059669'],[310,140,'초식동물','#b45f06'],[490,230,'육식동물','#dc2626']];
+   nodes.forEach(([x,y,nm,col])=>{
+     sx.fillStyle=col+'33'; sx.strokeStyle=col; sx.lineWidth=2;
+     sx.beginPath(); sx.arc(x,y,34,0,Math.PI*2); sx.fill(); sx.stroke();
+     P.txt(x,y+56,nm,col,12); });
+   P.arrow(166,222,278,152,'#243141',2.5);
+   P.arrow(346,152,458,222,'#243141',2.5);
+   P.flow([[130,230],[310,140]],'#059669',4,0.6,3.6);
+   P.flow([[310,140],[490,230]],'#b45f06',4,0.6,3.6);
+   sx.strokeStyle='rgba(148,163,184,.5)'; sx.lineWidth=2; sx.setLineDash([5,4]);
+   sx.beginPath(); sx.moveTo(490,266); sx.quadraticCurveTo(310,330,130,266); sx.stroke(); sx.setLineDash([]);
+   P.txt(310,318,'분해자를 거쳐 다시 흙으로','#41505f',11);
+   P.txt(W/2,50,'태양 에너지가 유기물의 형태로 흐른다','#243141',12);
+ }
+};
+
+function drawScene(){
+  sx.clearRect(0,0,W,H);
+  if(!curIX){
+    P.sky(0,220); P.land(220); P.tree(150,220,1.5);
+    P.txt(W/2,H/2,'왼쪽 격자에서 칸을 눌러 보세요','#4a5a6b',14);
+  } else {
+    (SCENE[curIX]||(()=>{}))();
+    const [f,t]=curIX.split('_');
+    sx.fillStyle='rgba(5,7,15,.6)'; sx.fillRect(0,0,180,26);
+    P.txt(8,18,`${REG[f].n} → ${REG[t].n}`, REG[f].c, 12.5, 'left');
+  }
+  tick++;
+  requestAnimationFrame(drawScene);
+}
+drawScene();
+
+/* ============ 3. 사건 추적 ============ */
+const EVENTS=[
+ {y:'1991년',t:'피나투보 화산 폭발',place:'필리핀',
+  steps:[
+   {k:'G_A',q:'화산이 폭발하며 무엇이 어디로 갔을까요?',
+    o:['이산화황(SO₂) 2천만 톤이 <b>성층권</b>까지 올라갔다','용암이 바다로 흘러들어 수온을 높였다','지진파가 지구 반대편까지 전달되었다'],
+    a:0,e:'성층권은 대류가 없어 안정하기 때문에, 한번 올라간 물질이 <b>수년간 머물며 전 지구로 퍼집니다.</b> 대류권에 머물렀다면 비에 씻겨 며칠 만에 사라졌을 것입니다.'},
+   {k:'A_A',q:'성층권에 들어간 이산화황은 대기에서 어떻게 되었을까요?',
+    o:['빗물에 곧바로 씻겨 내려갔다','황산 방울(에어로졸)이 되어 <b>햇빛을 반사</b>했다','오존과 결합해 오존층을 두껍게 만들었다'],
+    a:1,e:'황산 에어로졸은 아주 작은 방울이라 햇빛을 잘 반사합니다. 지구에 도달하는 태양 에너지가 줄어든 셈입니다.'},
+   {k:'A_A',q:'햇빛이 줄어들자 기권에는 어떤 변화가 생겼을까요?',
+    o:['전 지구 평균 기온이 <b>약 0.5 ℃ 내려갔다</b>','적도 지방만 기온이 올라갔다','기온은 변하지 않고 강수량만 늘었다'],
+    a:0,e:'실제로 1992~1993년 전 지구 평균 기온이 약 0.5 ℃ 낮아졌습니다. 작아 보이지만 <b>전 지구 평균</b>이라 엄청난 양의 에너지 변화입니다.'},
+   {k:'A_B',q:'기온이 내려가자 생물권에는 무슨 일이 있었을까요?',
+    o:['모든 생물이 더 빨리 자랐다','여러 지역에서 <b>농작물 수확이 줄었다</b>','바다의 산소가 사라졌다'],
+    a:1,e:'기온이 내려가고 일조량이 줄어 곡물 생산이 감소했습니다. 화산 하나가 <b>전 세계 식탁</b>에 영향을 준 것입니다.'}],
+  out:'지권에서 시작한 사건이 기권을 거쳐 생물권과 사람의 삶까지 이르렀습니다. 영향은 약 2년간 이어졌습니다.'},
+
+ {y:'2010년',t:'아이슬란드 화산 분출',place:'에이야퍄들라이외퀴들',
+  steps:[
+   {k:'G_A',q:'빙하 아래에서 화산이 분출했습니다. 무엇이 만들어졌을까요?',
+    o:['용암이 그대로 굳어 새 땅이 되었다','얼음과 만나 급히 식으면서 <b>잘게 부서진 화산재</b>가 대량 발생했다','수증기만 나오고 화산재는 없었다'],
+    a:1,e:'뜨거운 용암이 얼음물과 만나면 급격히 식으며 유리질이 잘게 부서집니다. 그래서 <b>유난히 미세한 화산재</b>가 만들어졌습니다.'},
+   {k:'A_A',q:'화산재는 대기에서 어떻게 움직였을까요?',
+    o:['<b>편서풍</b>을 타고 유럽 상공으로 퍼졌다','화산 바로 위에만 머물렀다','우주로 빠져나갔다'],
+    a:0,e:'아이슬란드는 중위도에 있어 편서풍대에 놓입니다. 그래서 화산재가 <b>동쪽인 유럽 쪽으로</b> 이동했습니다.'},
+   {k:'A_B',q:'유럽 상공을 덮은 화산재는 사람에게 어떤 영향을 주었을까요?',
+    o:['비가 많이 내려 가뭄이 해소되었다','화산재가 항공기 엔진을 망가뜨릴 수 있어 <b>10만 편이 넘는 항공편이 결항</b>되었다','태양광 발전량이 늘었다'],
+    a:1,e:'화산재는 엔진 안에서 녹아 달라붙어 엔진을 멈추게 할 수 있습니다. 약 일주일간 유럽 항공망이 마비되어 <b>수조 원의 손실</b>이 났습니다.'}],
+  out:'화산재라는 물질 하나가 지권 → 기권 → 사람의 경제 활동까지 번졌습니다. 자연 현상이 곧 사회 문제가 된 사례입니다.'},
+
+ {y:'2011년',t:'동일본 대지진',place:'일본 도호쿠 앞바다',
+  steps:[
+   {k:'G_G',q:'지진은 왜 일어났을까요?',
+    o:['화산이 폭발하면서 땅이 흔들렸다','<b>판이 다른 판 아래로 내려가다</b> 쌓인 힘이 한꺼번에 풀렸다','달의 인력이 땅을 끌어당겼다'],
+    a:1,e:'태평양판이 일본 아래로 가라앉는 곳입니다. 눌려 있던 판이 튕겨 오르며 <b>규모 9.0</b>의 지진이 일어났습니다.'},
+   {k:'G_H',q:'해저에서 일어난 지진은 바다에 무슨 일을 일으켰을까요?',
+    o:['해저가 솟구치며 <b>지진 해일(쓰나미)</b>이 발생했다','바닷물이 모두 증발했다','해류의 방향이 반대로 바뀌었다'],
+    a:0,e:'해저 지형이 갑자기 솟으면 그 위의 바닷물 전체가 밀려 올라갑니다. 최대 <b>40 m</b>에 이르는 해일이 되었습니다.'},
+   {k:'H_B',q:'해일이 육지에 닿은 뒤에는 무슨 일이 있었을까요?',
+    o:['연안이 침수되고 <b>원전 사고로 방사성 물질이 유출</b>되었다','토양이 비옥해져 농사가 잘되었다','아무 피해도 없었다'],
+    a:0,e:'해일이 원자력 발전소의 전원을 끊어 냉각이 멈췄고, 방사성 물질이 대기와 바다로 유출되었습니다. <b>지권의 사건이 수권을 거쳐 생물권 전체</b>로 번졌습니다.'}],
+  out:'판의 움직임 하나가 해일·침수·방사성 물질 유출로 이어졌습니다. 지구 내부 에너지가 일으킨 사건입니다.'},
+
+ {y:'매년 봄',t:'황사',place:'중국 내륙 · 몽골',
+  steps:[
+   {k:'A_G',q:'황사는 어디서 시작될까요?',
+    o:['바다에서 소금이 증발해 만들어진다','건조한 사막에서 <b>강한 바람이 표층의 흙먼지를 깎아 올린다</b>','화산이 재를 뿜어낸다'],
+    a:1,e:'겨울부터 봄까지 건조한 사막·황토 지대에 강풍이 불면 표층 흙이 깎여 공중으로 떠오릅니다. 기권이 지권을 깎은 것입니다.'},
+   {k:'G_A',q:'떠오른 흙먼지는 어떻게 우리나라까지 올까요?',
+    o:['<b>편서풍</b>을 타고 동쪽으로 이동한다','해류를 타고 떠내려온다','땅속을 통해 이동한다'],
+    a:0,e:'우리나라는 중위도 편서풍대에 있습니다. 그래서 서쪽에서 발생한 황사가 <b>하루 이틀 만에</b> 한반도에 도달합니다.'},
+   {k:'A_B',q:'황사가 도착하면 생물권에는 어떤 일이 생길까요?',
+    o:['호흡기 질환이 늘고 <b>농작물의 광합성이 방해</b>받는다','식물이 더 잘 자란다','아무 영향이 없다'],
+    a:0,e:'미세한 먼지가 호흡기에 들어가고, 잎에 쌓여 햇빛을 가립니다. 다만 황사에 섞인 <b>철분이 바다에 떨어져 식물플랑크톤을 늘리는</b> 긍정적 효과도 있습니다.'}],
+  out:'지권의 흙이 기권을 타고 국경을 넘어 생물권에 이릅니다. 한 나라의 사막화가 이웃 나라의 건강 문제가 됩니다.'}
+];
+
+let curEv=-1, evState=[];
+$('ev-pick').innerHTML=EVENTS.map((e,i)=>
+  `<button class="ev" data-i="${i}"><div class="y">${e.y} · ${e.place}</div>
+    <div class="t">${e.t}</div></button>`).join('');
+$('ev-pick').querySelectorAll('.ev').forEach(b=>b.addEventListener('click',()=>{
+  curEv=+b.dataset.i;
+  $('ev-pick').querySelectorAll('.ev').forEach(x=>x.classList.toggle('on',+x.dataset.i===curEv));
+  evState=EVENTS[curEv].steps.map(()=>({done:false,pick:-1}));
+  renderChain();
+}));
+function renderChain(){
+  if(curEv<0) return;
+  const ev=EVENTS[curEv];
+  $('chain').innerHTML=ev.steps.map((s,i)=>{
+    const st=evState[i], open=i===0||evState[i-1].done;
+    const [f,t]=s.k.split('_');
+    if(!open) return `<div class="step" style="opacity:.35">
+      <div class="st-h"><span class="st-n">${i+1}</span>
+      <span class="st-q" style="color:var(--dim)">앞 단계를 먼저 완성하세요</span></div></div>`;
+    return `<div class="step ${st.done?'done':''}">
+      <div class="st-h"><span class="st-n">${i+1}</span>
+        <span class="st-tag" style="color:${REG[f].c}">${REG[f].n} → ${REG[t].n}</span>
+        <span class="st-q">${s.q}</span></div>
+      <div class="st-opts">${s.o.map((o,j)=>{
+        let cls=''; if(st.pick===j) cls=(j===s.a?'ok':'no');
+        else if(st.done&&j===s.a) cls='ok';
+        return `<button class="st-o ${cls}" data-s="${i}" data-o="${j}">${o}</button>`;}).join('')}</div>
+      ${st.done?`<div class="st-a">${s.e}</div>`:''}
+    </div>`;
+  }).join('');
+  $('chain').querySelectorAll('.st-o').forEach(b=>b.addEventListener('click',()=>{
+    const i=+b.dataset.s, j=+b.dataset.o;
+    evState[i].pick=j;
+    if(j===EVENTS[curEv].steps[i].a) evState[i].done=true;
+    renderChain(); litMatrix();
+  }));
+  const allDone=evState.every(s=>s.done);
+  $('ev-tail').innerHTML= allDone ? `
+    <div class="ev-out"><h4>연쇄가 완성되었습니다</h4><p>${ev.out}</p></div>
+    <div class="card" style="margin-top:12px;">
+      <div class="qa-q" style="margin-bottom:8px;">
+        <span class="qa-tag">대책</span>이런 피해를 줄이려면 무엇을 준비해야 할까요?
+        <em>사전 예방</em>과 <em>사후 대처</em>로 나누어 제안해 보세요.
+      </div>
+      <textarea data-ev="${curEv}" placeholder="사전에는 …, 사고가 난 뒤에는 …">${(EVANS[curEv]||'')}</textarea>
+    </div>` : '';
+  const ta=$('ev-tail').querySelector('textarea');
+  if(ta) ta.addEventListener('input',e=>EVANS[curEv]=e.target.value);
+  litMatrix();
+}
+const EVANS={};
+function litMatrix(){
+  const lit=new Set();
+  if(curEv>=0) EVENTS[curEv].steps.forEach((s,i)=>{ if(evState[i]?.done) lit.add(s.k); });
+  $('matrix2').querySelectorAll('.pad').forEach(p=>p.classList.toggle('lit',lit.has(p.dataset.k)));
+}
+
+/* ============ 답안 · 활동지 ============ */
+const QIDS=[['q0','세 권역의 층을 나누는 기준과 그 타당성'],
+            ['q1','위도별 에너지 불균형에도 적도가 계속 뜨거워지지 않는 까닭']];
+const EXQ=[['q-ozone','오존이 가장 많은 고도와 가장 뜨거운 고도가 다른 까닭 (자외선 세기와 공기 밀도)'],
+           ['q-lat','고위도에 수온 약층이 거의 없는 까닭, 그리고 혼합층이 중위도에서 가장 두꺼운 까닭'],
+           ['q-geo','지각에서 핵으로 갈수록 무거운 원소의 비율이 높아지는 까닭']];
+function allAnswers(){
+  const A=QIDS.map(([id,q])=>({q,a:($(id).value||'').trim(),lines:5}));
+  EXQ.forEach(([id,q])=>A.push({q, a:(EX[id]||'').trim(), lines:5}));
+  EVENTS.forEach((e,i)=>A.push({
+    q:`[${e.t}] 이런 피해를 줄이기 위한 사전 예방과 사후 대처 방안`,
+    a:(EVANS[i]||'').trim(), lines:5}));
+  return A;
+}
+function renderAnswers(){
+  const A=allAnswers(), done=A.filter(x=>x.a).length;
+  $('ans-wrap').innerHTML= done
+    ? A.map(x=>`<div class="ans-block"><div class="ans-q">${esc(x.q)}</div>
+        <div class="ans-a">${x.a?esc(x.a):'<span style="color:var(--dim);font-style:italic">아직 쓰지 않았습니다.</span>'}</div></div>`).join('')
+      +`<div style="font-size:.78rem;color:var(--dim);margin-top:8px;">
+         ${A.length}문항 중 <b style="color:var(--good)">${done}문항</b> 작성했습니다.</div>`
+    : '<div class="empty">아직 쓴 답이 없습니다.</div>';
+}
+function wsConfig(blank){
+  const chainRows=[];
+  EVENTS.forEach(e=>e.steps.forEach((s,j)=>{
+    const [f,t]=s.k.split('_');
+    chainRows.push([e.t, `${j+1}`, `${REG[f].n} → ${REG[t].n}`, IX[s.k].t]);
+  }));
+  return {
+    blank,
+    title:'지구 시스템 — 하나의 사건이 지구 전체를 흔든다',
+    subtitle:'통합과학1 · 시스템과 상호작용',
+    standard:'[10통과1-03-01] 지구 시스템은 태양계라는 시스템의 구성요소임을 알고, 지구 시스템을 구성하는 권역들 간의 물질 순환과 에너지 흐름의 결과로 나타나는 현상을 논증할 수 있다.',
+    who:($('who').value||'').trim(),
+    records:[
+      {h:'권역의 층 구조와 나누는 기준',type:'table',
+       head:['권역','층','나누는 기준'],
+       rows:[['기권','대류권 · 성층권 · 중간권 · 열권','높이에 따른 기온 변화'],
+             ['수권','혼합층 · 수온 약층 · 심해층','깊이에 따른 수온 변화'],
+             ['지권','지각 · 맨틀 · 외핵 · 내핵','지진파 속도의 급변']]},
+      {h:'지구 시스템의 세 에너지원',type:'table',
+       head:['에너지원','크기','일으키는 현상'],
+       rows:[['태양 복사','약 1.7 × 10^17 W','대기·해수 순환, 날씨, 풍화·침식, 광합성'],
+             ['지구 내부','약 4 × 10^13 W','맨틀 대류, 판 운동, 지진·화산'],
+             ['조력','약 3 × 10^12 W','밀물과 썰물']]},
+      {h:'사건별 연쇄 고리',type:'table',
+       head:['사건','단계','권역 이동','상호작용'], rows:chainRows, blankRows:8}
+    ],
+    answers: allAnswers(),
+    checks: Worksheet.collect.checks('#chk'),
+    summary: Worksheet.collect.summary('#page4 .cc')
+  };
+}
+Worksheet.mount('ws-actions', wsConfig,
+  ()=>(($('who').value||'이름없음').trim()+'_지구시스템'));
+</script>
+</body>
+</html>

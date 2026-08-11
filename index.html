@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="description" content="고등학교 지구과학·통합과학 탐구 활동 아카이브. 실제 데이터와 시뮬레이션으로 지구와 우주를 탐구합니다.">
+<title>창백한 푸른 점 — 지구과학 탐구 활동 아카이브</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="nav-left">
+    <button class="side-toggle" id="side-toggle" aria-label="목록 열기">☰ 목록</button>
+    <a class="logo" href="#home">
+      <span class="logo-dot" aria-hidden="true"></span>
+      <span class="logo-text">
+        <strong>The Pale Blue Dot</strong>
+        <em>지구과학 탐구 활동 아카이브</em>
+      </span>
+    </a>
+  </div>
+  <nav class="nav-links" aria-label="주요 메뉴">
+    <a href="#home" class="nav-link" data-nav="home">활동</a>
+    <a href="#info" class="nav-link" data-nav="info">사이트 소개</a>
+  </nav>
+</header>
+
+<div class="shell">
+
+  <!-- ───────── 사이드바 ───────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="side-head">
+      <div class="side-title">과목</div>
+      <div class="track-list" id="track-list"></div>
+    </div>
+    <div class="side-div"></div>
+    <div class="side-scroll" id="side-scroll"></div>
+    <div class="side-foot">
+      <a href="#info">사이트 소개 · 활용 안내 →</a>
+    </div>
+  </aside>
+  <div class="side-mask" id="side-mask"></div>
+
+  <!-- ───────── 콘텐츠 ───────── -->
+  <div class="content">
+
+    <!-- 홈: 과목 선택 -->
+    <section class="panel active" id="panel-home">
+      <div class="scrollpane"><div class="wrap">
+        <div class="hero">
+          <div class="hero-text">
+            <p class="hero-eyebrow">CARL SAGAN · PALE BLUE DOT</p>
+            <h1>교과서 밖으로 나온 지구과학</h1>
+            <p class="hero-quote">"현재까지 알려진 바로는, 지구는 생명을 간직할 수 있는 유일한 장소입니다."</p>
+            <p class="hero-desc">실제 관측 자료를 불러오고, 변수를 직접 바꾸고, 왜 그런지 설명해 보는 활동입니다.
+              모두 수업 시간에 바로 쓸 수 있도록 만들었고, 작성한 답안은 학습지로 저장할 수 있습니다.</p>
+          </div>
+          <div class="hero-globe" aria-hidden="true">
+            <div class="globe">
+              <span class="globe-face"></span><span class="globe-shade"></span>
+              <picture class="globe-gif">
+                <source srcset="images/earthturn_still.png" media="(prefers-reduced-motion: reduce)">
+                <img src="images/earthturn_600.gif" alt="" width="200" height="190" decoding="async"
+                     onerror="this.closest('.globe').classList.add('no-gif');this.parentNode.remove();">
+              </picture>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-head"><h2>과목을 고르세요</h2></div>
+        <p class="sec-sub">교육과정 과목별로 정리되어 있습니다. 과목을 고르면 그 안의 활동이 나옵니다.</p>
+        <div class="track-cards" id="track-cards"></div>
+
+        <div class="stat-row" id="stat-row"></div>
+      </div></div>
+    </section>
+
+    <!-- 과목별 활동 목록 -->
+    <section class="panel" id="panel-track">
+      <div class="scrollpane"><div class="wrap">
+        <a class="back-link" href="#home">← 과목 선택으로</a>
+        <div class="sec-head"><h2 id="track-title">과목</h2><span id="track-count"></span></div>
+        <p class="sec-sub" id="track-desc"></p>
+        <div class="card-grid" id="card-grid"></div>
+        <div id="soon-wrap" style="display:none">
+          <div class="sec-head" style="margin-top:30px"><h2>준비 중인 활동</h2></div>
+          <p class="sec-sub">센서 기반 탐구로 개발하고 있는 활동입니다.</p>
+          <div class="card-grid" id="soon-grid"></div>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- 활동 실행 -->
+    <section class="panel" id="panel-run">
+      <div class="run-bar">
+        <span class="badge" id="run-badge">과목</span>
+        <span class="rb-title" id="run-title">활동</span>
+        <span class="rb-spacer"></span>
+        <a class="btn-ghost" id="run-newtab" href="#" target="_blank" rel="noopener">새 탭에서 열기 ↗</a>
+        <a class="btn-ghost" id="run-back" href="#home">목록으로</a>
+      </div>
+      <div class="frame-wrap"><iframe id="content-frame" src="" title="활동 화면"></iframe></div>
+    </section>
+
+    <!-- 소개 -->
+    <section class="panel" id="panel-info">
+      <div class="scrollpane"><div class="wrap">
+        <div class="sec-head"><h2>사이트 소개</h2></div>
+        <p class="sec-sub">이 아카이브가 무엇을 위한 것이고 어떻게 쓰면 좋은지 정리했습니다.</p>
+
+        <div class="info-block">
+          <h3>무엇을 위한 곳인가</h3>
+          <p>지구과학은 실험실에서 재현하기 어려운 현상을 다룹니다. 별의 진화도, 판의 이동도,
+            대멸종도 교실에서 실험할 수 없습니다. 그래서 이 아카이브의 활동은
+            <b>실제 관측 자료를 불러와 학생이 직접 판단하게</b> 만드는 데 초점을 맞춥니다.</p>
+          <p>USGS 실시간 지진 자료로 판 경계를 찾고, 고생물 데이터베이스에서 화석의 생존 기간을 확인하고,
+            실제 해수면 온도로 엘니뇨를 판정합니다. 결과를 알려주는 대신
+            <b>증거를 주고 판정하게</b> 합니다.</p>
+        </div>
+
+        <div class="info-block">
+          <h3>수업에서 이렇게 쓰세요</h3>
+          <ul>
+            <li>활동마다 <b>탭 순서대로</b> 진행하면 한 편의 탐구가 됩니다. 마지막 탭은 언제나 총정리입니다.</li>
+            <li>답을 적는 칸은 모두 <b>학습지로 저장·인쇄</b>할 수 있습니다. 총정리 탭에서 학번·이름을 넣고 내려받으면 됩니다.</li>
+            <li>빈 활동지만 인쇄해 종이로 진행할 수도 있습니다.</li>
+            <li>인터넷이 끊기거나 학교 방화벽에 막혀도 <b>내장 자료로 대체</b>되어 수업이 멈추지 않습니다.</li>
+          </ul>
+        </div>
+
+        <div class="info-block">
+          <h3>자료 출처</h3>
+          <ul>
+            <li>지진 — USGS Earthquake Hazards Program</li>
+            <li>기상 — Open-Meteo (관측·예보·해양)</li>
+            <li>고생물 — The Paleobiology Database</li>
+            <li>지질 연대 — International Commission on Stratigraphy (2024/12)</li>
+            <li>기후 전망 — IPCC 제6차 평가보고서 · 기상청</li>
+            <li>위성 영상 — Esri World Imagery</li>
+          </ul>
+        </div>
+
+        <div class="info-block">
+          <h3>이름에 대하여</h3>
+          <p>1990년 보이저 1호가 60억 km 밖에서 찍은 지구는 하나의 흐릿한 점이었습니다.
+            칼 세이건은 그것을 <b>창백한 푸른 점</b>이라 불렀습니다.
+            지구과학을 배우는 일은 결국 그 점을 이해하는 일이라고 생각합니다.</p>
+        </div>
+      </div></div>
+    </section>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>화석과 지질 시대</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+:root{
+  --bg:#f5f8fc; --surface:#ffffff; --surface-2:#f1f5fa; --surface-3:#e6eef7;
+  --line:#e4eaf2; --line-2:#cfdbe8;
+  --text:#0b1420; --mid:#243141; --dim:#4a5a6b;
+  --accent:#0369a1; --warm:#9c5c00; --cool:#2563eb;
+  --good:#0b7d73; --bad:#dc2626; --violet:#7c3aed;
+  --pc:#8a5aa5; --pz:#3d8f74; --mz:#3f7fb8; --cz:#c08c1f;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',-apple-system,sans-serif;}
+body{background:var(--bg);color:var(--text);-webkit-text-size-adjust:100%;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+button{font:inherit;cursor:pointer;color:var(--text);}
+select,input,textarea{font:inherit;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.topbar{flex:0 0 54px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);}
+.topbar h1{font-size:.9rem;font-weight:800;letter-spacing:-.02em;white-space:nowrap;}
+.topbar h1 span{color:var(--accent);}
+.std{font-size:.66rem;color:var(--dim);background:var(--surface-2);border:1px solid var(--line);
+  padding:3px 8px;border-radius:5px;white-space:nowrap;}
+.tabs{display:flex;gap:3px;}
+.tab{padding:7px 12px;font-size:.79rem;font-weight:700;color:var(--dim);background:transparent;
+  border:1px solid transparent;border-radius:8px;transition:.15s;white-space:nowrap;}
+.tab:hover{color:var(--mid);background:var(--surface-2);}
+.tab.on{color:#ffffff;background:var(--accent);border-color:var(--accent);}
+.tab-n{opacity:.6;margin-right:4px;}
+
+.wrap{flex:1;min-height:0;}
+.page{display:none;height:100%;}
+.page.on{display:flex;}
+.scroll{overflow-y:auto;height:100%;width:100%;}
+.pane{padding:22px;max-width:1180px;margin:0 auto;}
+
+h2.sec{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+h3.sub3{font-size:.87rem;font-weight:800;margin:20px 0 7px;}
+p.sub{font-size:.82rem;color:var(--mid);line-height:1.75;margin-bottom:16px;word-break:keep-all;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.card+.card{margin-top:14px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr;}}
+label.lbl{display:block;font-size:.75rem;font-weight:700;color:var(--mid);margin-bottom:5px;
+  word-break:keep-all;line-height:1.6;}
+input[type=text],input[type=number],select,textarea{width:100%;padding:8px 10px;background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;color:var(--text);font-size:.85rem;}
+textarea{resize:vertical;min-height:64px;line-height:1.6;}
+.btn{padding:8px 14px;border:1px solid var(--line-2);border-radius:7px;background:var(--surface-2);
+  color:var(--text);font-size:.82rem;font-weight:700;transition:.15s;text-decoration:none;display:inline-block;}
+.btn:hover{background:var(--surface-3);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#ffffff;}
+.btn.sm{padding:5px 10px;font-size:.75rem;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.note{font-size:.76rem;color:var(--mid);line-height:1.75;word-break:keep-all;}
+.hl{color:var(--accent);font-weight:700;}
+.hl-w{color:var(--warm);font-weight:700;}
+.tagline{display:inline-block;font-size:.68rem;font-weight:800;padding:2px 7px;border-radius:5px;
+  background:var(--surface-3);color:var(--mid);border:1px solid var(--line-2);}
+.badge-live{display:inline-block;font-size:.66rem;font-weight:800;padding:3px 8px;border-radius:12px;}
+.badge-live.on{background:rgba(52,211,153,.15);color:var(--good);border:1px solid rgba(52,211,153,.45);}
+.badge-live.off{background:var(--surface-2);color:var(--dim);border:1px solid var(--line-2);}
+.badge-live.load{background:rgba(56,189,248,.13);color:var(--accent);border:1px solid rgba(56,189,248,.4);}
+
+table.dt{width:100%;border-collapse:collapse;font-size:.76rem;}
+table.dt th,table.dt td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:middle;}
+table.dt th{background:var(--surface-2);font-weight:700;color:var(--mid);white-space:nowrap;}
+table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+
+/* 분류 활동 */
+.sortwrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+@media(max-width:820px){.sortwrap{grid-template-columns:1fr;}}
+.bin{border:1px dashed var(--line-2);border-radius:10px;padding:12px;min-height:100px;background:var(--surface-2);}
+.bin h4{font-size:.8rem;font-weight:800;margin-bottom:8px;}
+.bin .items{display:flex;flex-wrap:wrap;gap:5px;}
+.itm{padding:6px 10px;font-size:.75rem;font-weight:700;border-radius:7px;
+  border:1px solid var(--line-2);background:var(--surface-3);color:var(--text);}
+.itm:hover:not(:disabled){border-color:var(--accent);}
+.itm.ok{background:var(--good);border-color:var(--good);color:#ffffff;}
+.itm.no{background:var(--bad);border-color:var(--bad);color:#ffffff;}
+.itm:disabled{cursor:default;}
+.pool{display:flex;flex-wrap:wrap;gap:5px;padding:12px;border-radius:10px;
+  background:var(--surface-2);border:1px solid var(--line);}
+
+.verdict{margin-top:11px;padding:11px 13px;border-radius:9px;font-size:.79rem;line-height:1.8;
+  display:none;word-break:keep-all;}
+.verdict.show{display:block;}
+.verdict.ok{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.4);}
+.verdict.no{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.4);}
+.verdict.info{background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.35);}
+
+/* 사진 */
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:11px;}
+.pcard{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;overflow:hidden;
+  cursor:pointer;transition:.15s;text-align:left;padding:0;color:var(--text);width:100%;}
+.pcard:hover{border-color:var(--accent);}
+.pcard .ph{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#f8fafc;}
+.pcard .cap{padding:8px 9px;}
+.pcard .cap b{font-size:.79rem;display:block;}
+.pcard .cap span{font-size:.67rem;color:var(--dim);}
+.modal{position:fixed;inset:0;background:rgba(11,20,32,.55);color:var(--text);display:none;place-items:center;z-index:60;padding:20px;}
+.modal.on{display:grid;}
+.mbox{max-width:860px;width:100%;max-height:90vh;overflow-y:auto;background:var(--surface);
+  border:1px solid var(--line-2);border-radius:14px;padding:18px;}
+.mbox h3{font-size:1rem;font-weight:800;margin-bottom:3px;}
+.mimgs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;}
+@media(max-width:700px){.mimgs{grid-template-columns:1fr;}}
+.mimgs figure{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;overflow:hidden;}
+.mimgs img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#f8fafc;}
+.mimgs figcaption{padding:6px 9px;font-size:.72rem;color:var(--mid);font-weight:700;}
+
+/* 2축 그래프 */
+.plotbox{position:relative;height:400px;background:var(--surface-2);border:1px solid var(--line-2);
+  border-radius:10px;margin:10px 0 4px;overflow:hidden;}
+.quad{position:absolute;font-size:.7rem;font-weight:800;padding:5px 8px;border-radius:6px;opacity:.85;}
+.pt{position:absolute;transform:translate(-50%,-50%);display:grid;place-items:center;
+  width:15px;height:15px;border-radius:50%;border:2px solid #ffffff;cursor:pointer;transition:.15s;}
+.pt:hover{transform:translate(-50%,-50%) scale(1.45);z-index:5;}
+.ptl{position:absolute;transform:translate(-50%,0);font-size:.66rem;font-weight:700;
+  white-space:nowrap;pointer-events:none;text-shadow:0 0 5px #f5f8fc,0 0 5px #f5f8fc;}
+.axl{position:absolute;font-size:.68rem;color:var(--dim);font-weight:700;}
+.gridln{position:absolute;background:rgba(45,63,92,.5);}
+
+/* 시간 막대 */
+.tlbar{position:relative;height:50px;border-radius:8px;overflow:hidden;border:1px solid var(--line-2);
+  background:var(--surface-2);}
+.tlseg{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:800;color:#ffffff;overflow:hidden;white-space:nowrap;
+  border-right:1px solid rgba(0,0,0,.35);cursor:pointer;}
+.tlseg:hover{filter:brightness(1.15);}
+.tlaxis{position:relative;height:20px;margin-top:2px;}
+.tlaxis span{position:absolute;top:0;font-size:.65rem;color:var(--dim);transform:translateX(-50%);white-space:nowrap;}
+.calout{margin-top:12px;padding:15px;border-radius:10px;background:linear-gradient(135deg,#e8f2fb,#f4f9fe);
+  border:1px solid var(--line-2);text-align:center;}
+.calout .big{font-size:1.45rem;font-weight:900;color:var(--warm);letter-spacing:-.02em;}
+.calout .small{font-size:.74rem;color:var(--dim);margin-top:4px;}
+.chiprow{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px;}
+.chip{padding:5px 9px;font-size:.72rem;font-weight:700;border-radius:20px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--mid);}
+.chip:hover{background:var(--surface-3);color:var(--text);}
+
+/* 지층 문제 */
+.stratq{display:grid;grid-template-columns:250px 1fr;gap:16px;}
+@media(max-width:820px){.stratq{grid-template-columns:1fr;}}
+.slayer{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:6px;margin-bottom:3px;
+  font-size:.75rem;font-weight:700;color:#ffffff;}
+.slayer .fos{display:flex;gap:4px;margin-left:auto;}
+.slayer .fos b{width:19px;height:19px;border-radius:4px;display:grid;place-items:center;
+  font-size:.68rem;background:rgba(4,18,31,.7);color:#fff;}
+.picker{display:flex;gap:5px;flex-wrap:wrap;}
+.pk{padding:6px 10px;font-size:.74rem;font-weight:700;border-radius:6px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--mid);}
+.pk:hover:not(:disabled){background:var(--surface-3);color:var(--text);}
+.pk.on{background:var(--accent);border-color:var(--accent);color:#ffffff;}
+.pk.ok{background:var(--good);border-color:var(--good);color:#ffffff;}
+.pk.no{background:var(--bad);border-color:var(--bad);color:#ffffff;}
+.pk:disabled{cursor:default;}
+
+/* 시대별 */
+.erabtns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.ebtn{padding:8px 14px;font-size:.8rem;font-weight:800;border-radius:8px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--mid);}
+.ebtn.on{color:#ffffff;}
+.erapanel .kv{display:grid;grid-template-columns:88px 1fr;gap:7px 10px;font-size:.79rem;line-height:1.75;}
+.erapanel .kv b{color:var(--mid);font-weight:700;}
+.erapanel .kv div{word-break:keep-all;}
+
+.ans-item{padding:11px 13px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);
+  margin-bottom:9px;}
+.ans-item .q{font-size:.77rem;font-weight:700;color:var(--mid);margin-bottom:5px;word-break:keep-all;}
+.ans-item .a{font-size:.81rem;line-height:1.75;white-space:pre-wrap;word-break:keep-all;}
+.ans-item .a.empty{color:var(--dim);font-style:italic;}
+.chk{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);}
+.chk:last-child{border-bottom:0;}
+.chk input{flex:0 0 auto;width:16px;height:16px;margin-top:2px;accent-color:var(--good);}
+.chk label{font-size:.8rem;line-height:1.65;word-break:keep-all;cursor:pointer;}
+.sumblk{padding:12px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);margin-bottom:10px;}
+.sumblk h4{font-size:.84rem;font-weight:800;margin-bottom:6px;color:var(--accent);}
+.sumblk p{font-size:.78rem;line-height:1.8;color:var(--mid);word-break:keep-all;margin-bottom:4px;}
+.srcs{font-size:.7rem;color:var(--mid);line-height:1.9;word-break:keep-all;}
+
+/* PBDB 설명 */
+.dbcard{background:linear-gradient(135deg,#f1f5fa,#f1f5fa);border:1px solid var(--line-2);
+  border-radius:12px;padding:16px;}
+.dbstat{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0 4px;}
+@media(max-width:760px){.dbstat{grid-template-columns:repeat(2,1fr);}}
+.dbstat div{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:9px;text-align:center;}
+.dbstat b{display:block;font-size:1.15rem;font-weight:900;color:var(--accent);letter-spacing:-.02em;}
+.dbstat span{font-size:.68rem;color:var(--dim);}
+
+/* 분포 지도 */
+#map{height:400px;border-radius:10px;border:1px solid var(--line-2);background:#f8fafc;}
+.leaflet-container{background:#f8fafc;}
+.maptools{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.fbtn{padding:5px 10px;font-size:.73rem;font-weight:700;border-radius:6px;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--mid);}
+.fbtn:hover:not(:disabled){background:var(--surface-3);color:var(--text);}
+.fbtn.on{color:#ffffff;}
+.latwrap{margin-top:12px;}
+.latrow{display:grid;grid-template-columns:74px 1fr 44px;gap:7px;align-items:center;margin-bottom:2px;}
+.latrow .lb{font-size:.68rem;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums;}
+.lattrack{height:14px;background:var(--surface-2);border-radius:3px;border:1px solid var(--line);overflow:hidden;}
+.latfill{display:block;height:100%;border-radius:2px;}
+.latrow .vn{font-size:.66rem;color:var(--dim);font-variant-numeric:tabular-nums;}
+.latband{font-size:.63rem;font-weight:800;padding:1px 5px;border-radius:4px;}
+
+/* ═══════════ 모바일 대응 ═══════════ */
+@supports (height:100dvh){ body{height:100dvh;} }
+@media(max-width:820px){
+  .topbar{flex:0 0 auto;height:auto;flex-wrap:wrap;padding:8px 12px;gap:6px 8px;}
+  .topbar h1{font-size:.82rem;order:1;flex:1 1 auto;white-space:normal;line-height:1.35;}
+  .std{order:2;font-size:.58rem;}
+  .tabs{order:3;flex:1 1 100%;max-width:none;overflow-x:auto;scrollbar-width:none;
+        padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .tabs::-webkit-scrollbar{height:0;}
+  .tab{flex:0 0 auto;padding:8px 11px;font-size:.75rem;}
+  .pane{padding:14px 12px 34px;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+
+  table.dt{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.dt tbody{display:table;width:100%;min-width:460px;}
+  table.dt th,table.dt td{padding:5px 6px;}
+  h2.sec{font-size:.98rem;}
+  p.sub{font-size:.79rem;}
+  textarea{min-height:76px;}
+  .btn,.btn.sm{padding:8px 12px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1>🦴 화석과 지질 시대 <span>— 돌에 남은 시간</span></h1>
+  <nav class="tabs">
+    <button class="tab on" data-tab="0"><span class="tab-n">0</span>화석이란</button>
+    <button class="tab" data-tab="1"><span class="tab-n">1</span>화석이 알려주는 것</button>
+    <button class="tab" data-tab="2"><span class="tab-n">2</span>지질 시대 나누기</button>
+    <button class="tab" data-tab="3"><span class="tab-n">3</span>시대별 환경과 생물</button>
+    <button class="tab" data-tab="4"><span class="tab-n">4</span>총정리</button>
+  </nav>
+  <div class="std">[10통과2-01-01]</div>
+</header>
+
+<div class="wrap">
+
+<!-- ══════ 0. 화석이란 ══════ -->
+<section class="page on" data-page="0"><div class="scroll"><div class="pane">
+  <h2 class="sec">화석이란 무엇인가</h2>
+  <p class="sub"><b class="hl">화석</b>은 지질 시대에 살았던 생물의 <b class="hl">유해나 흔적</b>이
+    지층 속에 남아 있는 것입니다. 지층은 대부분 <b class="hl">퇴적암</b>이므로, 화석은 주로 퇴적암에서 발견됩니다.</p>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">몸이 남으면 체화석, 흔적이 남으면 생흔화석</h3>
+    <p class="note" style="margin-bottom:6px">항목을 <b>한 번 누르면 체화석</b>, <b>다시 누르면 생흔화석</b>,
+      <b>한 번 더 누르면 원래 자리</b>로 돌아갑니다.</p>
+    <div class="pool" id="fkPool"></div>
+    <div class="sortwrap">
+      <div class="bin" data-bin="body"><h4>🦴 체화석 — 생물의 몸이 남은 것</h4><div class="items" id="binBody"></div></div>
+      <div class="bin" data-bin="trace"><h4>👣 생흔화석 — 생활한 흔적이 남은 것</h4><div class="items" id="binTrace"></div></div>
+    </div>
+    <div class="row" style="margin-top:11px">
+      <button class="btn sm primary" id="fkCheck">분류 확인</button>
+      <button class="btn sm" id="fkReset">다시</button>
+    </div>
+    <div class="verdict" id="fkVerdict"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">화석이 되려면</h3>
+    <p class="note" style="margin-bottom:10px">죽은 생물이 모두 화석이 되지는 않습니다. 어떤 조건이 유리할까요?
+      유리한 조건만 골라 보세요.</p>
+    <div class="picker" id="condPick"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn sm primary" id="condCheck">판정</button>
+      <button class="btn sm" id="condReset">다시</button>
+    </div>
+    <div class="verdict" id="condVerdict"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">실제 화석 보기</h3>
+    <p class="note" style="margin-bottom:11px">카드를 누르면 <b class="hl">살아 있을 때의 복원도</b>와
+      <b class="hl">실제 화석 사진</b>을 나란히 볼 수 있습니다. "이 돌이 저 생물이었다"를 눈으로 확인해 보세요.</p>
+    <div class="gal" id="galHost"></div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q0a">Q1. 공룡 발자국은 뼈가 아닌데도 화석입니다. 왜 화석이라고 할 수 있나요?
+      그리고 발자국 화석에서만 알 수 있는 것은 무엇일지 한 가지 써 보세요.</label>
+    <textarea id="q0a" data-q="Q1. 발자국이 화석인 이유와, 발자국에서만 알 수 있는 것"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q0b">Q2. 해파리처럼 몸이 부드러운 생물의 화석은 매우 드뭅니다.
+      화석이 되는 조건과 연결지어 이유를 설명하세요.</label>
+    <textarea id="q0b" data-q="Q2. 몸이 부드러운 생물의 화석이 드문 이유"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 1. 화석이 알려주는 것 ══════ -->
+<section class="page" data-page="1"><div class="scroll"><div class="pane">
+  <h2 class="sec">화석이 알려주는 것</h2>
+  <p class="sub">화석 하나에서 놀랄 만큼 많은 것을 읽어낼 수 있습니다. 그중에서도
+    <b class="hl">언제</b> 쌓인 지층인지, <b class="hl">어떤 환경</b>이었는지를 알려주는 두 종류의 화석이 특히 중요합니다.</p>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">화석으로 알 수 있는 여섯 가지</h3>
+    <div class="grid3" id="knowHost"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">표준화석과 시상화석</h3>
+    <div class="grid2">
+      <div style="padding:12px;border-radius:9px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3)">
+        <b style="color:var(--accent);font-size:.85rem">표준화석 — 시대를 알려준다</b>
+        <p class="note" style="margin-top:6px">분포 면적이 <b class="hl">넓고</b> 생존 기간이 <b class="hl">짧은</b> 화석.
+          짧은 기간에만 살았으니 그 화석이 나오면 시대가 좁혀지고, 널리 퍼져 있으니 멀리 떨어진 지층끼리 비교할 수 있습니다.</p>
+        <p class="note" style="margin-top:5px">삼엽충·갑주어·방추충 → 고생대 / 암모나이트·공룡 → 중생대 / 화폐석·매머드 → 신생대</p>
+      </div>
+      <div style="padding:12px;border-radius:9px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3)">
+        <b style="color:var(--warm);font-size:.85rem">시상화석 — 환경을 알려준다</b>
+        <p class="note" style="margin-top:6px">분포 면적이 <b class="hl-w">좁고</b> 생존 기간이 <b class="hl-w">긴</b> 화석.
+          특정 환경에서만 살기 때문에, 그 화석이 나오면 당시 그곳이 어떤 환경이었는지 알 수 있습니다.</p>
+        <p class="note" style="margin-top:5px">산호 → 따뜻하고 얕은 바다 / 고사리 → 따뜻하고 습한 육지 / 조개 → 얕은 바다·갯벌</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">두 축으로 갈라 보면</h3>
+    <p class="note" style="margin-bottom:10px">가로축은 <b>분포 면적</b>, 세로축은 <b>생존 기간</b>입니다.
+      두 종류의 화석은 정반대 자리에 놓입니다.</p>
+    <div id="conceptSvg"></div>
+  </div>
+
+  <div class="card dbcard">
+    <h3 class="sub3" style="margin-top:0">잠깐 — 고생물 데이터베이스(PBDB)가 뭔가요?</h3>
+    <p class="note">전 세계 고생물학자들이 논문에 발표한 <b class="hl">화석 발견 기록</b>을 한곳에 모아 둔
+      공개 자료 창고입니다. 정식 이름은 <b>The Paleobiology Database</b>, 줄여서 <b class="hl">PBDB</b>라고 부릅니다.</p>
+    <p class="note" style="margin-top:7px">기록 하나하나에는 <b>어떤 화석이</b> · <b>언제(어느 지질 시대에)</b> ·
+      <b>어디에서</b> 발견되었는지가 들어 있습니다. 우리가 이번 활동에서 쓸 것도 바로 이 <b class="hl">시기</b>와
+      <b class="hl">장소</b> 두 가지입니다.</p>
+    <div class="dbstat">
+      <div><b>1998년</b><span>시작한 해</span></div>
+      <div><b>138만+</b><span>화석 발견 기록</span></div>
+      <div><b>37만+</b><span>등록된 생물 종류</span></div>
+      <div><b>24개국</b><span>참여 연구자 400여 명</span></div>
+    </div>
+    <p class="note" style="margin-top:9px">누구나 무료로 볼 수 있게 공개되어 있습니다(CC BY).
+      즉, 아래 버튼을 누르면 여러분은 <b class="hl">교과서에 실린 요약본이 아니라 전 세계 연구자들이 쌓아 온 원래 자료</b>를
+      직접 들여다보게 됩니다. 지금 이 순간에도 새 화석이 발견되면 값이 갱신됩니다.</p>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:4px">
+      <h3 class="sub3" style="margin:0">① 언제 살았는가 — 생존 기간</h3>
+      <span class="badge-live off" id="pbdbBadge">내장 자료</span>
+    </div>
+    <p class="note" style="margin-bottom:10px">"생존 기간이 짧다"는 말이 정말인지 확인해 봅시다.
+      아래 막대는 각 화석이 <b class="hl">언제부터 언제까지</b> 살았는지를 나타냅니다.
+      전 세계 고생물학자들이 화석 산출 기록을 모아 만든 <b>고생물 데이터베이스(PBDB)</b>에서 직접 불러올 수도 있습니다.</p>
+    <div id="spanChart"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn sm primary" id="pbdbBtn">PBDB에서 실제 자료 불러오기</button>
+      <button class="btn sm" id="pbdbReset">내장 자료로 되돌리기</button>
+    </div>
+    <div class="verdict" id="pbdbMsg"></div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:4px">
+      <h3 class="sub3" style="margin:0">② 어디에서 발견되는가 — 분포</h3>
+      <span class="badge-live off" id="mapBadge">화석을 선택하세요</span>
+    </div>
+    <p class="note" style="margin-bottom:10px">화석 이름을 누르면 PBDB에 기록된 <b class="hl">실제 발견 장소</b>를
+      세계지도에 표시합니다. 암모나이트처럼 수만 건이 되는 화석은 최대 1만 건까지 받아, 가까운 지점끼리 묶어
+      <b class="hl">원 하나로</b> 나타냅니다. <b>원이 클수록 그곳에서 많이 발견되었다</b>는 뜻이고, 원에 마우스를 올리면 건수가 나옵니다.
+      <b>넓게 흩어져 있는지</b>, <b>특정 위도에 몰려 있는지</b>를 살펴보세요.</p>
+    <div class="maptools" id="mapBtns"></div>
+    <div class="row" style="margin-bottom:9px">
+      <button class="fbtn on" id="locNow" data-mode="now">현재 위치</button>
+      <button class="fbtn" id="locPaleo" data-mode="paleo">화석이 살던 당시 위치</button>
+      <span class="note" id="locHint" style="flex:1 1 200px">지금 그 화석이 나오는 자리입니다.</span>
+    </div>
+    <div id="map"></div>
+    <div class="verdict" id="mapMsg"></div>
+    <div class="latwrap" id="latHost"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">직접 나눠 보기</h3>
+    <p class="note" style="margin-bottom:6px">아래 화석을 표준화석과 시상화석으로 나누세요.</p>
+    <div class="pool" id="stPool"></div>
+    <div class="sortwrap">
+      <div class="bin" data-bin="index"><h4>🔵 표준화석 (시대 지시)</h4><div class="items" id="binIndex"></div></div>
+      <div class="bin" data-bin="facies"><h4>🟠 시상화석 (환경 지시)</h4><div class="items" id="binFacies"></div></div>
+    </div>
+    <div class="row" style="margin-top:11px">
+      <button class="btn sm primary" id="stCheck">분류 확인</button>
+      <button class="btn sm" id="stReset">다시</button>
+    </div>
+    <div class="verdict" id="stVerdict"></div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q1a">Q3. 어떤 지층에서 <b>산호 화석</b>과 <b>삼엽충 화석</b>이 함께 나왔습니다.
+      이 지층이 쌓일 당시의 시대와 환경을 각각 말하고, 어느 화석이 어느 정보를 주었는지 쓰세요.</label>
+    <textarea id="q1a" data-q="Q3. 산호와 삼엽충이 함께 나온 지층의 시대와 환경"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q1b">Q4. 조개는 지금도 살아 있습니다.
+      그런데도 조개 화석이 쓸모 있는 이유는 무엇인가요?</label>
+    <textarea id="q1b" data-q="Q4. 지금도 살아 있는 조개의 화석이 쓸모 있는 이유"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q1c">Q5. 지도에서 <b>매머드</b>와 <b>삼엽충</b>의 분포를 비교해 보세요.
+      매머드는 삼엽충보다 훨씬 좁은 지역에서만 나오는데도 표준화석으로 씁니다.
+      매머드 화석이 그 지역에 몰려 있는 이유와, 그래도 표준화석이 될 수 있는 까닭을 함께 생각해 쓰세요.</label>
+    <textarea id="q1c" data-q="Q5. 매머드의 분포가 좁은 이유와 그래도 표준화석인 까닭"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 2. 지질 시대 나누기 ══════ -->
+<section class="page" data-page="2"><div class="scroll"><div class="pane">
+  <h2 class="sec">지질 시대를 나누는 법</h2>
+  <p class="sub"><b class="hl">지질 시대</b>는 지구가 탄생한 약 46억 년 전부터 현재까지의 시간입니다.
+    이 긴 시간을 나누는 기준은 <b class="hl">생물의 급격한 변화</b>입니다.
+    지구 환경이 크게 바뀌면 생물이 크게 바뀌고, 그 흔적이 화석으로 남기 때문입니다.</p>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">네 개의 대(代)</h3>
+    <div class="tlbar" id="tlbar"></div>
+    <div class="tlaxis" id="tlaxis"></div>
+    <div class="verdict info" id="eraDetail" style="display:block;margin-top:10px">막대를 눌러 보세요.</div>
+    <table class="dt" id="ratiotbl" style="margin-top:12px"></table>
+    <p class="note" style="margin-top:8px">교과서와 같은 값(45.67억 · 5.41억 · 2.52억 · 0.66억 년)을 썼습니다.
+      국제층서위원회(ICS) 2024년 최신 값은 고생대 시작 5.388억 년, 중생대 시작 2.519억 년입니다.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">어떤 화석이 시대를 갈라 주는가</h3>
+    <p class="note" style="margin-bottom:11px">한 지역의 지층 A~G에서 화석 ㉠~㉣이 나왔습니다.
+      아래 그림에서 각 화석이 어느 층에서 나오는지 확인하고 물음에 답하세요.
+      <b class="hl">아래층일수록 먼저 쌓인 것</b>입니다.</p>
+    <div class="stratq">
+      <div id="stratCol"></div>
+      <div>
+        <div id="stratQs"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">46억 년을 1년으로 줄이면</h3>
+    <p class="note" style="margin-bottom:11px">1월 1일 0시에 지구가 탄생하고 12월 31일 24시가 지금이라고 해 봅시다.
+      이 달력에서 <b class="hl-w">1일 = 1,251만 년</b>, <b class="hl-w">1초 = 145년</b>입니다.</p>
+    <div class="row" style="align-items:flex-end">
+      <div style="flex:1 1 190px">
+        <label class="lbl" for="calin">연대 입력 (억 년 전)</label>
+        <input type="number" id="calin" value="0.66" step="any" min="0" max="45.67">
+      </div>
+      <button class="btn primary" id="calgo">달력으로 변환</button>
+    </div>
+    <div class="chiprow" id="calchips"></div>
+    <div class="calout" id="calout"></div>
+    <label class="lbl" style="margin-top:14px" for="q2a">Q6. 인류의 조상이 나타난 시각과 지구 탄생 사이의 간격을
+      이 달력으로 확인하고, 느낀 점을 쓰세요.</label>
+    <textarea id="q2a" data-q="Q6. 1년 달력에서 인류가 차지하는 시간과 느낀 점"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q2b">Q7. 선캄브리아 시대는 지질 시대의 약 88%를 차지하는데도
+      교과서에서 다루는 내용은 가장 적습니다. 화석과 연결지어 이유를 설명하세요.</label>
+    <textarea id="q2b" data-q="Q7. 선캄브리아 시대가 가장 길지만 알려진 것이 적은 이유"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 3. 시대별 환경과 생물 ══════ -->
+<section class="page" data-page="3"><div class="scroll"><div class="pane">
+  <h2 class="sec">시대별 환경과 생물</h2>
+  <p class="sub">각 대(代)마다 기후, 수륙 분포, 살던 생물이 달랐습니다.
+    버튼을 눌러 시대를 바꿔 가며 살펴보세요.</p>
+  <div class="erabtns" id="eraBtns"></div>
+  <div id="eraPanel"></div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">우리나라에서 나오는 화석</h3>
+    <table class="dt" id="korTbl"></table>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q3a">Q8. 중생대에는 빙하기가 없었고 신생대에는 여러 번의 빙하기가 있었습니다.
+      이런 기후 차이가 그 시대에 살던 생물에게 어떤 영향을 주었을지 추론해 쓰세요.</label>
+    <textarea id="q3a" data-q="Q8. 중생대와 신생대의 기후 차이가 생물에 준 영향"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q3b">Q9. 선캄브리아 시대에 남세균이 광합성을 시작한 것이
+      이후 육상 생물의 등장으로 이어졌습니다. 그 연결 고리를 순서대로 설명하세요.</label>
+    <textarea id="q3b" data-q="Q9. 광합성 → 산소 → 오존층 → 육상 진출의 연결"></textarea>
+  </div>
+</div></div></section>
+
+<!-- ══════ 4. 총정리 ══════ -->
+<section class="page" data-page="4"><div class="scroll"><div class="pane">
+  <h2 class="sec">활동 총정리</h2>
+  <p class="sub">작성한 답안과 활동 결과를 모았습니다. 확인한 뒤 학습지로 저장하거나 인쇄하세요.</p>
+  <div class="card"><h3 class="sub3" style="margin-top:0">활동 기록</h3><table class="dt" id="scoretbl"></table></div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">내가 쓴 답안</h3><div id="anshost"></div></div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">스스로 점검</h3><div id="chkhost"></div></div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">핵심 정리</h3><div id="summaryhost"></div></div>
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">학습지 저장 · 인쇄</h3>
+    <div style="max-width:280px;margin-bottom:12px">
+      <label class="lbl" for="whoName">학번 · 이름</label>
+      <input type="text" id="whoName" placeholder="예: 10512 김지구">
+    </div>
+    <div id="ws-actions"></div>
+  </div>
+  <div class="card"><h3 class="sub3" style="margin-top:0">자료 출처</h3>
+    <div class="srcs">
+      · 지질 연대 — International Commission on Stratigraphy, <i>International Chronostratigraphic Chart</i> v2024/12<br>
+      · 화석 산출 자료 — The Paleobiology Database (paleobiodb.org)<br>
+      · 화석 사진 — 활동 폴더 내 images/
+    </div>
+  </div>
+</div></div></section>
+
+</div>
+
+<div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="worksheet.js?v=7"></script>
+<script>
+/* ══════════════ 공통 ══════════════ */
+const EARTH = 45.67;   // 억 년
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    document.querySelector('.page[data-page="'+t.dataset.tab+'"]').classList.add('on');
+    if(t.dataset.tab==='1' && window.map) setTimeout(()=>window.map.invalidateSize(),60);
+    if(t.dataset.tab==='4') renderSummaryTab();
+  });
+});
+const esc = s => String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+
+/* ══════════════ 탭 0 ══════════════ */
+const FKINDS = [
+  {t:'공룡 뼈',            k:'body'}, {t:'조개 껍데기',      k:'body'},
+  {t:'상어 이빨',          k:'body'}, {t:'나뭇잎 자국',      k:'body'},
+  {t:'호박 속 곤충',       k:'body'}, {t:'빙하 속 매머드',   k:'body'},
+  {t:'규화목(나무가 돌로)', k:'body'},
+  {t:'공룡 발자국',        k:'trace'},{t:'배설물(분화석)',   k:'trace'},
+  {t:'기어간 자국',        k:'trace'},{t:'조개가 뚫은 구멍', k:'trace'},
+  {t:'벌레가 판 굴',       k:'trace'},{t:'공룡 알 둥지 자국',k:'trace'}
+];
+let fkPlaced = {};   // idx -> 'body'|'trace'
+function drawFK(done){
+  const pool = document.getElementById('fkPool');
+  pool.innerHTML = FKINDS.map((f,i)=> fkPlaced[i]?'':
+    '<button class="itm" data-i="'+i+'">'+f.t+'</button>').join('') ||
+    '<span class="note">모두 분류했습니다.</span>';
+  ['body','trace'].forEach(k=>{
+    const host = document.getElementById(k==='body'?'binBody':'binTrace');
+    host.innerHTML = FKINDS.map((f,i)=>{
+      if(fkPlaced[i]!==k) return '';
+      let c='itm';
+      if(done) c += (f.k===k?' ok':' no');
+      return '<button class="'+c+'" data-i="'+i+'"'+(done?' disabled':'')+'>'+f.t+'</button>';
+    }).join('');
+  });
+}
+/* 풀 → 체화석 → 생흔화석 → 풀 순으로 한 번씩 눌러 옮깁니다 */
+function fkMove(i,to){
+  if(to) fkPlaced[i]=to; else delete fkPlaced[i];
+  document.getElementById('fkVerdict').className='verdict';
+  drawFK(false);
+}
+document.getElementById('fkPool').addEventListener('click',e=>{
+  const b=e.target.closest('.itm'); if(!b) return; fkMove(+b.dataset.i,'body');
+});
+document.getElementById('binBody').addEventListener('click',e=>{
+  const b=e.target.closest('.itm'); if(!b||b.disabled) return; fkMove(+b.dataset.i,'trace');
+});
+document.getElementById('binTrace').addEventListener('click',e=>{
+  const b=e.target.closest('.itm'); if(!b||b.disabled) return; fkMove(+b.dataset.i,null);
+});
+document.getElementById('fkCheck').addEventListener('click',()=>{
+  const v=document.getElementById('fkVerdict');
+  const placed=Object.keys(fkPlaced).length;
+  if(placed<FKINDS.length){
+    v.className='verdict no show';
+    v.innerHTML='아직 <b>'+(FKINDS.length-placed)+'개</b>가 남았습니다. 위 목록에서 눌러 옮기세요.';
+    return;
+  }
+  drawFK(true);
+  const wrong=FKINDS.filter((f,i)=>fkPlaced[i]!==f.k);
+  fkScore = wrong.length===0 ? 1 : 0;
+  v.className='verdict '+(wrong.length?'no':'ok')+' show';
+  v.innerHTML = (wrong.length? '<b>'+wrong.length+'개가 틀렸습니다.</b> ' : '<b>모두 맞혔습니다.</b> ')+
+    '<br><br><b>체화석</b>은 생물의 몸(뼈·껍데기·이빨·잎)이 남은 것입니다. 호박 속 곤충이나 빙하 속 매머드처럼 '+
+    '몸 전체가 그대로 보존되기도 합니다. 규화목도 나무의 몸이 광물로 바뀐 것이니 체화석입니다.<br>'+
+    '<b>생흔화석</b>은 몸이 아니라 <b>살아가며 남긴 흔적</b>입니다. 발자국, 배설물, 기어간 자국, 뚫은 구멍, 판 굴이 여기 속합니다. '+
+    '생흔화석은 몸의 생김새는 알려주지 못하지만, <b>그 생물이 어떻게 움직이고 무엇을 먹었는지</b>를 알려줍니다.';
+});
+document.getElementById('fkReset').addEventListener('click',()=>{
+  fkPlaced={}; fkScore=0; document.getElementById('fkVerdict').className='verdict'; drawFK(false);
+});
+let fkScore=0;
+drawFK(false);
+
+/* 화석화 조건 */
+const CONDS = [
+  {t:'뼈·껍데기 같은 단단한 부분이 있다', ok:true,  w:'살은 금방 썩지만 단단한 부분은 오래 남습니다.'},
+  {t:'죽은 뒤 빠르게 묻힌다',            ok:true,  w:'공기에 오래 노출되면 썩거나 부서집니다.'},
+  {t:'개체 수가 많다',                   ok:true,  w:'수가 많을수록 그중 하나가 화석이 될 확률이 높아집니다.'},
+  {t:'입자가 고운 퇴적물에 묻힌다',      ok:true,  w:'고운 입자일수록 세밀한 모습까지 남습니다.'},
+  {t:'몸이 부드럽고 말랑하다',           ok:false, w:'반대입니다. 해파리·지렁이의 화석이 드문 이유입니다.'},
+  {t:'죽은 자리에 오래 놓여 있다',       ok:false, w:'반대입니다. 그동안 썩거나 다른 생물에게 먹힙니다.'},
+  {t:'몸집이 아주 크다',                 ok:false, w:'관계없습니다. 방추충과 화폐석은 아주 작지만 화석이 많습니다.'},
+  {t:'화산 활동이 활발한 곳에 산다',     ok:false, w:'오히려 불리합니다. 높은 열은 화석을 파괴합니다.'}
+];
+let condPick=new Set(), condScore=0;
+function drawCond(done){
+  document.getElementById('condPick').innerHTML = CONDS.map((c,i)=>{
+    let cls='pk';
+    if(done){ if(condPick.has(i)) cls+= (c.ok?' ok':' no'); else if(c.ok) cls+=' no'; }
+    else if(condPick.has(i)) cls+=' on';
+    return '<button class="'+cls+'" data-i="'+i+'"'+(done?' disabled':'')+'>'+c.t+'</button>';
+  }).join('');
+}
+drawCond(false);
+document.getElementById('condPick').addEventListener('click',e=>{
+  const b=e.target.closest('.pk'); if(!b||b.disabled) return;
+  const i=+b.dataset.i; condPick.has(i)?condPick.delete(i):condPick.add(i);
+  document.getElementById('condVerdict').className='verdict'; drawCond(false);
+});
+document.getElementById('condCheck').addEventListener('click',()=>{
+  drawCond(true);
+  const right=CONDS.filter((c,i)=>c.ok===condPick.has(i)).length;
+  condScore = right===CONDS.length?1:0;
+  const v=document.getElementById('condVerdict');
+  v.className='verdict '+(condScore?'ok':'no')+' show';
+  v.innerHTML=(condScore?'<b>모두 맞혔습니다.</b>':'<b>초록이 정답, 빨강이 오답입니다.</b>')+'<br><br>'+
+    CONDS.map(c=>'· <b>'+c.t+'</b> — '+c.w).join('<br>');
+});
+document.getElementById('condReset').addEventListener('click',()=>{
+  condPick.clear(); condScore=0;
+  document.getElementById('condVerdict').className='verdict'; drawCond(false);
+});
+
+/* 사진 갤러리 */
+const PHOTOS = [
+  {id:'stromatolite', n:'스트로마톨라이트', era:'선캄브리아 시대', kind:'체화석',
+   d:'남세균이 얕은 바다에서 층층이 쌓여 만든 돌기둥입니다. 남세균의 광합성으로 바다와 대기에 산소가 쌓이기 시작했고, 그 결과가 뒷날 오존층과 육상 생물로 이어집니다. 약 35억 년 전 것까지 발견됩니다.'},
+  {id:'ediacara', n:'에디아카라 동물군', era:'선캄브리아 시대 말', kind:'체화석',
+   d:'약 6억 년 전, 단단한 껍데기가 없는 납작한 다세포 생물들입니다. 몸이 부드러워 화석이 드물게 남았습니다. 최초의 다세포 동물 화석군으로 꼽힙니다.'},
+  {id:'trilobite', n:'삼엽충', era:'고생대', kind:'체화석 · 표준화석',
+   d:'몸이 세로로 세 갈래로 나뉘어 삼엽충입니다. 캄브리아기에 나타나 고생대 내내 바다에 번성하다가 고생대 말 대멸종으로 완전히 사라졌습니다. 고생대의 대표 표준화석입니다.'},
+  {id:'brachiopod', n:'완족류', era:'고생대 번성 (현재도 생존)', kind:'체화석',
+   d:'조개처럼 보이지만 다른 무리입니다. 고생대에 크게 번성했고 지금도 살아 있습니다. 지금도 살아 있기 때문에 시대를 좁혀주지 못해 표준화석으로는 쓰지 않습니다.'},
+  {id:'graptolite', n:'필석', era:'고생대 전기', kind:'체화석 · 표준화석', single:true,
+   d:'톱니 모양으로 생긴 군체 생물입니다. 바다에 떠다니며 넓게 퍼졌고 형태가 빠르게 바뀌어, 고생대 전기 지층을 맞추는 데 매우 유용합니다.'},
+  {id:'ostracoderm', n:'갑주어', era:'고생대 (데본기 번성)', kind:'체화석 · 표준화석', single:true,
+   d:'턱이 없고 머리에 단단한 갑옷을 두른 원시 어류입니다. 데본기에 번성해 이 시기를 "어류의 시대"라 부르게 했고, 고생대 말 이전에 사라졌습니다.'},
+  {id:'ammonite', n:'암모나이트', era:'중생대', kind:'체화석 · 표준화석',
+   d:'나선형 껍데기를 가진 바다 연체동물입니다. 종류가 매우 빠르게 바뀌어 중생대 지층의 시대를 세밀하게 나누는 데 쓰입니다. 중생대 말 대멸종으로 사라졌습니다.'},
+  {id:'dino_tracks', n:'공룡 발자국', era:'중생대', kind:'생흔화석',
+   d:'몸이 아니라 걸어간 흔적이 굳은 것입니다. 발자국의 크기·보폭·방향으로 공룡의 몸집과 걷는 속도, 무리 생활 여부까지 추정할 수 있습니다. 우리나라 경상도 일대에 세계적인 산지가 있습니다.'},
+  {id:'dinosaur', n:'공룡', era:'중생대', kind:'체화석 · 표준화석', single:true,
+   d:'중생대 육상을 지배한 파충류입니다. 중생대 말 대멸종으로 대부분 사라졌지만, 한 갈래가 살아남아 오늘날의 새가 되었습니다.'},
+  {id:'crurotarsi', n:'원시 악어류', era:'중생대 초기', kind:'체화석', single:true,
+   d:'트라이아스기에 공룡과 함께 번성한 파충류 무리입니다. 트라이아스기 말 대멸종으로 크게 줄었고, 그 빈자리를 공룡이 채우며 쥐라기에 번성하게 됩니다.'},
+  {id:'nummulites', n:'화폐석', era:'신생대 전기', kind:'체화석 · 표준화석',
+   d:'동전처럼 생긴 큰 단세포 생물(유공충)입니다. 신생대 전기 따뜻한 바다에 엄청나게 많아, 이집트 피라미드의 석회암에도 들어 있습니다.'},
+  {id:'mammoth', n:'매머드', era:'신생대 후기', kind:'체화석 · 표준화석',
+   d:'털이 길게 난 코끼리 무리로 빙하기의 추운 초원에 살았습니다. 시베리아 얼음 속에서 살과 털까지 그대로 남은 개체가 발견되기도 합니다.'}
+];
+function drawGallery(){
+  document.getElementById('galHost').innerHTML = PHOTOS.map(p=>{
+    const src = p.single ? 'images/'+p.id+'.jpeg' : 'images/'+p.id+'_restore.jpeg';
+    return '<button class="pcard" data-id="'+p.id+'">'+
+      '<img class="ph" src="'+src+'" alt="'+p.n+'" loading="lazy" '+
+      'onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\');">'+
+      '<div class="cap"><b>'+p.n+'</b><span>'+p.era+'</span></div></button>';
+  }).join('');
+}
+drawGallery();
+function openPhoto(id){
+  const p=PHOTOS.find(x=>x.id===id); if(!p) return;
+  const imgs = p.single
+    ? '<figure><img src="images/'+p.id+'.jpeg" alt="'+p.n+'" onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')"><figcaption>'+p.n+'</figcaption></figure>'
+    : '<figure><img src="images/'+p.id+'_restore.jpeg" alt="복원도" onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')"><figcaption>살아 있을 때의 모습 (복원도)</figcaption></figure>'+
+      '<figure><img src="images/'+p.id+'_real.jpeg" alt="실제 화석" onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')"><figcaption>실제 화석</figcaption></figure>';
+  document.getElementById('mbox').innerHTML =
+    '<div class="row" style="justify-content:space-between"><h3>'+p.n+'</h3>'+
+    '<button class="btn sm" id="mClose">닫기 ✕</button></div>'+
+    '<div class="note" style="margin-top:2px"><b>'+p.era+'</b> · '+p.kind+'</div>'+
+    '<div class="mimgs">'+imgs+'</div>'+
+    '<p class="note">'+p.d+'</p>';
+  document.getElementById('modal').classList.add('on');
+}
+document.getElementById('galHost').addEventListener('click',e=>{
+  const b=e.target.closest('.pcard'); if(b) openPhoto(b.dataset.id);
+});
+document.getElementById('modal').addEventListener('click',e=>{
+  if(e.target.id==='modal'||e.target.id==='mClose')
+    document.getElementById('modal').classList.remove('on');
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.getElementById('modal').classList.remove('on');
+});
+
+/* ══════════════ 탭 1 ══════════════ */
+const KNOWS = [
+  {i:'🦕', h:'가. 과거 생물의 생김새', d:'뼈나 껍데기의 모양에서 그 생물이 어떻게 생겼는지 복원할 수 있습니다.'},
+  {i:'🧬', h:'나. 생물의 진화 과정', d:'아래층에서 위층으로 갈수록 화석이 조금씩 달라지는 모습에서 진화의 흐름을 읽습니다.'},
+  {i:'🌡️', h:'다. 서식 환경과 시대', d:'어떤 화석이 나오는지에 따라 그곳이 어떤 환경이었고 언제 쌓인 지층인지 알 수 있습니다. — 시상화석 · 표준화석'},
+  {i:'🗺️', h:'라. 과거 수륙 분포', d:'지금은 바다인 곳에서 육상 생물 화석이 나오면, 그때는 그곳이 육지였다는 뜻입니다.'},
+  {i:'❄️', h:'마. 과거 기후 변화', d:'산호 화석은 따뜻한 바다를, 매머드 화석은 추운 기후를 알려줍니다.'},
+  {i:'🛢️', h:'바. 지하자원 탐사', d:'유공충 같은 미생물이 대량으로 쌓인 지층은 석유가 만들어지는 조건과 겹칩니다. 그래서 화석은 자원 탐사의 단서가 됩니다.'}
+];
+document.getElementById('knowHost').innerHTML = KNOWS.map(k=>
+  '<div style="padding:12px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line)">'+
+  '<div style="font-size:1.3rem;margin-bottom:4px">'+k.i+'</div>'+
+  '<b style="font-size:.8rem;display:block;margin-bottom:4px">'+k.h+'</b>'+
+  '<span class="note">'+k.d+'</span></div>').join('');
+
+/* 개념 2축 그림 */
+document.getElementById('conceptSvg').innerHTML = `
+<svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+  <rect x="70" y="20" width="450" height="230" fill="#f1f5fa" stroke="#cfdbe8"/>
+  <line x1="295" y1="20" x2="295" y2="250" stroke="#cfdbe8" stroke-dasharray="4 4"/>
+  <line x1="70" y1="135" x2="520" y2="135" stroke="#cfdbe8" stroke-dasharray="4 4"/>
+  <rect x="70" y="20" width="225" height="115" fill="rgba(245,158,11,.13)"/>
+  <rect x="295" y="135" width="225" height="115" fill="rgba(56,189,248,.13)"/>
+  <text x="182" y="72" text-anchor="middle" font-size="17" font-weight="900" fill="#9c5c00">시상화석</text>
+  <text x="182" y="94" text-anchor="middle" font-size="11.5" fill="#243141">분포 좁음 · 생존 기간 긺</text>
+  <text x="182" y="112" text-anchor="middle" font-size="11" fill="#4a5a6b">산호 · 고사리 · 조개</text>
+  <text x="407" y="187" text-anchor="middle" font-size="17" font-weight="900" fill="#03699f">표준화석</text>
+  <text x="407" y="209" text-anchor="middle" font-size="11.5" fill="#243141">분포 넓음 · 생존 기간 짧음</text>
+  <text x="407" y="227" text-anchor="middle" font-size="11" fill="#4a5a6b">삼엽충 · 암모나이트 · 화폐석</text>
+  <line x1="70" y1="250" x2="70" y2="20" stroke="#243141" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="70" y1="250" x2="520" y2="250" stroke="#243141" stroke-width="2" marker-end="url(#ah)"/>
+  <defs><marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto">
+    <path d="M0,0 L7,3.2 L0,6.4 z" fill="#243141"/></marker></defs>
+  <text x="34" y="140" font-size="12.5" font-weight="800" fill="#0b1420">생<tspan x="34" dy="16">존</tspan><tspan x="34" dy="16">기</tspan><tspan x="34" dy="16">간</tspan></text>
+  <text x="295" y="277" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0b1420">분포 면적 →</text>
+  <text x="78" y="34" font-size="10.5" fill="#4a5a6b">긺</text>
+  <text x="78" y="244" font-size="10.5" fill="#4a5a6b">짧음</text>
+</svg>`;
+
+/* 생존 기간 실측 차트 */
+const SPAN_MAX = 560;
+const FDATA = [
+  {n:'삼엽충',      taxon:'Trilobita',    kind:'index',  a:521,   z:251.9, c:'#3d8f74'},
+  {n:'필석',        taxon:'Graptolithina',kind:'index',  a:486,   z:319,   c:'#35806a'},
+  {n:'갑주어',      taxon:'Osteostraci',  kind:'index',  a:451,   z:359,   c:'#4aa88c'},
+  {n:'방추충',      taxon:'Fusulinida',   kind:'index',  a:340,   z:251.9, c:'#2f7a63'},
+  {n:'암모나이트',  taxon:'Ammonoidea',   kind:'index',  a:409,   z:66,    c:'#3f7fb8'},
+  {n:'공룡',        taxon:'Ornithischia', kind:'index',  a:233,   z:66,    c:'#3070a8'},
+  {n:'화폐석',      taxon:'Nummulites',   kind:'index',  a:56,    z:34,    c:'#c08c1f'},
+  {n:'매머드',      taxon:'Mammuthus',    kind:'index',  a:5,     z:0.004, c:'#a8761f'},
+  {n:'산호',        taxon:'Scleractinia', kind:'facies', a:247,   z:0,     c:'#9c5c00'},
+  {n:'조개',        taxon:'Bivalvia',     kind:'facies', a:520,   z:0,     c:'#d98a3c'},
+  {n:'완족류',      taxon:'Brachiopoda',  kind:'facies', a:538.8, z:0,     c:'#bf7434'}
+];
+let spanLive = null;   // PBDB 결과 저장
+
+function drawSpanChart(){
+  const X = v => (SPAN_MAX - Math.min(v,SPAN_MAX))/SPAN_MAX*100;
+  const ERAS_S = [
+    {n:'고생대', a:541,  z:252, c:'#3d8f74'},
+    {n:'중생대', a:252,  z:66,  c:'#3f7fb8'},
+    {n:'신생대', a:66,   z:0,   c:'#c08c1f'}
+  ];
+  let band = '<div style="position:relative;height:17px;margin-left:96px;margin-right:104px;'+
+    'border-radius:4px;overflow:hidden;border:1px solid var(--line)">';
+  band += '<div style="position:absolute;left:0;width:'+X(541)+'%;top:0;bottom:0;background:#8a5aa5;'+
+    'display:grid;place-items:center;font-size:.6rem;font-weight:800;color:#ffffff">선캄브리아</div>';
+  ERAS_S.forEach(e=>{
+    const l=X(e.a), w=X(e.z)-X(e.a);
+    band += '<div style="position:absolute;left:'+l+'%;width:'+w+'%;top:0;bottom:0;background:'+e.c+
+      ';display:grid;place-items:center;font-size:.6rem;font-weight:800;color:#ffffff">'+(w>7?e.n:'')+'</div>';
+  });
+  band += '</div>';
+
+  let rows='';
+  FDATA.forEach(f=>{
+    const live = spanLive && spanLive[f.taxon];
+    const a = live ? live.a : f.a, z = live ? live.z : f.z;
+    const over = a > SPAN_MAX;
+    const l = X(a), w = Math.max(X(z)-X(a), 0.8);
+    const dur = a - z;
+    const tag = f.kind==='index' ? '🔵' : '🟠';
+    rows += '<div style="display:grid;grid-template-columns:96px 1fr 104px;gap:8px;align-items:center;margin-bottom:5px">'+
+      '<div style="font-size:.75rem;font-weight:700;white-space:nowrap">'+tag+' '+f.n+'</div>'+
+      '<div style="position:relative;height:18px;background:var(--surface-2);border-radius:4px;'+
+        'border:1px solid var(--line);overflow:hidden">'+
+        '<span style="position:absolute;display:block;top:0;bottom:0;left:'+l+'%;width:'+w+'%;'+
+        'background:'+f.c+';border-radius:3px"></span>'+
+        (over?'<span style="position:absolute;left:2px;top:1px;font-size:.6rem;color:#ffffff;font-weight:900">◀</span>':'')+
+        (z<=0.01?'<span style="position:absolute;right:2px;top:1px;font-size:.6rem;color:#ffffff;font-weight:900">▶현생</span>':'')+
+      '</div>'+
+      '<div style="font-size:.7rem;text-align:right;color:var(--dim);font-variant-numeric:tabular-nums">'+
+        (over?'약 ':'')+Math.round(dur).toLocaleString()+' Ma</div></div>';
+  });
+
+  let axis='<div style="position:relative;height:24px;margin-left:96px;margin-right:104px">';
+  [560,400,300,200,100,0].forEach(t=>{
+    axis += '<i style="position:absolute;display:block;left:'+X(t)+'%;top:0;width:1px;height:5px;background:var(--line-2)"></i>'+
+      '<span style="position:absolute;left:'+X(t)+'%;top:6px;font-size:.62rem;color:var(--dim);transform:translateX(-50%)">'+
+      (t===0?'현재':t)+'</span>';
+  });
+  axis+='</div>';
+
+  document.getElementById('spanChart').innerHTML = band + '<div style="height:6px"></div>' + rows + axis +
+    '<div class="note" style="margin-top:6px">🔵 표준화석 후보 · 🟠 시상화석 후보 · 가로축 단위는 Ma(백만 년 전)입니다. '+
+    '막대가 <b>짧을수록</b>, 그리고 <b>현재까지 이어지지 않을수록</b> 시대를 좁혀 주는 좋은 표준화석입니다.</div>'+
+    '<div class="verdict info show" style="margin-top:10px">'+
+    '<b>막대를 보고 이상한 점을 찾았나요?</b><br>'+
+    '삼엽충(269 Ma)과 암모나이트(343 Ma)의 막대가 시상화석인 산호(247 Ma)보다 오히려 <b>깁니다</b>. '+
+    '그래도 이들이 표준화석인 이유는 두 가지입니다.<br>'+
+    '① <b>현재까지 이어지지 않습니다.</b> 산호·조개·완족류의 막대는 오른쪽 끝(현재)에 닿아 있습니다. '+
+    '지금도 살아 있으면 그 화석이 나와도 "언제인지"를 좁힐 수 없습니다.<br>'+
+    '② 위 막대는 <b>무리 전체</b>의 기간입니다. 실제로는 그 안에서 종류가 계속 바뀌었고, '+
+    '<b>종류 하나하나의 생존 기간은 훨씬 짧습니다</b>. 고생물학자는 이 세밀한 종류로 지층의 시대를 아주 좁게 찍어냅니다.</div>';
+}
+drawSpanChart();
+
+/* PBDB 조회 */
+const PBDB_URL = t => 'https://paleobiodb.org/data1.2/taxa/single.json?name='+
+  encodeURIComponent(t)+'&show=app&vocab=pbdb';
+function fetchWithTimeout(url, ms){
+  return new Promise((res,rej)=>{
+    const t=setTimeout(()=>rej(new Error('timeout')), ms);
+    fetch(url).then(r=>{clearTimeout(t); r.ok?res(r.json()):rej(new Error('HTTP '+r.status));})
+              .catch(e=>{clearTimeout(t); rej(e);});
+  });
+}
+document.getElementById('pbdbBtn').addEventListener('click',async()=>{
+  const badge=document.getElementById('pbdbBadge'), msg=document.getElementById('pbdbMsg');
+  const btn=document.getElementById('pbdbBtn');
+  badge.className='badge-live load'; badge.textContent='불러오는 중…';
+  btn.disabled=true;
+  msg.className='verdict info show'; msg.innerHTML='고생물 데이터베이스에 '+FDATA.length+'건을 요청하고 있습니다…';
+  const got={}; let fail=0; const notes=[];
+  await Promise.all(FDATA.map(async f=>{
+    try{
+      const j = await fetchWithTimeout(PBDB_URL(f.taxon), 9000);
+      const r = j && j.records && j.records[0];
+      if(!r) throw new Error('no record');
+      const a = r.firstapp_max_ma ?? r.firstapp_min_ma;
+      const z = r.lastapp_min_ma ?? r.lastapp_max_ma;
+      if(a==null || z==null) throw new Error('no age');
+      got[f.taxon] = {a:+a, z:+z, n:r.n_occs};
+    }catch(e){ fail++; }
+  }));
+  btn.disabled=false;
+  if(Object.keys(got).length===0){
+    badge.className='badge-live off'; badge.textContent='내장 자료';
+    msg.className='verdict no show';
+    msg.innerHTML='<b>데이터베이스에 연결하지 못했습니다.</b><br>'+
+      '학교 방화벽이나 인터넷 연결 문제일 수 있습니다. '+
+      '아래 막대는 <b>미리 넣어 둔 검증된 자료</b>이므로 활동은 그대로 진행하면 됩니다.';
+    return;
+  }
+  spanLive = got;
+  drawSpanChart();
+  badge.className='badge-live on'; badge.textContent='PBDB 실시간 자료';
+  const dino = got['Ornithischia'];
+  let extra = '';
+  if(got['Brachiopoda'] && got['Brachiopoda'].z <= 1)
+    extra += '<br>· <b>완족류</b>의 막대가 현재까지 이어집니다. 지금도 살아 있다는 뜻이고, 그래서 표준화석이 될 수 없습니다.';
+  if(got['Trilobita'])
+    extra += '<br>· <b>삼엽충</b>의 막대는 고생대 안에서 끝납니다. 실제 자료가 "고생대의 표준화석"임을 확인해 줍니다.';
+  msg.className='verdict ok show';
+  msg.innerHTML='<b>'+Object.keys(got).length+'건을 불러왔습니다.</b>'+(fail?' ('+fail+'건 실패)':'')+
+    '<br>전 세계 고생물학자들이 실제 화석 산출 기록에서 정리한 최초·최후 출현 시기입니다. '+
+    '내장 자료와 조금 다를 수 있는데, 새로운 화석이 발견되면 값이 갱신되기 때문입니다.'+extra;
+});
+document.getElementById('pbdbReset').addEventListener('click',()=>{
+  spanLive=null; drawSpanChart();
+  document.getElementById('pbdbBadge').className='badge-live off';
+  document.getElementById('pbdbBadge').textContent='내장 자료';
+  document.getElementById('pbdbMsg').className='verdict';
+});
+
+/* ── 분포 지도 ── */
+/* PBDB 연결이 안 될 때 보여 줄 정성적 분포 정보 (수치가 아니라 알려진 사실) */
+const FALLBACK_DIST = {
+  'Trilobita':    '남극을 포함한 <b>모든 대륙</b>의 고생대 해성층에서 나옵니다. 전 세계 어디서든 발견되는 대표적인 예입니다.',
+  'Graptolithina':'<b>모든 대륙</b>에서 나옵니다. 바다에 떠다녀 널리 퍼졌기 때문입니다.',
+  'Osteostraci':  '주로 <b>북미·유럽·아시아 북부</b>에서 나옵니다. 당시 이 지역들이 하나로 붙어 있었기 때문입니다.',
+  'Fusulinida':   '<b>북미·유럽·아시아</b>의 석회암층에서 널리 나옵니다. 우리나라 강원도 평안누층군에서도 나옵니다.',
+  'Ammonoidea':   '<b>모든 대륙</b>에서 나옵니다. 바다에 널리 퍼져 살았습니다.',
+  'Ornithischia': '남극을 포함한 <b>모든 대륙</b>에서 나옵니다. 우리나라 경상도 일대에도 발자국 화석 산지가 있습니다.',
+  'Nummulites':   '<b>유럽 남부·북아프리카·서아시아·인도</b>에 몰려 있습니다. 당시 이 지역을 잇던 따뜻한 바다(테티스해)에서만 번성했기 때문입니다.',
+  'Mammuthus':    '<b>북반구 고위도</b>(시베리아·유럽 북부·북아메리카)에 몰려 있습니다. 빙하기의 추운 초원에 살았기 때문입니다.',
+  'Scleractinia': '<b>따뜻한 바다였던 지역</b>에서 나옵니다. 지금은 추운 곳에서 발견되기도 하는데, 그때는 그곳이 따뜻한 바다였기 때문입니다.',
+  'Bivalvia':     '<b>모든 대륙</b>에서 아주 흔하게 나옵니다.',
+  'Brachiopoda':  '<b>모든 대륙</b>에서 나옵니다. 고생대 지층에 특히 많습니다.'
+};
+let map=null, ptLayer=null, curTaxon=null, locMode='now', occCache={}, paleoCache={};
+
+function initMap(){
+  if(map || typeof L==='undefined') return;
+  map = L.map('map',{worldCopyJump:true, minZoom:1, attributionControl:false}).setView([15,10],1);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:8})
+    .addTo(map);
+  // 위도 띠 (열대 / 온대 / 한대)
+  const bands=[[23.44,66.56,'#2563eb',.07],[-66.56,-23.44,'#2563eb',.07],[-23.44,23.44,'#9c5c00',.09],
+               [66.56,90,'#e2e8f0',.09],[-90,-66.56,'#e2e8f0',.09]];
+  bands.forEach(([s,n,c,o])=>{
+    L.rectangle([[s,-180],[n,180]],{color:c,weight:0,fillColor:c,fillOpacity:o,interactive:false}).addTo(map);
+  });
+  [23.44,-23.44,66.56,-66.56,0].forEach(la=>{
+    L.polyline([[la,-180],[la,180]],{color:'#cfdbe8',weight:1,dashArray:'4 5',interactive:false}).addTo(map);
+  });
+  ptLayer = L.layerGroup().addTo(map);
+  window.map = map;
+  setTimeout(()=>map.invalidateSize(),80);
+}
+
+function drawLatHist(pts, color){
+  const host=document.getElementById('latHost');
+  if(!pts || !pts.length){ host.innerHTML=''; return; }
+  const bins=new Array(18).fill(0);
+  pts.forEach(p=>{ const i=Math.min(17,Math.max(0,Math.floor((90-p[0])/10)));
+    bins[i] += (p[2]||1); });
+  const max=Math.max(...bins)||1;
+  const label=i=>{ const hi=90-i*10, lo=hi-10; return hi+'° ~ '+lo+'°'; };
+  const zone=i=>{ const mid=85-i*10, a=Math.abs(mid);
+    return a>66.56?['한대','#e2e8f0']:a>23.44?['온대','#2563eb']:['열대','#9c5c00']; };
+  let h='<h4 style="font-size:.8rem;font-weight:800;margin-bottom:7px">위도별 발견 지점 수</h4>';
+  bins.forEach((v,i)=>{
+    const [zn,zc]=zone(i);
+    h+='<div class="latrow"><div class="lb">'+label(i)+'</div>'+
+       '<div class="lattrack"><span class="latfill" style="width:'+(v/max*100)+'%;background:'+color+'"></span></div>'+
+       '<div class="vn">'+(v||'')+'</div></div>';
+  });
+  h+='<div class="row" style="margin-top:8px;gap:6px">'+
+     '<span class="latband" style="background:rgba(245,158,11,.2);color:#9c5c00">열대 (0~23.4°)</span>'+
+     '<span class="latband" style="background:rgba(96,165,250,.2);color:#2563eb">온대 (23.4~66.6°)</span>'+
+     '<span class="latband" style="background:rgba(226,232,240,.15);color:#e2e8f0">한대 (66.6~90°)</span></div>';
+  host.innerHTML=h;
+}
+
+function renderPoints(){
+  if(!ptLayer || !curTaxon) return;
+  ptLayer.clearLayers();
+  const f=FDATA.find(x=>x.taxon===curTaxon);
+  const msg=document.getElementById('mapMsg');
+  const rec = locMode==='now' ? occCache[curTaxon] : paleoCache[curTaxon];
+  if(!rec){ return; }
+  const pts=rec.pts;
+  if(!pts.length){
+    msg.className='verdict no show';
+    msg.innerHTML='이 화석은 좌표가 기록된 자료가 없습니다.';
+    drawLatHist([], f.c); return;
+  }
+  const maxC=Math.max(...pts.map(p=>p[2]||1));
+  pts.forEach(p=>{
+    const c=p[2]||1;
+    const r = maxC<=1 ? 3.2 : 2.6 + 5.4*Math.sqrt(c/maxC);
+    L.circleMarker([p[0],p[1]],{radius:r,color:f.c,weight:1,
+      fillColor:f.c,fillOpacity:.5,opacity:.85})
+      .bindTooltip(c>1 ? c.toLocaleString()+'건' : '1건',{direction:'top'})
+      .addTo(ptLayer);
+  });
+  drawLatHist(pts, f.c);
+
+  const totOcc = pts.reduce((s,p)=>s+(p[2]||1),0);
+  const lats=pts.map(p=>p[0]);
+  const span=Math.max(...lats)-Math.min(...lats);
+  const trop=pts.filter(p=>Math.abs(p[0])<=23.44).reduce((s,p)=>s+(p[2]||1),0);
+  const src = rec.mode==='cluster'
+      ? '<b>전체 자료</b>를 지역별로 묶어 표시했습니다. 원이 클수록 그곳에서 많이 발견되었다는 뜻입니다.'
+    : rec.mode==='grid'
+      ? '<b>'+rec.fetched.toLocaleString()+'건</b>을 받아 2° 격자로 묶어 표시했습니다.'
+      : '<b>'+rec.fetched.toLocaleString()+'건</b>의 표본입니다.';
+  msg.className='verdict info show';
+  msg.innerHTML=
+    '<b>'+f.n+'</b> — PBDB에 기록된 발견 건수 <b class="hl">'+
+      (rec.total||totOcc).toLocaleString()+'건</b>'+
+    (locMode==='paleo'?' <span class="tagline">당시 위치</span>':'')+
+    '<br>지도에 표시된 지역 <b>'+pts.length.toLocaleString()+'곳</b> · '+
+    '위도 범위 <b>'+span.toFixed(0)+'°</b> · 열대 발견 비율 <b>'+
+      Math.round(trop/totOcc*100)+'%</b>'+
+    '<br><span class="note">'+src+'</span>';
+}
+
+/* 좌표를 격자로 묶기 */
+function gridAgg(pts, deg){
+  const m=new Map();
+  pts.forEach(p=>{
+    const la=p[0], ln=p[1], w=p[2]||1;
+    const k=Math.round(la/deg)+'|'+Math.round(ln/deg);
+    const o=m.get(k)||[0,0,0];
+    o[0]+=la*w; o[1]+=ln*w; o[2]+=w; m.set(k,o);
+  });
+  return [...m.values()].map(o=>[o[0]/o[2], o[1]/o[2], o[2]]);
+}
+/* 원이 너무 많으면 격자를 넓혀 가며 줄인다 (지도 렌더링 보호) */
+const MAX_MARKERS = 1200;
+function capAgg(pts){
+  let out=pts, deg=2;
+  while(out.length>MAX_MARKERS && deg<=16){ out=gridAgg(pts,deg); deg*=2; }
+  return out;
+}
+
+function drawMapBtns(){
+  document.getElementById('mapBtns').innerHTML = FDATA.map(f=>
+    '<button class="fbtn'+(curTaxon===f.taxon?' on':'')+'" data-t="'+f.taxon+'"'+
+    (curTaxon===f.taxon?' style="background:'+f.c+';border-color:'+f.c+'"':'')+'>'+
+    (f.kind==='index'?'🔵':'🟠')+' '+f.n+'</button>').join('');
+}
+drawMapBtns();
+
+const BASE='https://paleobiodb.org/data1.2/occs/';
+const SUM_URL  = t => BASE+'summary.json?base_name='+encodeURIComponent(t)+'&level=2&vocab=pbdb';
+const LIST_URL = (t,lim,show) => BASE+'list.json?base_name='+encodeURIComponent(t)+
+  '&show='+show+'&limit='+lim+'&vocab=pbdb';
+const numOf = r => +(r.n_occs ?? r.noc ?? r.n_colls ?? r.nco ?? 1);
+
+/* 현재 위치 — 전체 자료를 지역별로 묶어서 가져온다 */
+async function loadOcc(taxon){
+  const f=FDATA.find(x=>x.taxon===taxon);
+  const badge=document.getElementById('mapBadge'), msg=document.getElementById('mapMsg');
+  curTaxon=taxon; drawMapBtns();
+  if(occCache[taxon]){ badge.className='badge-live on'; badge.textContent='PBDB 실제 자료';
+    renderPoints(); return; }
+  badge.className='badge-live load'; badge.textContent='불러오는 중…';
+  msg.className='verdict info show';
+  msg.innerHTML=f.n+'의 발견 기록을 PBDB에서 가져오는 중입니다…';
+
+  /* 1순위 — 집계(summary) 요청: 건수가 아무리 많아도 지역별로 묶여서 오므로 전체를 다 볼 수 있다 */
+  try{
+    const j = await fetchWithTimeout(SUM_URL(taxon), 7000);
+    const rows=(j&&j.records)||[];
+    const pts=[];
+    rows.forEach(r=>{ const la=+r.lat, ln=+r.lng;
+      if(isFinite(la)&&isFinite(ln)) pts.push([la,ln,numOf(r)]); });
+    if(pts.length){
+      occCache[taxon]={pts:capAgg(pts), mode:'cluster',
+        total: pts.reduce((s,p)=>s+p[2],0), fetched:rows.length};
+      badge.className='badge-live on'; badge.textContent='PBDB 전체 자료';
+      renderPoints(); return;
+    }
+  }catch(e){ /* 다음 방법으로 */ }
+
+  /* 2순위 — 좌표를 많이 받아 격자로 직접 묶는다 */
+  try{
+    const j = await fetchWithTimeout(LIST_URL(taxon,10000,'coords'), 15000);
+    const rows=(j&&j.records)||[];
+    if(!rows.length) throw new Error('empty');
+    const raw=[];
+    rows.forEach(r=>{ const la=+r.lat, ln=+r.lng;
+      if(isFinite(la)&&isFinite(ln)) raw.push([la,ln]); });
+    occCache[taxon]={pts:capAgg(gridAgg(raw,2)), mode:'grid',
+      total:(j.records_found||rows.length), fetched:raw.length};
+    badge.className='badge-live on'; badge.textContent='PBDB 실제 자료';
+    renderPoints(); return;
+  }catch(e){ /* 실패 */ }
+
+  badge.className='badge-live off'; badge.textContent='연결 실패';
+  if(ptLayer) ptLayer.clearLayers();
+  drawLatHist([], f.c);
+  msg.className='verdict no show';
+  msg.innerHTML='<b>데이터베이스에 연결하지 못했습니다.</b> 대신 알려진 사실로 설명하면 —<br>'+
+    '<b>'+f.n+'</b> · '+(FALLBACK_DIST[taxon]||'분포 정보를 준비하지 못했습니다.');
+}
+
+/* 당시 위치 — 집계 자료에는 고지리 좌표가 없어 개별 기록을 받아 격자로 묶는다 */
+async function loadPaleo(taxon){
+  const f=FDATA.find(x=>x.taxon===taxon);
+  const badge=document.getElementById('mapBadge'), msg=document.getElementById('mapMsg');
+  if(paleoCache[taxon]){ renderPoints(); return; }
+  badge.className='badge-live load'; badge.textContent='불러오는 중…';
+  msg.className='verdict info show';
+  msg.innerHTML=f.n+'이(가) 살던 <b>당시 위치</b>를 계산한 좌표를 가져오는 중입니다…';
+  try{
+    const j = await fetchWithTimeout(LIST_URL(taxon,10000,'paleoloc'), 15000);
+    const rows=(j&&j.records)||[];
+    const raw=[];
+    rows.forEach(r=>{ const la=+(r.paleolat ?? r.pla), ln=+(r.paleolng ?? r.pln);
+      if(isFinite(la)&&isFinite(ln)) raw.push([la,ln]); });
+    if(!raw.length) throw new Error('empty');
+    paleoCache[taxon]={pts:capAgg(gridAgg(raw,2)), mode:'grid',
+      total:(j.records_found||rows.length), fetched:raw.length};
+    badge.className='badge-live on'; badge.textContent='PBDB 실제 자료';
+    renderPoints();
+  }catch(e){
+    badge.className='badge-live off'; badge.textContent='연결 실패';
+    if(ptLayer) ptLayer.clearLayers(); drawLatHist([], f.c);
+    msg.className='verdict no show';
+    msg.innerHTML='<b>당시 위치 자료를 불러오지 못했습니다.</b> 현재 위치로 돌아가 보세요.';
+  }
+}
+document.getElementById('mapBtns').addEventListener('click',e=>{
+  const b=e.target.closest('.fbtn'); if(!b) return;
+  initMap();
+  if(typeof L==='undefined'){
+    document.getElementById('mapMsg').className='verdict no show';
+    document.getElementById('mapMsg').innerHTML=
+      '<b>지도를 불러오지 못했습니다.</b> 인터넷 연결을 확인해 주세요. '+
+      '지도 없이도 아래 설명으로 분포를 확인할 수 있습니다.<br><br>'+
+      (FALLBACK_DIST[b.dataset.t]||'');
+    curTaxon=b.dataset.t; drawMapBtns(); return;
+  }
+  loadOcc(b.dataset.t);
+});
+document.querySelectorAll('#locNow,#locPaleo').forEach(b=>{
+  b.addEventListener('click',()=>{
+    locMode=b.dataset.mode;
+    document.getElementById('locNow').classList.toggle('on',locMode==='now');
+    document.getElementById('locPaleo').classList.toggle('on',locMode==='paleo');
+    document.getElementById('locHint').innerHTML = locMode==='now'
+      ? '지금 그 화석이 나오는 자리입니다.'
+      : '<b class="hl-w">주의</b> — 대륙은 계속 움직입니다. 화석이 살던 때의 위도를 계산해 찍은 것이니, '+
+        '지도의 해안선(현재 모습)이 아니라 <b>점의 위도</b>에 주목하세요.';
+    if(!curTaxon) return;
+    if(locMode==='paleo') loadPaleo(curTaxon); else renderPoints();
+  });
+});
+
+/* 표준 / 시상 분류 */
+const STF = [
+  {t:'삼엽충',      k:'index',  w:'고생대에만 살았고 종류가 빠르게 바뀌어 시대를 좁혀 줍니다.'},
+  {t:'암모나이트',  k:'index',  w:'중생대의 대표 표준화석입니다.'},
+  {t:'화폐석',      k:'index',  w:'신생대 전기에만 번성했습니다.'},
+  {t:'매머드',      k:'index',  w:'신생대 후기에만 살았습니다.'},
+  {t:'방추충',      k:'index',  w:'석탄기~페름기에만 살아 고생대 후기를 가리킵니다.'},
+  {t:'공룡',        k:'index',  w:'중생대에만 육상을 지배했습니다.'},
+  {t:'산호',        k:'facies', w:'따뜻하고 얕은 바다에서만 삽니다. 지금도 살아 있어 시대는 못 알려 줍니다.'},
+  {t:'고사리',      k:'facies', w:'따뜻하고 습한 육지에서 자랍니다. 오래 살아남아 환경만 알려 줍니다.'},
+  {t:'조개',        k:'facies', w:'얕은 바다나 갯벌에 삽니다. 지금도 살아 있습니다.'}
+];
+let stPlaced={}, stScore=0;
+function drawST(done){
+  document.getElementById('stPool').innerHTML = STF.map((f,i)=> stPlaced[i]?'':
+    '<button class="itm" data-i="'+i+'">'+f.t+'</button>').join('') ||
+    '<span class="note">모두 분류했습니다.</span>';
+  [['index','binIndex'],['facies','binFacies']].forEach(([k,id])=>{
+    document.getElementById(id).innerHTML = STF.map((f,i)=>{
+      if(stPlaced[i]!==k) return '';
+      let c='itm'; if(done) c += (f.k===k?' ok':' no');
+      return '<button class="'+c+'" data-i="'+i+'"'+(done?' disabled':'')+'>'+f.t+'</button>';
+    }).join('');
+  });
+}
+function stMove(i,to){
+  if(to) stPlaced[i]=to; else delete stPlaced[i];
+  document.getElementById('stVerdict').className='verdict'; drawST(false);
+}
+document.getElementById('stPool').addEventListener('click',e=>{
+  const b=e.target.closest('.itm'); if(!b) return; stMove(+b.dataset.i,'index');
+});
+document.getElementById('binIndex').addEventListener('click',e=>{
+  const b=e.target.closest('.itm'); if(!b||b.disabled) return; stMove(+b.dataset.i,'facies');
+});
+document.getElementById('binFacies').addEventListener('click',e=>{
+  const b=e.target.closest('.itm'); if(!b||b.disabled) return; stMove(+b.dataset.i,null);
+});
+document.getElementById('stCheck').addEventListener('click',()=>{
+  const v=document.getElementById('stVerdict');
+  const placed=Object.keys(stPlaced).length;
+  if(placed<STF.length){
+    v.className='verdict no show';
+    v.innerHTML='아직 <b>'+(STF.length-placed)+'개</b>가 남았습니다.'; return;
+  }
+  drawST(true);
+  const wrong=STF.filter((f,i)=>stPlaced[i]!==f.k);
+  stScore = wrong.length===0?1:0;
+  v.className='verdict '+(wrong.length?'no':'ok')+' show';
+  v.innerHTML=(wrong.length?'<b>'+wrong.length+'개가 틀렸습니다.</b>':'<b>모두 맞혔습니다.</b>')+'<br><br>'+
+    STF.map(f=>'· <b>'+f.t+'</b> ('+(f.k==='index'?'표준':'시상')+') — '+f.w).join('<br>')+
+    '<br><br><b>기억할 것 —</b> 지금도 살아 있는 생물은 표준화석이 될 수 없습니다. '+
+    '언제 쌓인 지층인지 좁혀 주지 못하기 때문입니다.';
+});
+document.getElementById('stReset').addEventListener('click',()=>{
+  stPlaced={}; stScore=0; document.getElementById('stVerdict').className='verdict'; drawST(false);
+});
+drawST(false);
+
+/* ══════════════ 탭 2 ══════════════ */
+const ERAS = [
+  {n:'선캄브리아 시대', a:45.67, z:5.41, c:'#8a5aa5',
+   d:'지구 탄생부터 고생대 직전까지. 지질 시대의 약 88%를 차지하지만 알려진 것은 가장 적습니다. 단단한 껍데기를 가진 생물이 거의 없어 화석이 드물고, 오래된 암석일수록 지각 변동과 침식으로 지워졌기 때문입니다.'},
+  {n:'고생대', a:5.41, z:2.52, c:'#3d8f74',
+   d:'단단한 껍데기와 골격을 가진 동물이 크게 늘고, 생물이 바다에서 육지로 올라온 시대입니다. 말기에 판게아가 만들어지고 지구 역사상 최대 규모의 대멸종으로 끝납니다.'},
+  {n:'중생대', a:2.52, z:0.66, c:'#3f7fb8',
+   d:'파충류가 육지·바다·하늘을 모두 차지한 시대입니다. 빙하기가 없었고 전반적으로 온난했으며, 판게아가 갈라지기 시작했습니다.'},
+  {n:'신생대', a:0.66, z:0, c:'#c08c1f',
+   d:'포유류와 속씨식물의 시대. 지질 시대의 1.4%밖에 되지 않는 짧은 구간이지만 화석이 가장 잘 남아 있어 가장 자세히 알려져 있습니다.'}
+];
+function drawTimeline(){
+  const bar=document.getElementById('tlbar');
+  bar.innerHTML = ERAS.map((e,i)=>{
+    const l=(EARTH-e.a)/EARTH*100, w=(e.a-e.z)/EARTH*100;
+    return '<div class="tlseg" data-i="'+i+'" style="left:'+l+'%;width:'+w+'%;background:'+e.c+
+      '" title="'+e.n+'">'+(w>7?e.n:'')+'</div>';
+  }).join('');
+  bar.querySelectorAll('.tlseg').forEach(el=>el.addEventListener('click',()=>{
+    const e=ERAS[+el.dataset.i], d=e.a-e.z, p=d/EARTH*100;
+    document.getElementById('eraDetail').innerHTML =
+      '<b style="color:'+e.c+';font-size:.95rem">'+e.n+'</b><br>'+
+      '<b>'+e.a+'억 년 전 ~ '+(e.z===0?'현재':e.z+'억 년 전')+'</b> · 기간 '+d.toFixed(2)+'억 년 · '+
+      '전체의 <b class="hl">'+p.toFixed(2)+'%</b><br>'+e.d;
+  }));
+  document.getElementById('tlaxis').innerHTML =
+    [45.67,40,30,20,10,0].map(t=>'<span style="left:'+
+      Math.min(98.5,Math.max(1.5,(EARTH-t)/EARTH*100))+'%">'+(t===0?'현재':t)+'</span>').join('');
+}
+drawTimeline();
+(function(){
+  let rows='<tr><th>대(代)</th><th>시기 (억 년 전)</th><th>기간</th><th>비율</th><th style="width:28%">비율 막대</th></tr>';
+  ERAS.forEach(e=>{
+    const d=e.a-e.z, p=d/EARTH*100;
+    rows+='<tr><td style="color:'+e.c+';font-weight:800">'+e.n+'</td>'+
+      '<td class="num">'+e.a+' ~ '+(e.z===0?'현재':e.z)+'</td>'+
+      '<td class="num">'+d.toFixed(2)+'억 년</td>'+
+      '<td class="num"><b>'+p.toFixed(2)+'%</b></td>'+
+      '<td><span style="display:block;height:13px;border-radius:3px;background:'+e.c+';width:'+Math.max(p,0.8)+'%"></span></td></tr>';
+  });
+  document.getElementById('ratiotbl').innerHTML=rows;
+})();
+
+/* 지층 A~G 문제 */
+const LAYERS = [
+  {n:'G층', c:'#c4b49a', fos:['㉣']},
+  {n:'F층', c:'#b9a998', fos:['㉢','㉣']},
+  {n:'E층', c:'#a98263', fos:['㉡','㉢']},
+  {n:'D층', c:'#9fc6c0', fos:['㉠','㉡']},
+  {n:'C층', c:'#8fa3ab', fos:['㉠','㉡']},
+  {n:'B층', c:'#4a5a6b', fos:['㉠']},
+  {n:'A층', c:'#5e6b7d', fos:['㉠']}
+];
+const SQS = [
+  {q:'㉠~㉣ 중 <b>생존 기간이 가장 긴</b> 화석은?', opts:['㉠','㉡','㉢','㉣'], ans:'㉠',
+   w:'㉠은 A·B·C·D 네 개 층에서 나옵니다. 여러 층에 걸쳐 나온다는 것은 그만큼 <b>오래 살았다</b>는 뜻입니다.'},
+  {q:'㉠~㉣ 중 <b>표준화석으로 가장 알맞은</b> 것은?', opts:['㉠','㉡','㉢','㉣'], ans:'㉣',
+   w:'㉣은 F·G 두 층에서만 나와 생존 기간이 짧습니다. 생존 기간이 짧을수록 지층의 시대를 좁게 찍어 주므로 표준화석으로 알맞습니다. (㉢도 E·F 두 층이라 비슷하지만, ㉣이 가장 위쪽의 좁은 구간에 몰려 있어 시대를 가장 잘 갈라 줍니다.)'},
+  {q:'<b>C층과 D층</b>이 같은 시기에 쌓였는지 판단할 근거로 알맞은 것은?',
+   opts:['㉠과 ㉡이 모두 나온다','색이 다르다','층의 두께가 다르다','G층에서 멀다'], ans:'㉠과 ㉡이 모두 나온다',
+   w:'멀리 떨어진 지층이라도 <b>같은 화석 무리</b>가 나오면 비슷한 시기에 쌓인 것으로 봅니다. C층과 D층은 ㉠·㉡이 함께 나오므로 시기가 겹칩니다. 이것이 화석으로 지층을 맞추는 방법입니다.'},
+  {q:'이 지층에서 <b>가장 오래된</b> 층은?', opts:['A층','D층','F층','G층'], ans:'A층',
+   w:'퇴적물은 아래에서 위로 쌓이므로 <b>가장 아래층이 가장 먼저</b> 쌓인 것입니다. 따라서 A층이 가장 오래되었고 G층이 가장 젊습니다.'}
+];
+let sqAns={};
+function drawStrat(){
+  document.getElementById('stratCol').innerHTML = LAYERS.map(l=>
+    '<div class="slayer" style="background:'+l.c+'">'+l.n+
+    '<span class="fos">'+l.fos.map(f=>'<b>'+f+'</b>').join('')+'</span></div>').join('')+
+    '<div class="note" style="text-align:center;margin-top:6px">▲ 위가 나중에 쌓인 층</div>';
+  document.getElementById('stratQs').innerHTML = SQS.map((s,i)=>{
+    const a=sqAns[i];
+    return '<div style="margin-bottom:14px"><div style="font-size:.79rem;font-weight:700;margin-bottom:6px;line-height:1.7">'+
+      (i+1)+'. '+s.q+'</div><div class="picker" data-q="'+i+'">'+
+      s.opts.map(o=>{
+        let c='pk';
+        if(a){ if(o===a) c+=(o===s.ans?' ok':' no'); else if(o===s.ans) c+=' ok'; }
+        return '<button class="'+c+'" data-o="'+o+'"'+(a?' disabled':'')+'>'+o+'</button>';
+      }).join('')+'</div>'+
+      (a?'<div class="verdict '+(a===s.ans?'ok':'no')+' show" style="margin-top:7px">'+
+        '<b>'+(a===s.ans?'맞습니다.':'정답은 '+s.ans+'입니다.')+'</b> '+s.w+'</div>':'')+
+      '</div>';
+  }).join('')+
+  '<button class="btn sm" id="sqReset">다시 풀기</button>';
+}
+drawStrat();
+document.getElementById('stratQs').addEventListener('click',e=>{
+  const r=e.target.closest('#sqReset');
+  if(r){ sqAns={}; drawStrat(); return; }
+  const b=e.target.closest('.pk'); if(!b||b.disabled) return;
+  sqAns[+b.parentElement.dataset.q]=b.dataset.o; drawStrat();
+});
+
+/* 1년 달력 */
+const CAL_EVENTS=[['지구 탄생',45.67],['최초 생명체',38],['남세균 광합성',35],['에디아카라 동물군',6],
+  ['고생대 시작',5.41],['최초의 육상 식물',4.7],['고생대 말 대멸종',2.52],['공룡 멸종',0.66],
+  ['인류의 조상',0.028],['호모 사피엔스',0.003],['농경 시작',0.00012]];
+const MON=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+function runCalc(ok,label){
+  const ma=Math.min(EARTH,Math.max(0,ok||0));
+  const sec=(EARTH-ma)/EARTH*365*24*3600;
+  const d=new Date(Date.UTC(2001,0,1)); d.setUTCSeconds(Math.round(sec));
+  const txt=MON[d.getUTCMonth()]+' '+d.getUTCDate()+'일 '+
+    String(d.getUTCHours()).padStart(2,'0')+'시 '+String(d.getUTCMinutes()).padStart(2,'0')+'분';
+  const yrs = ma>=1 ? ma+'억 년 전'
+            : ma>=0.01 ? Math.round(ma*1e8/1e4).toLocaleString()+'만 년 전'
+            : Math.round(ma*1e8).toLocaleString()+'년 전';
+  document.getElementById('calout').innerHTML =
+    '<div class="big">'+txt+'</div><div class="small">'+yrs+(label?' · '+label:'')+'</div>';
+}
+document.getElementById('calchips').innerHTML =
+  CAL_EVENTS.map((e,i)=>'<button class="chip" data-i="'+i+'">'+e[0]+'</button>').join('');
+document.getElementById('calchips').addEventListener('click',e=>{
+  const b=e.target.closest('.chip'); if(!b) return;
+  const ev=CAL_EVENTS[+b.dataset.i];
+  document.getElementById('calin').value=ev[1]; runCalc(ev[1],ev[0]);
+});
+document.getElementById('calgo').addEventListener('click',()=>{
+  runCalc(parseFloat(document.getElementById('calin').value),'');
+});
+runCalc(0.66,'공룡이 사라진 순간');
+
+/* ══════════════ 탭 3 ══════════════ */
+const ERAINFO = [
+  {n:'선캄브리아 시대', c:'#8a5aa5', when:'45.67억 ~ 5.41억 년 전',
+   climate:'대체로 온난했고, 몇 차례 빙하기가 있었던 것으로 추정합니다.',
+   land:'지각 변동을 많이 받고 화석이 드물어 수륙 분포를 알기 어렵습니다.',
+   life:['바다에서 최초의 생명체가 나타났습니다.',
+         '남세균이 광합성을 시작해 산소를 만들었고, 그 흔적이 스트로마톨라이트로 남았습니다.',
+         '산소가 쌓여 바닷속에 있던 철이 산화·침전되며 대규모 철광층이 만들어졌습니다.',
+         '말기에 에디아카라 동물군 같은 다세포 생물이 나타났습니다.',
+         '오존층이 아직 충분하지 않아 육상 생물은 없었습니다.'],
+   fossils:['stromatolite','ediacara']},
+  {n:'고생대', c:'#3d8f74', when:'5.41억 ~ 2.52억 년 전',
+   climate:'대체로 온난했으나 말기에 빙하기가 있었습니다.',
+   land:'말기에 여러 대륙이 하나로 모여 초대륙 판게아가 만들어졌습니다.',
+   life:['바다에 삼엽충·완족류·필석이 크게 번성했습니다.',
+         '오존층이 만들어지면서 생물이 육지로 올라올 수 있게 되었습니다.',
+         '어류(갑주어)가 번성해 데본기를 "어류의 시대"라 부릅니다. 이어 양서류가 나타났습니다.',
+         '석탄기에는 거대한 양치식물 숲이 자랐고, 이것이 묻혀 석탄이 되었습니다.',
+         '말기에 방추충이 번성했습니다.',
+         '말기에 지구 역사상 가장 큰 대멸종이 일어나 삼엽충·방추충이 사라졌습니다.'],
+   fossils:['trilobite','brachiopod','graptolite','ostracoderm']},
+  {n:'중생대', c:'#3f7fb8', when:'2.52억 ~ 0.66억 년 전',
+   climate:'전반적으로 온난했고 빙하기가 없었습니다.',
+   land:'판게아가 갈라지기 시작해 오늘날의 대륙 배치로 향합니다.',
+   life:['겉씨식물(은행나무·소나무·소철)이 번성했습니다.',
+         '파충류가 육지·바다·하늘을 모두 차지했고, 특히 공룡이 번성했습니다.',
+         '바다에서는 암모나이트가 번성했습니다.',
+         '포유류와 새가 나타났지만 아직 작고 수가 적었습니다.',
+         '말기에 소행성 충돌로 대멸종이 일어나 공룡과 암모나이트가 사라졌습니다.'],
+   fossils:['ammonite','dino_tracks','dinosaur','crurotarsi']},
+  {n:'신생대', c:'#c08c1f', when:'0.66억 년 전 ~ 현재',
+   climate:'초기에는 온난했으나 후기에 여러 번의 빙하기와 간빙기가 되풀이되었습니다.',
+   land:'현재와 거의 비슷한 수륙 분포가 되었습니다.',
+   life:['속씨식물(참나무·단풍나무 같은 꽃 피는 나무)이 번성했습니다.',
+         '공룡이 사라진 자리를 포유류가 채우며 크게 번성했습니다.',
+         '바다에서는 화폐석이 번성했습니다.',
+         '후기에 매머드가 추운 초원에 살았습니다.',
+         '말기에 인류의 조상이 나타났습니다.'],
+   fossils:['nummulites','mammoth']}
+];
+let eraIdx=1;
+function drawEra(){
+  document.getElementById('eraBtns').innerHTML = ERAINFO.map((e,i)=>
+    '<button class="ebtn'+(i===eraIdx?' on':'')+'" data-i="'+i+'"'+
+    (i===eraIdx?' style="background:'+e.c+';border-color:'+e.c+'"':'')+'>'+e.n+'</button>').join('');
+  const e=ERAINFO[eraIdx];
+  const pics = e.fossils.map(id=>{
+    const p=PHOTOS.find(x=>x.id===id); if(!p) return '';
+    const src = p.single ? 'images/'+p.id+'.jpeg' : 'images/'+p.id+'_restore.jpeg';
+    return '<button class="pcard" data-id="'+p.id+'">'+
+      '<img class="ph" src="'+src+'" alt="'+p.n+'" loading="lazy" '+
+      'onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')">'+
+      '<div class="cap"><b>'+p.n+'</b><span>'+p.kind+'</span></div></button>';
+  }).join('');
+  document.getElementById('eraPanel').innerHTML =
+    '<div class="card erapanel" style="border-color:'+e.c+'55">'+
+      '<h3 class="sub3" style="margin-top:0;color:'+e.c+'">'+e.n+' <span class="note">('+e.when+')</span></h3>'+
+      '<div class="kv">'+
+        '<b>기후</b><div>'+e.climate+'</div>'+
+        '<b>수륙 분포</b><div>'+e.land+'</div>'+
+        '<b>생물</b><div>'+e.life.map(l=>'· '+l).join('<br>')+'</div>'+
+      '</div>'+
+      '<h3 class="sub3">대표 화석</h3>'+
+      '<div class="gal">'+pics+'</div>'+
+    '</div>';
+}
+drawEra();
+document.getElementById('eraBtns').addEventListener('click',e=>{
+  const b=e.target.closest('.ebtn'); if(!b) return; eraIdx=+b.dataset.i; drawEra();
+});
+document.getElementById('eraPanel').addEventListener('click',e=>{
+  const b=e.target.closest('.pcard'); if(!b) return;
+  openPhoto(b.dataset.id);
+});
+
+const KOREA = [
+  ['강원 태백·영월','조선누층군','고생대','삼엽충 · 완족류 · 두족류'],
+  ['강원 태백·정선','평안누층군','고생대 후기','방추충 · 양치식물(석탄층)'],
+  ['충남 보령','대동누층군','중생대','소철류 · 은행류 잎'],
+  ['경남 고성 · 전남 해남','경상누층군','중생대','공룡 발자국 · 공룡 알 · 새 발자국'],
+  ['경북 포항','연일층군','신생대','조개 · 나뭇잎 · 유공충'],
+  ['제주 서귀포','서귀포층','신생대','조개 · 고둥 · 산호']
+];
+document.getElementById('korTbl').innerHTML =
+  '<tr><th>지역</th><th>지층</th><th>지질 시대</th><th>주요 화석</th></tr>'+
+  KOREA.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('');
+
+/* ══════════════ 탭 4 ══════════════ */
+const QIDS=['q0a','q0b','q1a','q1b','q1c','q2a','q2b','q3a','q3b'];
+const CHECKS=[
+  '화석이 무엇인지, 왜 주로 퇴적암에서 발견되는지 설명할 수 있다.',
+  '체화석과 생흔화석을 구분하고 예를 들 수 있다.',
+  '화석이 잘 만들어지는 조건을 세 가지 이상 말할 수 있다.',
+  '화석으로 알 수 있는 것을 여러 가지 들 수 있다.',
+  '표준화석과 시상화석의 조건을 분포 면적과 생존 기간으로 설명할 수 있다.',
+  '고생대·중생대·신생대의 대표 표준화석을 말할 수 있다.',
+  '지금도 살아 있는 생물은 표준화석이 될 수 없는 까닭을 설명할 수 있다.',
+  '지질 시대를 나누는 기준이 생물의 급격한 변화임을 설명할 수 있다.',
+  '지질 시대의 대부분이 선캄브리아 시대임을 비율로 말할 수 있다.',
+  '각 대(代)의 기후·수륙 분포·대표 생물을 설명할 수 있다.'
+];
+let chkState={};
+function collectAnswers(){
+  return QIDS.map(id=>{ const el=document.getElementById(id);
+    return {q:el.dataset.q, a:el.value.trim(), lines:4}; });
+}
+function scoreRows(){
+  const sq=SQS.filter((s,i)=>sqAns[i]===s.ans).length;
+  return [
+    ['체화석 · 생흔화석 분류', fkScore?'완료 (모두 정답)':'미완료'],
+    ['화석이 되는 조건 판정',  condScore?'완료 (모두 정답)':'미완료'],
+    ['표준화석 · 시상화석 분류', stScore?'완료 (모두 정답)':'미완료'],
+    ['지층 A~G 문제', sq+' / '+SQS.length]
+  ];
+}
+const SUMMARY=[
+  {h:'1. 화석',
+   body:['화석은 지질 시대에 살았던 생물의 <b>유해나 흔적</b>이 지층에 남은 것입니다. 지층은 대부분 퇴적암이므로 화석도 주로 퇴적암에서 발견됩니다.',
+         '몸이 남으면 <b>체화석</b>(뼈·껍데기·이빨·잎), 생활한 흔적이 남으면 <b>생흔화석</b>(발자국·배설물·굴·기어간 자국)입니다.',
+         '화석이 잘 만들어지려면 단단한 부분이 있고, 죽은 뒤 빠르게 묻히며, 개체 수가 많고, 입자가 고운 퇴적물에 묻혀야 합니다.']},
+  {h:'2. 화석으로 알 수 있는 것',
+   body:['과거 생물의 생김새, 진화 과정, 서식 환경과 지층의 생성 시기, 과거의 수륙 분포, 과거의 기후, 그리고 지하자원 탐사의 단서까지 알 수 있습니다.']},
+  {h:'3. 표준화석과 시상화석',
+   body:['<b>표준화석</b>은 <b>지층이 쌓인 시대</b>를 알려줍니다. 분포 면적이 넓고 생존 기간이 짧아야 합니다.',
+         '<b>시상화석</b>은 <b>당시의 환경</b>을 알려줍니다. 분포 면적이 좁고 생존 기간이 길어야 합니다.',
+         '지금도 살아 있는 생물(완족류·조개·산호)은 시대를 좁혀 주지 못하므로 표준화석이 될 수 없습니다.'],
+   table:[['구분','분포 면적','생존 기간','알려주는 것','예'],
+          ['표준화석','넓다','짧다','지질 시대','삼엽충 · 갑주어 · 방추충(고생대) / 암모나이트 · 공룡(중생대) / 화폐석 · 매머드(신생대)'],
+          ['시상화석','좁다','길다','퇴적 환경','산호(따뜻하고 얕은 바다) / 고사리(따뜻하고 습한 육지) / 조개(얕은 바다 · 갯벌)']]},
+  {h:'4. 지질 시대의 구분',
+   body:['지질 시대는 지구 탄생부터 현재까지의 시간이며, <b>생물의 급격한 변화</b>를 기준으로 나눕니다. 지구 환경이 크게 바뀌면 생물이 크게 바뀌고, 그것이 화석으로 남기 때문입니다.',
+         '선캄브리아 시대가 전체의 약 88%를 차지하고, 신생대는 1.4%에 지나지 않습니다.'],
+   table:[['대','시기(억 년 전)','기간','비율'],
+          ['선캄브리아 시대','45.67 ~ 5.41','40.26억 년','88.15%'],
+          ['고생대','5.41 ~ 2.52','2.89억 년','6.33%'],
+          ['중생대','2.52 ~ 0.66','1.86억 년','4.07%'],
+          ['신생대','0.66 ~ 현재','0.66억 년','1.45%']]},
+  {h:'5. 시대별 환경과 생물',
+   body:['<b>선캄브리아 시대</b> — 온난, 최초의 생명체와 남세균의 광합성, 스트로마톨라이트, 말기에 에디아카라 동물군. 육상 생물은 아직 없음.',
+         '<b>고생대</b> — 온난하다 말기에 빙하기. 삼엽충 · 갑주어 · 방추충 번성, 오존층 형성으로 육상 진출, 양치식물 삼림(석탄), 말기에 판게아 형성과 최대의 대멸종.',
+         '<b>중생대</b> — 온난하고 빙하기 없음. 겉씨식물, 공룡과 파충류, 암모나이트 번성. 판게아 분리. 말기에 소행성 충돌로 대멸종.',
+         '<b>신생대</b> — 초기 온난, 후기에 빙하기 반복. 속씨식물과 포유류 번성, 화폐석과 매머드, 말기에 인류의 조상 등장.']}
+];
+function renderSummaryTab(){
+  document.getElementById('scoretbl').innerHTML='<tr><th>활동</th><th>결과</th></tr>'+
+    scoreRows().map(r=>'<tr><td>'+r[0]+'</td><td class="num"><b>'+r[1]+'</b></td></tr>').join('');
+  document.getElementById('anshost').innerHTML=collectAnswers().map(x=>
+    '<div class="ans-item"><div class="q">'+x.q+'</div><div class="a'+(x.a?'':' empty')+'">'+
+    (x.a?esc(x.a):'아직 작성하지 않았습니다.')+'</div></div>').join('');
+  document.getElementById('chkhost').innerHTML=CHECKS.map((t,i)=>
+    '<div class="chk"><input type="checkbox" id="ck'+i+'" data-i="'+i+'"'+(chkState[i]?' checked':'')+'>'+
+    '<label for="ck'+i+'">'+t+'</label></div>').join('');
+  document.getElementById('summaryhost').innerHTML=SUMMARY.map(s=>
+    '<div class="sumblk"><h4>'+s.h+'</h4>'+s.body.map(p=>'<p>'+p+'</p>').join('')+
+    (s.table?'<table class="dt" style="margin-top:7px">'+s.table.map((row,ri)=>
+      '<tr>'+row.map(c=>ri===0?'<th>'+c+'</th>':'<td>'+c+'</td>').join('')+'</tr>').join('')+'</table>':'')+
+    '</div>').join('');
+}
+document.getElementById('chkhost').addEventListener('change',e=>{
+  if(e.target.type==='checkbox') chkState[+e.target.dataset.i]=e.target.checked;
+});
+
+function wsConfig(blank){
+  const who=(document.getElementById('whoName').value||'').trim();
+  return {
+    blank:!!blank, who:who,
+    title:'화석과 지질 시대',
+    subtitle:'통합과학2 「변화와 다양성」 · 지질시대의 생물과 화석',
+    standard:'[10통과2-01-01] 지질 시대를 통해 지구 환경이 끊임없이 변화해 왔으며 이러한 환경 변화가 생물 다양성에 미치는 영향을 추론할 수 있다.',
+    records:[
+      {type:'table', h:'활동 기록', head:['활동','결과'], rows:scoreRows()},
+      {type:'table', h:'표준화석 정리', head:['대(代)','대표 표준화석'],
+       rows:[['고생대','삼엽충 · 갑주어 · 방추충 · 필석'],
+             ['중생대','암모나이트 · 공룡'],
+             ['신생대','화폐석 · 매머드']]}
+    ],
+    answers:collectAnswers(),
+    checks:CHECKS.map((t,i)=>({t:t, ok:!!chkState[i]})),
+    summary:SUMMARY.map(s=>({h:s.h, body:s.body.map(p=>p.replace(/<[^>]+>/g,'')), table:s.table}))
+  };
+}
+if(window.Worksheet){
+  window.Worksheet.mount('ws-actions', wsConfig, ()=>{
+    const who=(document.getElementById('whoName').value||'').trim();
+    return (who?who+'_':'')+'화석과지질시대';
+  });
+}else{
+  document.getElementById('ws-actions').innerHTML=
+    '<div class="note">worksheet.js를 불러오지 못했습니다. 이 파일이 다른 활동 파일과 같은 폴더에 있는지 확인해 주세요.</div>';
+}
+</script>
+</body>
+</html>

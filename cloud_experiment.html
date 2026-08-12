@@ -789,6 +789,8 @@ table.cmp tr:hover td{background:var(--surface-2);}
 </footer>
 
 <script src="worksheet.js?v=7"></script>
+<script>/* file:// 로 열면 브라우저에 따라 물음표가 붙은 주소를 못 찾는다. 한 번 더 시도. */
+if(!window.Worksheet) document.write('<scr'+'ipt src="worksheet.js"><\/scr'+'ipt>');</script>
 <script>
 /* =========================================================
    상태
@@ -1202,8 +1204,17 @@ function wsConfig(blank){
     summary: Worksheet.collect.summary('#page4 .cc')
   };
 }
-Worksheet.mount('ws-actions', wsConfig,
+/* worksheet.js 를 못 불러왔더라도 나머지 기능은 살아 있어야 한다.
+   여기서 예외가 나면 이 아래 코드가 전부 실행되지 않는다. */
+if(window.Worksheet){
+  Worksheet.mount('ws-actions', wsConfig,
   ()=>(($('who').value||S.runs[0]?.name||'이름없음').trim()+'_구름발생'));
+}else{
+  var wsHost=document.getElementById('ws-actions');
+  if(wsHost) wsHost.innerHTML='<div class="note" style="color:#9c5c00">'+
+    'worksheet.js 를 불러오지 못해 활동지 인쇄·저장을 쓸 수 없습니다.<br>'+
+    '이 파일이 <b>worksheet.js 와 같은 폴더</b>에 있는지 확인해 주세요. 나머지 활동은 그대로 됩니다.</div>';
+}
 
 function download(fname,text){
   const b=new Blob([text],{type:'text/plain;charset=utf-8'});

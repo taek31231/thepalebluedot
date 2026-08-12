@@ -27,7 +27,21 @@ select,input,textarea{font:inherit;}
 .topbar h1 span{color:var(--accent);}
 .std{font-size:.66rem;color:var(--dim);background:var(--surface-2);border:1px solid var(--line);
   padding:3px 8px;border-radius:5px;white-space:nowrap;}
-.tabs{display:flex;gap:3px;overflow-x:auto;max-width:62vw;}
+.tabs{display:flex;gap:3px;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-behavior:smooth;padding-bottom:2px;}
+.tabs::-webkit-scrollbar{height:0;width:0;}
+.tab{flex:0 0 auto;}
+/* 화면이 좁아지면 탭에 자리를 내준다 — 부제 → 성취기준 순으로 접는다.
+   제목은 nowrap 이라 그냥 두면 탭 줄을 통째로 밀어내 버린다. */
+.topbar h1{min-width:0;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:1180px){ .topbar h1 span{display:none;} }
+@media(max-width:1000px){ .std{display:none;} }
+/* 탭 줄이 화면보다 길 때 — 가장자리를 흐리게 해 '더 있다'를 알린다 */
+.tabs.sc-r{-webkit-mask-image:linear-gradient(to right,#000 84%,transparent);
+  mask-image:linear-gradient(to right,#000 84%,transparent);}
+.tabs.sc-l{-webkit-mask-image:linear-gradient(to right,transparent,#000 14%);
+  mask-image:linear-gradient(to right,transparent,#000 14%);}
+.tabs.sc-l.sc-r{-webkit-mask-image:linear-gradient(to right,transparent,#000 13%,#000 87%,transparent);
+  mask-image:linear-gradient(to right,transparent,#000 13%,#000 87%,transparent);}
 .tabs::-webkit-scrollbar{height:0;}
 .tab{padding:7px 12px;font-size:.79rem;font-weight:700;color:var(--dim);background:transparent;
   border:1px solid transparent;border-radius:8px;transition:.15s;white-space:nowrap;}
@@ -199,9 +213,7 @@ input[type=range]{width:100%;accent-color:var(--accent);}
   .topbar{flex:0 0 auto;height:auto;flex-wrap:wrap;padding:8px 12px;gap:6px 8px;}
   .topbar h1{font-size:.82rem;order:1;flex:1 1 auto;white-space:normal;line-height:1.35;}
   .std{order:2;font-size:.58rem;}
-  .tabs{order:3;flex:1 1 100%;max-width:none;overflow-x:auto;scrollbar-width:none;
-        padding-bottom:2px;-webkit-overflow-scrolling:touch;}
-  .tabs::-webkit-scrollbar{height:0;}
+  .tabs{order:3;flex:1 1 100%;max-width:none;}
   .tab{flex:0 0 auto;padding:8px 11px;font-size:.75rem;}
   .pane{padding:14px 12px 34px;}
   .grid2,.grid3{grid-template-columns:1fr;}
@@ -661,6 +673,8 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="worksheet.js?v=7"></script>
+<script>/* file:// 로 열면 브라우저에 따라 물음표가 붙은 주소를 못 찾는다. 한 번 더 시도. */
+if(!window.Worksheet) document.write('<scr'+'ipt src="worksheet.js"><\/scr'+'ipt>');</script>
 <script>
 const esc=s=>String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
 document.querySelectorAll('.tab').forEach(t=>{
@@ -1809,6 +1823,43 @@ if(window.Worksheet){
   document.getElementById('ws-actions').innerHTML=
     '<div class="note">worksheet.js를 불러오지 못했습니다. 이 파일이 다른 활동 파일과 같은 폴더에 있는지 확인해 주세요.</div>';
 }
+
+/* ── 탭 줄 가로 스크롤 ──────────────────────────────────
+   탭이 화면 폭보다 길어지면 손가락으로 밀어서 볼 수 있어야 한다.
+   ① 지금 열린 탭이 화면 밖이면 자동으로 가운데로 끌어온다
+   ② 아직 볼 게 남은 쪽 가장자리를 흐리게 해 알려 준다
+   ③ 마우스 휠(세로)로도 좌우로 밀린다
+   주의: 관찰 대상을 .tabs 자신이 아니라 각 .tab 으로 둔다.
+        .tabs 에 클래스를 붙이는 순간 관찰자가 다시 깨어나 무한히 돈다.        */
+(function(){
+  var bar=document.querySelector('.tabs'); if(!bar) return;
+  function edge(){
+    var over=bar.scrollWidth-bar.clientWidth;
+    bar.classList.toggle('sc-l', over>4 && bar.scrollLeft>4);
+    bar.classList.toggle('sc-r', over>4 && bar.scrollLeft<over-4);
+  }
+  function center(){
+    var on=bar.querySelector('.tab.on'); if(!on) return;
+    var over=bar.scrollWidth-bar.clientWidth; if(over<=4){ edge(); return; }
+    var want=on.offsetLeft-(bar.clientWidth-on.offsetWidth)/2;
+    bar.scrollTo({left:Math.max(0,Math.min(over,want)),behavior:'smooth'});
+    setTimeout(edge,260);
+  }
+  if(window.MutationObserver){
+    var ob=new MutationObserver(function(){ center(); });
+    bar.querySelectorAll('.tab').forEach(function(t){
+      ob.observe(t,{attributes:true,attributeFilter:['class']}); });
+  }
+  bar.addEventListener('scroll',edge,{passive:true});
+  window.addEventListener('resize',function(){ center(); edge(); });
+  bar.addEventListener('wheel',function(e){
+    if(Math.abs(e.deltaY)>Math.abs(e.deltaX) && bar.scrollWidth>bar.clientWidth){
+      bar.scrollLeft+=e.deltaY; e.preventDefault(); }
+  },{passive:false});
+  window.addEventListener('load',function(){ center(); edge(); });
+  setTimeout(function(){ center(); edge(); },100);
+  edge();
+})();
 </script>
 </body>
 </html>

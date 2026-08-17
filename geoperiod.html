@@ -165,6 +165,69 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
 .verdict.info{background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.35);}
 
 /* 사진 */
+/* ── 화석이란: 한자·사진·암석 ── */
+.hanja{margin-bottom:14px;}
+.hj-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.hj{display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;padding:10px 16px;min-width:78px;}
+.hj .ch{font-size:1.9rem;font-weight:800;line-height:1.05;color:var(--text);}
+.hj .rd{font-size:.74rem;color:var(--dim);}
+.hj .rd b{color:var(--accent);font-size:.82rem;}
+.hj-plus,.hj-eq{font-size:1.15rem;font-weight:800;color:var(--dim);}
+.hj-mean{font-size:1.05rem;font-weight:800;color:var(--accent);
+  background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.32);
+  border-radius:10px;padding:12px 18px;}
+.two-photo{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.two-photo figure{margin:0;background:var(--surface-2);border:1px solid var(--line-2);
+  border-radius:11px;overflow:hidden;display:flex;flex-direction:column;}
+.two-photo img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#f1f5f9;}
+.two-photo figcaption{padding:11px 13px;display:flex;flex-direction:column;gap:5px;}
+.two-photo .tag{align-self:flex-start;font-size:.68rem;font-weight:800;padding:3px 9px;border-radius:5px;}
+.two-photo .tag.body{background:rgba(56,189,248,.16);color:var(--accent);}
+.two-photo .tag.trace{background:rgba(217,119,6,.14);color:var(--warm);}
+.two-photo figcaption>b{font-size:.86rem;}
+.two-photo .ds{font-size:.76rem;color:var(--mid);line-height:1.7;word-break:keep-all;}
+.two-photo .ds b{color:var(--text);}
+.didyou{margin-top:13px;background:var(--surface-2);border-left:3px solid var(--warm);
+  border-radius:0 9px 9px 0;padding:12px 14px;font-size:.78rem;color:var(--mid);
+  line-height:1.8;word-break:keep-all;}
+.didyou>b:first-child{display:block;color:var(--warm);font-size:.81rem;margin-bottom:4px;}
+.didyou b{color:var(--text);}
+.kind2{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.kbox{border:1px solid var(--line-2);border-radius:11px;padding:14px;background:var(--surface-2);}
+.kbox.body{border-top:3px solid var(--accent);}
+.kbox.trace{border-top:3px solid var(--warm);}
+.kbox h4{font-size:.9rem;font-weight:800;margin-bottom:8px;}
+.kbox h4 small{font-weight:600;font-size:.73rem;color:var(--dim);margin-left:5px;}
+.kbox p{font-size:.79rem;color:var(--mid);line-height:1.75;word-break:keep-all;margin-bottom:8px;}
+.kbox p b,.kbox li b{color:var(--text);}
+.kbox ul{margin:0 0 9px 17px;font-size:.78rem;color:var(--mid);line-height:1.85;word-break:keep-all;}
+.kwhat,.kweak{font-size:.76rem;line-height:1.75;border-radius:7px;padding:8px 11px;
+  margin-top:7px;word-break:keep-all;}
+.kwhat{background:rgba(22,163,74,.09);border:1px solid rgba(22,163,74,.26);color:var(--mid);}
+.kweak{background:rgba(120,140,160,.10);border:1px solid var(--line-2);color:var(--dim);}
+.kwhat>b:first-child,.kweak>b:first-child{display:block;margin-bottom:3px;}
+.kwhat>b:first-child{color:#15803d;} .kweak>b:first-child{color:var(--mid);}
+.rock{border-radius:10px;padding:13px 15px;margin-bottom:11px;border:1px solid var(--line-2);}
+.rock.ok{background:rgba(22,163,74,.06);border-color:rgba(22,163,74,.28);}
+.rock.no{background:rgba(120,140,160,.07);}
+.rk-h{font-size:.87rem;font-weight:800;color:var(--text);margin-bottom:7px;
+  display:flex;align-items:center;gap:8px;word-break:keep-all;}
+.rk-h .mk{flex:0 0 auto;width:21px;height:21px;border-radius:50%;display:grid;place-items:center;
+  font-size:.74rem;font-weight:800;}
+.rock.ok .mk{background:rgba(22,163,74,.18);color:#15803d;}
+.rock.no .mk{background:rgba(148,163,184,.28);color:var(--mid);}
+.rock p{font-size:.79rem;color:var(--mid);line-height:1.8;word-break:keep-all;margin-bottom:7px;}
+.rock p b{color:var(--text);}
+.rock ul{margin:0 0 8px 17px;font-size:.79rem;color:var(--mid);line-height:1.85;word-break:keep-all;}
+.rock .pt{font-weight:700;color:var(--text);border-top:1px dashed var(--line-2);padding-top:8px;margin-bottom:0;}
+.rock .pt.sm{font-weight:500;font-size:.75rem;color:var(--dim);}
+.rock .pt.sm b{color:var(--mid);}
+.dt td.yes{color:#15803d;font-weight:800;} .dt td.non{color:var(--dim);font-weight:700;}
+@media(max-width:700px){
+  .two-photo,.kind2{grid-template-columns:1fr;}
+  .hj-row{justify-content:center;} .hj .ch{font-size:1.6rem;}
+}
 .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:11px;}
 .pcard{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;overflow:hidden;
   cursor:pointer;transition:.15s;text-align:left;padding:0;color:var(--text);width:100%;}
@@ -355,7 +418,139 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
 <section class="page" data-page="1"><div class="scroll"><div class="pane">
   <h2 class="sec">화석이란 무엇인가</h2>
   <p class="sub"><b class="hl">화석</b>은 지질 시대에 살았던 생물의 <b class="hl">유해나 흔적</b>이
-    지층 속에 남아 있는 것입니다. 지층은 대부분 <b class="hl">퇴적암</b>이므로, 화석은 주로 퇴적암에서 발견됩니다.</p>
+    지층 속에 남아 있는 것입니다.</p>
+
+  <!-- ── 한자 풀이 ── -->
+  <div class="card hanja">
+    <div class="hj-row">
+      <div class="hj"><span class="ch">化</span><span class="rd">될 <b>화</b></span></div>
+      <div class="hj-plus">+</div>
+      <div class="hj"><span class="ch">石</span><span class="rd">돌 <b>석</b></span></div>
+      <div class="hj-eq">=</div>
+      <div class="hj-mean"><b>돌이 된 것</b></div>
+    </div>
+    <p class="note" style="margin-top:12px">
+      이름 그대로 <b>생물이 돌로 바뀐 것</b>을 가리킵니다. 땅에 묻힌 뼈나 껍데기의 빈틈으로
+      지하수가 스며들면, 물에 녹아 있던 광물이 그 자리에 앉으면서 원래의 성분을 조금씩 갈아치웁니다.
+      오랜 시간이 지나면 <b>모양은 그대로인데 재료만 돌로 바뀐 것</b>이 남습니다.</p>
+    <p class="note" style="margin-top:8px">
+      다만 이 이름이 화석 전부를 담지는 못합니다. <b class="hl-w">호박 속의 곤충</b>은 굳은 송진에 갇혔을 뿐 돌이 아니고,
+      <b class="hl-w">얼음 속의 매머드</b>는 살과 털까지 그대로입니다. <b class="hl-w">공룡 발자국</b>에 이르면
+      아예 몸이 없습니다. 그래서 정의는 "돌이 된 것"이 아니라
+      <b>지질 시대 생물의 유해나 흔적</b>이 됩니다. 한자는 <b>가장 흔한 경우</b>에 붙은 이름입니다.</p>
+  </div>
+
+  <!-- ── 두 장의 사진 ── -->
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">화석에는 두 갈래가 있습니다</h3>
+    <p class="note" style="margin-bottom:12px">둘 다 화석입니다. 그런데 남은 것이 전혀 다릅니다.</p>
+    <div class="two-photo">
+      <figure>
+        <img src="images/dynohead.jpeg" alt="박물관에 전시된 티라노사우루스의 두개골 화석" loading="lazy">
+        <figcaption>
+          <span class="tag body">🦴 체화석</span>
+          <b>티라노사우루스 두개골</b>
+          <span class="ds">생물의 <b>몸</b>이 남았습니다. 이빨이 몇 개인지, 턱이 얼마나 컸는지 —
+            <b>이 동물이 무엇이었는지</b>를 알려 줍니다.</span>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/trexpoo.jpeg" alt="사람이 두 손으로 들고 있는 커다란 공룡 분화석" loading="lazy">
+        <figcaption>
+          <span class="tag trace">👣 생흔화석</span>
+          <b>공룡의 똥 — 분화석</b>
+          <span class="ds">몸이 아니라 <b>살아 있을 때 남긴 자취</b>입니다. 무엇을 먹었는지 —
+            <b>이 동물이 어떻게 살았는지</b>를 알려 줍니다.</span>
+        </figcaption>
+      </figure>
+    </div>
+    <div class="didyou">
+      <b>똥 하나가 밝혀낸 것</b>
+      캐나다에서 발견된 길이 <b>약 44 cm</b>의 분화석은 티라노사우루스의 것으로 추정됩니다.
+      그 안에는 잘게 부서진 <b>뼛조각이 30~50%</b>나 들어 있었습니다.
+      티라노사우루스가 살점만 발라 먹은 것이 아니라 <b>뼈째 씹어 삼켰다</b>는 뜻입니다.
+      두개골만 보아서는 알 수 없었던 사실을, 똥이 알려 주었습니다.
+    </div>
+  </div>
+
+  <!-- ── 체화석 · 생흔화석 자세히 ── -->
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">두 갈래를 자세히</h3>
+    <div class="kind2">
+      <div class="kbox body">
+        <h4>🦴 체화석 <small>몸이 남은 것</small></h4>
+        <p><b>생물의 몸이나 그 일부</b>가 남은 화석입니다.</p>
+        <ul>
+          <li><b>잘 남는 부분</b> — 뼈, 이빨, 껍데기, 나무줄기처럼 <b>단단한 부분</b></li>
+          <li><b>잘 안 남는 부분</b> — 살, 피부, 내장. 죽자마자 썩거나 뜯어 먹힙니다</li>
+          <li><b>드문 경우</b> — 호박 속 곤충, 얼음 속 매머드처럼 <b>통째로</b> 남기도 합니다</li>
+        </ul>
+        <div class="kwhat"><b>알 수 있는 것</b> 생김새 · 크기 · 어떤 무리에 속하는 생물인지</div>
+        <div class="kweak"><b>못 하는 것</b> 살아 있을 때 어떻게 움직이고 무엇을 했는지는 알기 어렵습니다.</div>
+      </div>
+      <div class="kbox trace">
+        <h4>👣 생흔화석 <small>흔적이 남은 것</small></h4>
+        <p><b>생물이 살아 있을 때 남긴 활동의 자취</b>가 굳은 화석입니다. 몸은 없습니다.</p>
+        <ul>
+          <li><b>발자국</b> · 기어간 자국 · 땅을 판 <b>굴</b></li>
+          <li><b>알과 둥지</b> · 이빨 자국</li>
+          <li><b>배설물</b>이 굳은 <b>분화석</b></li>
+        </ul>
+        <div class="kwhat"><b>알 수 있는 것</b> 걸음의 보폭으로 <b>빠르기</b>를,
+          나란한 발자국 여러 줄로 <b>무리 지어 다녔음</b>을, 분화석 속 내용물로 <b>먹이</b>를 읽습니다.</div>
+        <div class="kweak"><b>못 하는 것</b> 흔적의 <b>주인</b>을 콕 집어내기는 어렵습니다.
+          발자국만으로는 어느 공룡인지 확정할 수 없습니다.</div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:12px">
+      한마디로 <b class="hl">체화석은 "무엇이었나"</b>를, <b class="hl-w">생흔화석은 "어떻게 살았나"</b>를 알려 줍니다.
+      둘을 함께 보아야 옛 생물의 모습이 온전해집니다.</p>
+  </div>
+
+  <!-- ── 왜 퇴적암에서만 ── -->
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">화석은 왜 퇴적암에서만 나올까</h3>
+    <p class="note" style="margin-bottom:12px">암석은 만들어지는 방식에 따라 셋으로 나뉩니다.
+      <b>어떻게 만들어지는가</b>를 보면 화석이 남을 수 있는지가 저절로 드러납니다.</p>
+
+    <div class="rock ok">
+      <div class="rk-h"><span class="mk">○</span><b>퇴적암</b> — 자갈·모래·진흙이 쌓여 굳은 암석</div>
+      <p>물속에서 알갱이가 <b>차곡차곡 쌓이면서</b> 만들어집니다. 온도가 낮고, 조용하고, 천천히 진행됩니다.
+        생물이 죽어 그 사이에 묻히면 <b>탈 일도 눌려 뭉개질 일도 없습니다.</b>
+        게다가 물속에서는 흙이 빠르게 덮여, 썩거나 다른 동물에게 뜯기기 전에 갇혀 버립니다.</p>
+      <p class="pt">그래서 화석은 <b>거의 모두 퇴적암</b>에서 나옵니다.</p>
+    </div>
+
+    <div class="rock no">
+      <div class="rk-h"><span class="mk">✕</span><b>화성암</b> — 마그마나 용암이 식어 굳은 암석</div>
+      <p>마그마의 온도는 <b>약 700~1200 ℃</b>입니다. 생물이 그 안에 들어가면 남는 것이 아니라
+        <b>타서 없어집니다.</b> 뼈도 껍데기도 견디지 못합니다.</p>
+      <p>애초에 마그마는 땅속 깊은 곳에서 만들어져 올라오므로, 지표에 사는 생물이 섞여 들어갈 일 자체가 거의 없습니다.</p>
+      <p class="pt sm">다만 화산재가 <b>식은 뒤에 쌓여</b> 굳은 지층에는 화석이 남을 수 있습니다.
+        그때는 '쌓여서' 만들어진 것이니 퇴적 작용에 가깝습니다.</p>
+    </div>
+
+    <div class="rock no">
+      <div class="rk-h"><span class="mk">✕</span><b>변성암</b> — 원래 있던 암석이 열과 압력으로 성질이 바뀐 암석</div>
+      <p>화석이 든 퇴적암이 땅속 깊이 묻히면 <b>강한 열과 압력</b>을 받습니다. 그러면 두 가지 일이 일어납니다.</p>
+      <ul>
+        <li><b>광물이 새로 자랍니다.</b> 알갱이가 다시 결정을 이루며 커지는데, 이때 화석의 <b>섬세한 무늬가 뭉개집니다.</b></li>
+        <li><b>모양이 일그러집니다.</b> 한쪽으로 눌리고 다른 쪽으로 늘어나, 원래 생김새를 잃습니다.</li>
+      </ul>
+      <p class="pt sm">변성이 <b>약한 경우</b>에는 찌그러진 화석이 남기도 합니다.
+        아예 없다기보다 <b>온전한 모습으로 남기 어렵다</b>고 하는 편이 정확합니다.</p>
+    </div>
+
+    <table class="dt" style="margin-top:14px">
+      <tr><th>암석</th><th>만들어지는 방식</th><th>생물에게 벌어지는 일</th><th>화석</th></tr>
+      <tr><td><b>퇴적암</b></td><td>낮은 온도에서 쌓여 굳음</td><td>그 자리에 그대로 갇힌다</td><td class="yes">○ 잘 남는다</td></tr>
+      <tr><td><b>화성암</b></td><td>700~1200 ℃ 마그마가 식음</td><td>타서 없어진다</td><td class="non">✕ 남지 않는다</td></tr>
+      <tr><td><b>변성암</b></td><td>열과 압력으로 성질이 바뀜</td><td>뭉개지고 일그러진다</td><td class="non">✕ 온전히 남기 어렵다</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">지층은 대부분 퇴적암입니다. 그래서
+      "<b class="hl">화석은 주로 퇴적암에서 발견된다</b>"는 말은 외울 규칙이 아니라,
+      <b>암석이 만들어지는 방식에서 따라 나오는 결론</b>입니다.</p>
+  </div>
 
   <div class="card">
     <h3 class="sub3" style="margin-top:0">몸이 남으면 체화석, 흔적이 남으면 생흔화석</h3>

@@ -30,6 +30,58 @@ select,input,textarea{font:inherit;}
 .tabs{display:flex;gap:3px;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-behavior:smooth;padding-bottom:2px;}
 .tabs::-webkit-scrollbar{height:0;width:0;}
 .tab{flex:0 0 auto;}
+/* ═══════════ 생각 열기 (0페이지) ═══════════ */
+.hk-hero{background:linear-gradient(180deg,rgba(56,189,248,.10),rgba(56,189,248,.02));
+  border:1px solid rgba(56,189,248,.30);border-radius:14px;padding:20px 22px;margin-bottom:18px;}
+.hk-hero h1{font-size:1.32rem;font-weight:800;letter-spacing:-.03em;margin-bottom:8px;word-break:keep-all;}
+.hk-hero p{font-size:.85rem;color:var(--mid);line-height:1.85;word-break:keep-all;}
+.hk-hero b{color:var(--text);}
+.hk-scene{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:16px;margin-bottom:16px;}
+.hk-q{font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:4px;word-break:keep-all;}
+.hk-sub{font-size:.79rem;color:var(--dim);line-height:1.7;margin-bottom:12px;word-break:keep-all;}
+.hk-opts{display:grid;gap:9px;}
+.hk-opt{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line-2);
+  border-radius:10px;padding:13px 15px;cursor:pointer;background:var(--surface-2);
+  transition:.14s;text-align:left;width:100%;}
+.hk-opt:hover{border-color:var(--accent);background:var(--surface-3);}
+.hk-opt.on{border-color:var(--accent);background:rgba(56,189,248,.10);
+  box-shadow:inset 0 0 0 1px var(--accent);}
+.hk-opt .mk{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--line-2);
+  margin-top:1px;transition:.14s;}
+.hk-opt.on .mk{border-color:var(--accent);background:var(--accent);
+  box-shadow:inset 0 0 0 3px var(--surface);}
+.hk-opt .tx{font-size:.85rem;font-weight:700;color:var(--text);line-height:1.6;word-break:keep-all;}
+.hk-opt .tx small{display:block;font-weight:500;font-size:.75rem;color:var(--dim);margin-top:3px;line-height:1.6;}
+.hk-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch;margin-bottom:14px;}
+.hk-card{border:1px solid var(--line-2);border-radius:12px;padding:14px;background:var(--surface-2);}
+.hk-card h4{font-size:.9rem;font-weight:800;margin-bottom:9px;color:var(--text);}
+.hk-card dl{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:.79rem;line-height:1.6;}
+.hk-card dt{color:var(--dim);white-space:nowrap;}
+.hk-card dd{color:var(--text);font-weight:700;word-break:keep-all;}
+.hk-mid{display:flex;align-items:center;font-size:1.05rem;font-weight:800;color:var(--dim);}
+.hk-why{margin-top:14px;}
+.hk-why label{display:block;font-size:.79rem;font-weight:700;color:var(--mid);margin-bottom:6px;}
+.hk-lock{margin-top:14px;background:var(--surface-2);border-left:3px solid var(--warm);
+  border-radius:0 8px 8px 0;padding:11px 14px;font-size:.79rem;color:var(--mid);
+  line-height:1.75;word-break:keep-all;}
+.hk-lock b{color:var(--warm);}
+.hk-go{margin-top:18px;}
+/* 총정리에서 되감기 */
+.hk-back{background:var(--surface);border:1px solid rgba(56,189,248,.35);
+  border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:16px 18px;margin-bottom:20px;}
+.hk-back h3{font-size:.92rem;font-weight:800;color:var(--accent);margin-bottom:10px;}
+.hk-back .then{background:var(--surface-2);border-radius:8px;padding:11px 13px;margin-bottom:12px;}
+.hk-back .then .lb{font-size:.72rem;font-weight:800;color:var(--dim);margin-bottom:5px;}
+.hk-back .then .vl{font-size:.84rem;color:var(--text);line-height:1.7;word-break:keep-all;}
+.hk-back .then .vl em{font-style:normal;color:var(--dim);}
+.hk-back label{display:block;font-size:.79rem;font-weight:700;color:var(--mid);margin:12px 0 6px;}
+.hk-back .hint{font-size:.75rem;color:var(--dim);line-height:1.65;margin-top:8px;word-break:keep-all;}
+@media(max-width:640px){
+  .hk-vs{grid-template-columns:1fr;}
+  .hk-mid{justify-content:center;padding:2px 0;}
+  .hk-hero h1{font-size:1.14rem;}
+}
 /* 화면이 좁아지면 탭에 자리를 내준다 — 부제 → 성취기준 순으로 접는다.
    제목은 nowrap 이라 그냥 두면 탭 줄을 통째로 밀어내 버린다. */
 .topbar h1{min-width:0;overflow:hidden;text-overflow:ellipsis;}
@@ -214,11 +266,12 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
 <header class="topbar">
   <h1>💥 대멸종과 생물 다양성 <span>— 다섯 번의 대격변</span></h1>
   <nav class="tabs">
-    <button class="tab on" data-tab="0"><span class="tab-n">0</span>대멸종이란</button>
-    <button class="tab" data-tab="1"><span class="tab-n">1</span>다섯 번의 대멸종</button>
-    <button class="tab" data-tab="2"><span class="tab-n">2</span>원인을 심판하다</button>
-    <button class="tab" data-tab="3"><span class="tab-n">3</span>그 이후에 일어난 일</button>
-    <button class="tab" data-tab="4"><span class="tab-n">4</span>총정리</button>
+    <button class="tab on" data-tab="0"><span class="tab-n">0</span>생각 열기</button>
+    <button class="tab" data-tab="1"><span class="tab-n">1</span>대멸종이란</button>
+    <button class="tab" data-tab="2"><span class="tab-n">2</span>다섯 번의 대멸종</button>
+    <button class="tab" data-tab="3"><span class="tab-n">3</span>원인을 심판하다</button>
+    <button class="tab" data-tab="4"><span class="tab-n">4</span>그 이후에 일어난 일</button>
+    <button class="tab" data-tab="5"><span class="tab-n">5</span>총정리</button>
   </nav>
   <div class="std">[10통과2-01-01]</div>
 </header>
@@ -226,7 +279,61 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
 <div class="wrap">
 
 <!-- ══════ 0 ══════ -->
+<!-- ══════ 0. 생각 열기 ══════ -->
 <section class="page on" data-page="0"><div class="scroll"><div class="pane">
+  <div class="hk-hero">
+    <h1>어느 쪽이 대멸종인가</h1>
+    <p>두 사건을 저울에 올려 보겠습니다. 둘 다 <b>실제로 있었던 일</b>입니다.<br>
+       하나는 <b>대멸종</b>이라 부르고, 다른 하나는 그렇게 부르지 않습니다.</p>
+  </div>
+
+  <div class="hk-scene">
+    <div class="hk-vs">
+      <div class="hk-card">
+        <h4>사건 A</h4>
+        <dl>
+          <dt>무슨 일</dt><dd>화산이 터진 섬 하나에서<br>20종이 사라졌다</dd>
+          <dt>걸린 시간</dt><dd>몇 달</dd>
+          <dt>범위</dt><dd>섬 하나</dd>
+        </dl>
+      </div>
+      <div class="hk-mid">vs</div>
+      <div class="hk-card">
+        <h4>사건 B</h4>
+        <dl>
+          <dt>무슨 일</dt><dd>전 세계 바다에서<br>삼엽충이 모두 사라졌다</dd>
+          <dt>걸린 시간</dt><dd>약 300만 년</dd>
+          <dt>범위</dt><dd>지구 전체</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="hk-q">둘 중 <b>대멸종</b>은 어느 쪽일까요?</div>
+    <p class="hk-sub">아직 배우지 않은 내용입니다. 지금의 감으로 판단해 보세요.</p>
+    <div class="hk-opts" id="hk-opts"></div>
+
+    <div class="hk-why">
+      <label for="hk-why">그렇게 본 근거는 무엇인가요? 한 줄이면 됩니다.</label>
+      <textarea id="hk-why" data-q="[생각 열기] 어느 쪽이 대멸종인가 — 처음 예상의 근거"
+        placeholder="예: 짧은 시간에 한꺼번에 사라졌으니까…"></textarea>
+    </div>
+
+    <div class="hk-lock">
+      <b>지금은 정답을 알려 주지 않습니다.</b> 적어 둔 예상은 그대로 보관되었다가
+      <b>총정리</b>에서 다시 나타납니다. 그때 생각이 바뀌었는지 스스로 보게 됩니다.
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <p class="sub" style="margin:0;">대멸종의 정의에는 <b>세 가지 조건</b>이 들어갑니다.
+      짧은 시간 · 많은 종 · <b>그리고 하나 더</b>. 그 하나가 무엇인지 알아내는 것이 이 활동의 시작입니다.</p>
+  </div>
+
+  <div class="hk-go"><button class="btn primary" data-jump="1">시작하기 — 대멸종이란 →</button></div>
+</div></div></section>
+
+<!-- ══════ 1. 대멸종이란 ══════ -->
+<section class="page" data-page="1"><div class="scroll"><div class="pane">
   <h2 class="sec">멸종은 늘 일어난다 — 그런데 가끔 한꺼번에 일어난다</h2>
   <p class="sub">생물이 사라지는 일은 지질 시대 내내 꾸준히 있었습니다. 이것을 <b class="hl">배경 멸종</b>이라고 합니다.
     그런데 어떤 시기에는 <b class="hl-b">짧은 시간 동안 넓은 지역에서 많은 종이 한꺼번에</b> 사라졌습니다.
@@ -308,7 +415,7 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
 </div></div></section>
 
 <!-- ══════ 1 ══════ -->
-<section class="page" data-page="1"><div class="scroll"><div class="pane">
+<section class="page" data-page="2"><div class="scroll"><div class="pane">
   <h2 class="sec">다섯 번의 대멸종</h2>
   <p class="sub">각 사건의 이름은 <b class="hl">그 사건으로 끝난 기(紀)</b>에서 따옵니다.
     카드를 눌러 자세히 살펴보세요. 사라진 생물과 살아남은 생물이 그다음 시대의 주인공을 결정했습니다.</p>
@@ -332,7 +439,7 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
 </div></div></section>
 
 <!-- ══════ 2 ══════ -->
-<section class="page" data-page="2"><div class="scroll"><div class="pane">
+<section class="page" data-page="3"><div class="scroll"><div class="pane">
   <h2 class="sec">원인을 심판하다</h2>
   <p class="sub">대멸종의 원인은 <b class="hl">지구 환경의 급격한 변화</b>입니다.
     그런데 "무엇이 그 변화를 일으켰는가"에 대해서는 여러 가설이 경쟁합니다.
@@ -390,7 +497,7 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
 </div></div></section>
 
 <!-- ══════ 3 ══════ -->
-<section class="page" data-page="3"><div class="scroll"><div class="pane">
+<section class="page" data-page="4"><div class="scroll"><div class="pane">
   <h2 class="sec">그 이후에 일어난 일</h2>
   <p class="sub">대멸종은 끝이 아니었습니다. 사라진 자리는 비어 있지 않았고,
     살아남은 생물이 그 자리를 채우며 <b class="hl">전혀 새로운 생물 다양성</b>이 만들어졌습니다.</p>
@@ -425,9 +532,10 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
 </div></div></section>
 
 <!-- ══════ 4 ══════ -->
-<section class="page" data-page="4"><div class="scroll"><div class="pane">
+<section class="page" data-page="5"><div class="scroll"><div class="pane">
   <h2 class="sec">활동 총정리</h2>
   <p class="sub">작성한 답안과 활동 결과를 모았습니다. 확인한 뒤 학습지로 저장하거나 인쇄하세요.</p>
+  <div class="hk-back" id="hk-back"></div>
   <div class="card"><h3 class="sub3" style="margin-top:0">활동 기록</h3><table class="dt" id="scoretbl"></table></div>
   <div class="card"><h3 class="sub3" style="margin-top:0">내가 쓴 답안</h3><div id="anshost"></div></div>
   <div class="card"><h3 class="sub3" style="margin-top:0">스스로 점검</h3><div id="chkhost"></div></div>
@@ -461,13 +569,58 @@ if(!window.Worksheet) document.write('<scr'+'ipt src="worksheet.js"><\/scr'+'ipt
 <script>
 /* ══════════════ 공통 ══════════════ */
 const esc = s => String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+
+/* ══════════════ 생각 열기 ══════════════
+   도입은 답을 주지 않는다. 예상만 받아 두었다가 총정리에서 되돌려 준다.
+   생각이 바뀌었다는 사실보다 '무엇을 보고 바뀌었나'를 쓰게 하는 것이 목적. */
+const HOOK = {
+  opts:[
+    {k:'A', t:'사건 A — 화산섬에서 몇 달 만에 20종', s:'빠르고 한꺼번에 사라졌다'},
+    {k:'B', t:'사건 B — 전 세계 삼엽충이 300만 년에 걸쳐', s:'느리지만 지구 전체에서 사라졌다'},
+    {k:'both', t:'둘 다 대멸종이다'},
+    {k:'none', t:'둘 다 대멸종이 아니다'}
+  ],
+  pick:null, now:''
+};
+function renderHook(){
+  const h=document.getElementById('hk-opts'); if(!h) return;
+  h.innerHTML=HOOK.opts.map(o=>
+    '<button class="hk-opt'+(HOOK.pick===o.k?' on':'')+'" data-hk="'+o.k+'">'+
+    '<span class="mk"></span><span class="tx">'+o.t+
+    (o.s?'<small>'+o.s+'</small>':'')+'</span></button>').join('');
+  h.querySelectorAll('[data-hk]').forEach(b=>b.addEventListener('click',()=>{
+    HOOK.pick=b.dataset.hk; renderHook();
+  }));
+}
+const hookPickText = ()=>{ const o=HOOK.opts.find(x=>x.k===HOOK.pick); return o? o.t : '(고르지 않음)'; };
+const hookWhy = ()=>{ const el=document.getElementById('hk-why'); return el? (el.value||'').trim() : ''; };
+function renderHookBack(){
+  const el=document.getElementById('hk-back'); if(!el) return;
+  const why=hookWhy();
+  el.innerHTML=
+    '<h3>처음에 나는 이렇게 생각했다</h3>'+
+    '<div class="then"><div class="lb">고른 답</div>'+
+      '<div class="vl">'+(HOOK.pick?esc(hookPickText()):'<em>고르지 않았습니다</em>')+'</div></div>'+
+    '<div class="then"><div class="lb">그렇게 본 까닭</div>'+
+      '<div class="vl">'+(why?esc(why):'<em>쓰지 않았습니다</em>')+'</div></div>'+
+    '<label for="hk-now">지금은 어떻게 생각하나요? 생각이 바뀌었다면 '+
+      '<b>무엇을 보고</b> 바뀌었는지 함께 쓰세요.</label>'+
+    '<textarea id="hk-now" placeholder="예: 처음에는 A라고 생각했다. 그런데 배경 멸종과 대멸종을 가르는 조건에 넓은 지역이 들어가는 것을 보고…"></textarea>'+
+    '<div class="hint">답이 바뀐 것보다 <b>무엇이 바뀌게 했는지</b>가 중요합니다. 그것이 탐구입니다.</div>';
+  const t=el.querySelector('#hk-now'); if(t){ t.value=HOOK.now||'';
+    t.addEventListener('input',()=>{ HOOK.now=t.value; }); }
+}
+document.querySelectorAll('[data-jump]').forEach(b=>b.addEventListener('click',()=>{
+  const t=document.querySelector('.tab[data-tab="'+b.dataset.jump+'"]'); if(t) t.click();
+}));
+renderHook();
 document.querySelectorAll('.tab').forEach(t=>{
   t.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
     document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
     t.classList.add('on');
     document.querySelector('.page[data-page="'+t.dataset.tab+'"]').classList.add('on');
-    if(t.dataset.tab==='4') renderSummaryTab();
+    if(t.dataset.tab==='5') renderSummaryTab();
   });
 });
 
@@ -972,8 +1125,15 @@ const CHECKS=[
 ];
 let chkState={};
 function collectAnswers(){
-  return QIDS.map(id=>{const el=document.getElementById(id);
+  /* 활동지 한 장에서 '처음 예상 → 지금 생각'이 한눈에 보이도록 앞뒤에 붙인다. */
+  const head=[{q:'[생각 열기] 어느 쪽이 대멸종인가 — 처음 고른 답', a:HOOK.pick? hookPickText() : '', lines:2},
+              {q:'[생각 열기] 그렇게 본 근거', a:hookWhy(), lines:3}];
+  const body=QIDS.map(id=>{const el=document.getElementById(id);
     return {q:el.dataset.q, a:el.value.trim(), lines:4};});
+  const nowEl=document.getElementById('hk-now');
+  const tail=[{q:'[되감기] 지금은 어떻게 생각하나 — 무엇을 보고 바뀌었나',
+               a:(nowEl? nowEl.value : (HOOK.now||'')).trim(), lines:5}];
+  return head.concat(body, tail);
 }
 function scoreRows(){
   const bgR=BGCASES.filter((c,i)=>bgAns[i]===c.a).length;
@@ -1019,6 +1179,7 @@ const SUMMARY=[
         '오늘날 종이 사라지는 속도가 매우 빠르다는 연구가 많습니다. 과거 다섯 번과 다른 점은 <b>원인이 사람</b>이라는 것이고, 그래서 인류가 속도를 늦출 수 있는 최초의 대멸종이기도 합니다.']}
 ];
 function renderSummaryTab(){
+  renderHookBack();
   document.getElementById('scoretbl').innerHTML='<tr><th>활동</th><th>결과</th></tr>'+
     scoreRows().map(r=>'<tr><td>'+r[0]+'</td><td class="num"><b>'+r[1]+'</b></td></tr>').join('');
   document.getElementById('anshost').innerHTML=collectAnswers().map(x=>

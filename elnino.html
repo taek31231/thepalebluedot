@@ -30,6 +30,70 @@ select,input,textarea{font:inherit;}
 .tabs{display:flex;gap:3px;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-behavior:smooth;padding-bottom:2px;}
 .tabs::-webkit-scrollbar{height:0;width:0;}
 .tab{flex:0 0 auto;}
+/* ═══════════ 생각 열기 (0페이지) ═══════════ */
+.hkmap-wrap{border:1px solid var(--line-2);border-radius:10px;overflow:hidden;background:#0d1b2a;line-height:0;}
+#hkmap{width:100%;height:auto;display:block;cursor:crosshair;touch-action:manipulation;}
+.hkmap-bar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+.hkmap-bar span{font-size:.79rem;color:var(--mid);font-weight:700;margin-right:auto;}
+.hkmap-res{margin-top:13px;border-radius:10px;padding:13px 15px;font-size:.81rem;line-height:1.8;
+  background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.30);color:var(--mid);word-break:keep-all;}
+.hkmap-res b{color:var(--text);}
+.hkmap-res .big{display:block;font-size:.9rem;font-weight:800;color:var(--accent);margin-bottom:6px;}
+.hkmap-t{width:100%;border-collapse:collapse;font-size:.77rem;margin-top:9px;}
+.hkmap-t th,.hkmap-t td{border:1px solid var(--line);padding:5px 8px;text-align:center;}
+.hkmap-t th{background:var(--surface-2);color:var(--dim);font-size:.72rem;}
+
+.hk-hero{background:linear-gradient(180deg,rgba(56,189,248,.10),rgba(56,189,248,.02));
+  border:1px solid rgba(56,189,248,.30);border-radius:14px;padding:20px 22px;margin-bottom:18px;}
+.hk-hero h1{font-size:1.32rem;font-weight:800;letter-spacing:-.03em;margin-bottom:8px;word-break:keep-all;}
+.hk-hero p{font-size:.85rem;color:var(--mid);line-height:1.85;word-break:keep-all;}
+.hk-hero b{color:var(--text);}
+.hk-scene{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:16px;margin-bottom:16px;}
+.hk-q{font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:4px;word-break:keep-all;}
+.hk-sub{font-size:.79rem;color:var(--dim);line-height:1.7;margin-bottom:12px;word-break:keep-all;}
+.hk-opts{display:grid;gap:9px;}
+.hk-opt{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line-2);
+  border-radius:10px;padding:13px 15px;cursor:pointer;background:var(--surface-2);
+  transition:.14s;text-align:left;width:100%;}
+.hk-opt:hover{border-color:var(--accent);background:var(--surface-3);}
+.hk-opt.on{border-color:var(--accent);background:rgba(56,189,248,.10);
+  box-shadow:inset 0 0 0 1px var(--accent);}
+.hk-opt .mk{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--line-2);
+  margin-top:1px;transition:.14s;}
+.hk-opt.on .mk{border-color:var(--accent);background:var(--accent);
+  box-shadow:inset 0 0 0 3px var(--surface);}
+.hk-opt .tx{font-size:.85rem;font-weight:700;color:var(--text);line-height:1.6;word-break:keep-all;}
+.hk-opt .tx small{display:block;font-weight:500;font-size:.75rem;color:var(--dim);margin-top:3px;line-height:1.6;}
+.hk-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch;margin-bottom:14px;}
+.hk-card{border:1px solid var(--line-2);border-radius:12px;padding:14px;background:var(--surface-2);}
+.hk-card h4{font-size:.9rem;font-weight:800;margin-bottom:9px;color:var(--text);}
+.hk-card dl{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:.79rem;line-height:1.6;}
+.hk-card dt{color:var(--dim);white-space:nowrap;}
+.hk-card dd{color:var(--text);font-weight:700;word-break:keep-all;}
+.hk-mid{display:flex;align-items:center;font-size:1.05rem;font-weight:800;color:var(--dim);}
+.hk-why{margin-top:14px;}
+.hk-why label{display:block;font-size:.79rem;font-weight:700;color:var(--mid);margin-bottom:6px;}
+.hk-lock{margin-top:14px;background:var(--surface-2);border-left:3px solid var(--warm);
+  border-radius:0 8px 8px 0;padding:11px 14px;font-size:.79rem;color:var(--mid);
+  line-height:1.75;word-break:keep-all;}
+.hk-lock b{color:var(--warm);}
+.hk-go{margin-top:18px;}
+/* 총정리에서 되감기 */
+.hk-back{background:var(--surface);border:1px solid rgba(56,189,248,.35);
+  border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:16px 18px;margin-bottom:20px;}
+.hk-back h3{font-size:.92rem;font-weight:800;color:var(--accent);margin-bottom:10px;}
+.hk-back .then{background:var(--surface-2);border-radius:8px;padding:11px 13px;margin-bottom:12px;}
+.hk-back .then .lb{font-size:.72rem;font-weight:800;color:var(--dim);margin-bottom:5px;}
+.hk-back .then .vl{font-size:.84rem;color:var(--text);line-height:1.7;word-break:keep-all;}
+.hk-back .then .vl em{font-style:normal;color:var(--dim);}
+.hk-back label{display:block;font-size:.79rem;font-weight:700;color:var(--mid);margin:12px 0 6px;}
+.hk-back .hint{font-size:.75rem;color:var(--dim);line-height:1.65;margin-top:8px;word-break:keep-all;}
+@media(max-width:640px){
+  .hk-vs{grid-template-columns:1fr;}
+  .hk-mid{justify-content:center;padding:2px 0;}
+  .hk-hero h1{font-size:1.14rem;}
+}
 /* 화면이 좁아지면 탭에 자리를 내준다 — 부제 → 성취기준 순으로 접는다.
    제목은 nowrap 이라 그냥 두면 탭 줄을 통째로 밀어내 버린다. */
 .topbar h1{min-width:0;overflow:hidden;text-overflow:ellipsis;}
@@ -233,13 +297,14 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 <header class="topbar">
   <h1>🌀 사막화와 엘니뇨 <span>— 바람이 바꾸는 세계</span></h1>
   <nav class="tabs">
-    <button class="tab on" data-tab="0"><span class="tab-n">0</span>대기 대순환</button>
-    <button class="tab" data-tab="1"><span class="tab-n">1</span>지구의 바람</button>
-    <button class="tab" data-tab="2"><span class="tab-n">2</span>사막화</button>
-    <button class="tab" data-tab="3"><span class="tab-n">3</span>평상시의 태평양</button>
-    <button class="tab" data-tab="4"><span class="tab-n">4</span>엘니뇨와 라니냐</button>
-    <button class="tab" data-tab="5"><span class="tab-n">5</span>실제 관측</button>
-    <button class="tab" data-tab="6"><span class="tab-n">6</span>총정리</button>
+    <button class="tab on" data-tab="0"><span class="tab-n">0</span>생각 열기</button>
+    <button class="tab" data-tab="1"><span class="tab-n">1</span>대기 대순환</button>
+    <button class="tab" data-tab="2"><span class="tab-n">2</span>지구의 바람</button>
+    <button class="tab" data-tab="3"><span class="tab-n">3</span>사막화</button>
+    <button class="tab" data-tab="4"><span class="tab-n">4</span>평상시의 태평양</button>
+    <button class="tab" data-tab="5"><span class="tab-n">5</span>엘니뇨와 라니냐</button>
+    <button class="tab" data-tab="6"><span class="tab-n">6</span>실제 관측</button>
+    <button class="tab" data-tab="7"><span class="tab-n">7</span>총정리</button>
   </nav>
   <div class="std">[10통과2-02-03]</div>
 </header>
@@ -247,7 +312,41 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 <div class="wrap">
 
 <!-- ══════ 0 ══════ -->
+<!-- ══════ 0. 생각 열기 ══════ -->
 <section class="page on" data-page="0"><div class="scroll"><div class="pane">
+  <div class="hk-hero">
+    <h1>사막을 찍어 보세요</h1>
+    <p>국경도 지명도 지운 세계 지도입니다. 지형만 남아 있습니다.<br>
+       이 지구 어딘가에 <b>큰 사막</b>이 있습니다. 어디일 것 같은지 <b>세 군데</b>를 눌러 보세요.</p>
+  </div>
+
+  <div class="hk-scene">
+    <div class="hk-q">큰 사막이 있을 것 같은 곳 세 군데</div>
+    <p class="hk-sub">지도를 눌러 표시합니다. 다시 누르면 지워집니다. 세 개를 다 찍으면 확인 버튼이 열립니다.</p>
+    <div class="hkmap-wrap"><canvas id="hkmap"></canvas></div>
+    <div class="hkmap-bar">
+      <span id="hkmap-cnt">0 / 3 표시함</span>
+      <button class="btn" id="hkmap-clear">다시 찍기</button>
+      <button class="btn primary" id="hkmap-check" disabled>실제 사막 위치와 견주기</button>
+    </div>
+    <div id="hkmap-out"></div>
+
+    <div class="hk-why">
+      <label for="hk-why">왜 그곳을 골랐나요? 한 줄로 적어 보세요.</label>
+      <textarea id="hk-why" data-q="[생각 열기] 사막이 있을 곳 — 처음 예상의 근거"
+        placeholder="예: 적도가 가장 더우니까 그 근처에 사막이 있을 것 같았다."></textarea>
+    </div>
+
+    <div class="hk-lock">
+      <b>왜 그런지는 지금 설명하지 않습니다.</b> 이 활동을 마치면 여러분이 직접 설명할 수 있게 됩니다.
+      적어 둔 예상은 <b>총정리</b>에서 다시 나타납니다.
+    </div>
+  </div>
+
+  <div class="hk-go"><button class="btn primary" data-jump="1">시작하기 — 대기 대순환 →</button></div>
+</div></div></section>
+
+<section class="page" data-page="1"><div class="scroll"><div class="pane">
   <h2 class="sec">지구가 둥글어서 생기는 거대한 바람</h2>
   <p class="sub">앞 단원에서 <b class="hl">위도 38°</b>를 경계로 저위도는 에너지가 남고 고위도는 모자란다는 것을 보았습니다.
     그 불균형을 해소하려고 공기가 지구 규모로 움직이는데, 이것이 <b class="hl">대기 대순환</b>입니다.
@@ -317,7 +416,7 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 </div></div></section>
 
 <!-- ══════ 1 ══════ -->
-<section class="page" data-page="1"><div class="scroll"><div class="pane">
+<section class="page" data-page="2"><div class="scroll"><div class="pane">
   <h2 class="sec">지상과 상공, 바람이 반대로 분다</h2>
   <p class="sub">순환은 <b class="hl">고리</b>입니다. 지상에서 한쪽으로 간 공기는 상공에서 반대쪽으로 돌아와야 합니다.
     그래서 <b class="hl">지상과 상공의 바람 방향이 반대</b>가 됩니다. 지도에서 직접 확인해 보세요.</p>
@@ -372,7 +471,7 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 </div></div></section>
 
 <!-- ══════ 2 ══════ -->
-<section class="page" data-page="2"><div class="scroll"><div class="pane">
+<section class="page" data-page="3"><div class="scroll"><div class="pane">
   <h2 class="sec">사막은 왜 위도 30° 부근에 있을까</h2>
   <p class="sub">세계의 큰 사막들은 신기하게도 <b class="hl">위도 30° 부근</b>에 몰려 있습니다.
     사하라, 아라비아, 타르, 칼라하리, 오스트레일리아 사막이 모두 그렇습니다. 우연이 아닙니다.</p>
@@ -463,7 +562,7 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 </div></div></section>
 
 <!-- ══════ 2 ══════ -->
-<section class="page" data-page="3"><div class="scroll"><div class="pane">
+<section class="page" data-page="4"><div class="scroll"><div class="pane">
   <h2 class="sec">평상시의 태평양 — 바람이 바닷물을 민다</h2>
   <p class="sub">컵에 담긴 물 위를 입으로 불면 물이 한쪽으로 쏠립니다.
     태평양에서도 <b class="hl">무역풍</b>이 늘 같은 방향으로 불기 때문에 바닷물의 윗부분이 서쪽으로 밀립니다.
@@ -499,7 +598,7 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 </div></div></section>
 
 <!-- ══════ 3 ══════ -->
-<section class="page" data-page="4"><div class="scroll"><div class="pane">
+<section class="page" data-page="5"><div class="scroll"><div class="pane">
   <h2 class="sec">무역풍이 바뀌면 세계의 날씨가 바뀐다</h2>
   <p class="sub"><b class="hl">엘니뇨</b>는 스페인어로 '아기 예수'라는 뜻입니다.
     남아메리카 서해안에 몇 해에 한 번씩 따뜻한 바닷물이 흘러드는 일이 주로 크리스마스 무렵에 나타나
@@ -560,7 +659,7 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 </div></div></section>
 
 <!-- ══════ 5 ══════ -->
-<section class="page" data-page="5"><div class="scroll"><div class="pane">
+<section class="page" data-page="6"><div class="scroll"><div class="pane">
   <h2 class="sec">지금은 어떤 상태일까 — 실제 바다를 재어 보자</h2>
   <p class="sub">앞에서는 슬라이더로 가상의 태평양을 움직여 봤습니다.
     이제 <b class="hl">진짜 바다의 수온</b>을 불러와 지금이 엘니뇨인지 라니냐인지 직접 판정해 봅시다.</p>
@@ -645,9 +744,10 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 </div></div></section>
 
 <!-- ══════ 6 ══════ -->
-<section class="page" data-page="6"><div class="scroll"><div class="pane">
+<section class="page" data-page="7"><div class="scroll"><div class="pane">
   <h2 class="sec">활동 총정리</h2>
   <p class="sub">작성한 답안과 활동 결과를 모았습니다. 확인한 뒤 학습지로 저장하거나 인쇄하세요.</p>
+  <div class="hk-back" id="hk-back"></div>
   <div class="card"><h3 class="sub3" style="margin-top:0">활동 기록</h3><table class="dt" id="scoretbl"></table></div>
   <div class="card"><h3 class="sub3" style="margin-top:0">내가 쓴 답안</h3><div id="anshost"></div></div>
   <div class="card"><h3 class="sub3" style="margin-top:0">스스로 점검</h3><div id="chkhost"></div></div>
@@ -677,6 +777,187 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 if(!window.Worksheet) document.write('<scr'+'ipt src="worksheet.js"><\/scr'+'ipt>');</script>
 <script>
 const esc=s=>String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+
+/* ══════════════ 생각 열기 ══════════════
+   도입은 답을 주지 않는다. 예상만 받아 두었다가 총정리에서 되돌려 준다. */
+const HOOK = { opts:[], pick:null, now:'' };
+function renderHook(){
+  const h=document.getElementById('hk-opts'); if(!h) return;
+  h.innerHTML=HOOK.opts.map(o=>
+    '<button class="hk-opt'+(HOOK.pick===o.k?' on':'')+'" data-hk="'+o.k+'">'+
+    '<span class="mk"></span><span class="tx">'+o.t+
+    (o.s?'<small>'+o.s+'</small>':'')+'</span></button>').join('');
+  h.querySelectorAll('[data-hk]').forEach(b=>b.addEventListener('click',()=>{
+    HOOK.pick=b.dataset.hk; renderHook(); }));
+}
+const hookPickText = ()=>{ const o=HOOK.opts.find(x=>x.k===HOOK.pick); return o? o.t : '(고르지 않음)'; };
+const hookWhy = ()=>{ const el=document.getElementById('hk-why'); return el? (el.value||'').trim() : ''; };
+function renderHookBack(){
+  const el=document.getElementById('hk-back'); if(!el) return;
+  const why=hookWhy();
+  el.innerHTML=
+    '<h3>처음에 나는 이렇게 생각했다</h3>'+
+    '<div class="then"><div class="lb">내가 찍은 세 곳</div>'+
+      '<div class="vl">'+(hookFirst()||'<em>기록이 없습니다</em>')+'</div></div>'+
+    '<div class="then"><div class="lb">그렇게 본 까닭</div>'+
+      '<div class="vl">'+(why?esc(why):'<em>쓰지 않았습니다</em>')+'</div></div>'+
+    '<label for="hk-now">지금은 어떻게 생각하나요? 생각이 바뀌었다면 '+
+      '<b>무엇을 보고</b> 바뀌었는지 함께 쓰세요.</label>'+
+    '<textarea id="hk-now" placeholder="예: 처음에는 적도 근처를 찍었다. 그런데 대기 대순환에서 위도 30°에 하강 기류가 생기는 것을 보고…"></textarea>'+
+    '<div class="hint">답이 바뀐 것보다 <b>무엇이 바뀌게 했는지</b>가 중요합니다. 그것이 탐구입니다.</div>';
+  const t=el.querySelector('#hk-now'); if(t){ t.value=HOOK.now||'';
+    t.addEventListener('input',()=>{ HOOK.now=t.value; }); }
+}
+document.querySelectorAll('[data-jump]').forEach(b=>b.addEventListener('click',()=>{
+  const t=document.querySelector('.tab[data-tab="'+b.dataset.jump+'"]'); if(t) t.click(); }));
+function hookFirst(){ return HK.pins.length? esc(HK.pins.map(p=>latLabel(p.lat)).join(' · ')) : ''; }
+renderHook();
+/* ── 사막 찍어 보기 ──────────────────────────────────
+   학생이 지도를 눌러 예상 위치를 찍는다. 세 개가 차면 실제 사막 위치를 겹쳐 보여 준다.
+   대부분 적도 근처를 찍는데, 실제 큰 사막은 위도 30° 두 줄에 늘어서 있다.
+   이 어긋남이 대기 대순환을 배울 이유가 된다. 여기서 까닭은 설명하지 않는다.  */
+const HK = { pins:[], shown:false };
+const HKDESERTS=[
+  {n:'사하라',        lat:23,  lon:13},
+  {n:'아라비아',      lat:24,  lon:45},
+  {n:'칼라하리·나미브',lat:-24, lon:19},
+  {n:'그레이트빅토리아',lat:-27, lon:128},
+  {n:'아타카마',      lat:-24, lon:-69},
+  {n:'소노라·치와와',  lat:29,  lon:-108},
+  {n:'타르',          lat:27,  lon:71},
+  {n:'고비',          lat:43,  lon:104},
+  {n:'타클라마칸',    lat:39,  lon:83}
+];
+function latLabel(la){
+  const a=Math.round(Math.abs(la));
+  return a<1? '적도' : (a+'°'+(la>0?'N':'S'));
+}
+function hookFirstPlain(){
+  return HK.pins.length? HK.pins.map(p=>latLabel(p.lat)).join(' · ') : '';
+}
+(function initHkMap(){
+  const cv=document.getElementById('hkmap'); if(!cv) return;
+  const W=920, H=470;              // 정거원통도법: 경도 −180~180, 위도 −85~85
+  const x2lon=x=>x/W*360-180, lon2x=l=>(l+180)/360*W;
+  const y2lat=y=>85-y/H*170,  lat2y=la=>(85-la)/170*H;
+
+  /* 대륙 윤곽 — 세밀할 필요는 없다. '어디가 육지인가'만 보이면 된다.
+     사막 9곳이 모두 육지 위에 놓이는지 좌표로 확인해 두었다. */
+  const LAND=[
+    /* 북아메리카 */
+    [[-168,66],[-160,71],[-130,70],[-100,73],[-80,73],[-64,60],[-55,52],[-66,45],[-76,35],[-81,25],
+     [-90,29],[-97,26],[-105,22],[-115,30],[-124,40],[-125,49],[-135,58],[-150,60]],
+    /* 그린란드 */
+    [[-45,60],[-20,70],[-20,82],[-60,82],[-55,68]],
+    /* 남아메리카 */
+    [[-81,8],[-75,11],[-60,11],[-50,5],[-35,-5],[-39,-15],[-48,-25],[-58,-34],[-62,-40],[-68,-50],
+     [-75,-53],[-73,-45],[-71,-30],[-70,-18],[-77,-5]],
+    /* 아프리카 */
+    [[-17,15],[-17,21],[-10,31],[0,36],[11,37],[20,32],[32,31],[35,23],[38,18],[43,12],[51,12],
+     [42,-1],[40,-15],[35,-24],[25,-34],[18,-34],[12,-18],[9,4],[3,6],[-8,4],[-13,9]],
+    /* 유라시아 (아라비아·인도 포함, 페르시아만은 메워 단순화) */
+    [[-10,36],[0,38],[12,38],[20,40],[28,41],[36,36],[35,31],[38,22],[43,13],[52,14],[57,17],[58,24],
+     [62,25],[67,25],[72,20],[73,15],[77,8],[80,13],[87,21],[92,21],[97,16],[99,10],[104,10],[109,11],
+     [108,21],[113,22],[121,31],[122,37],[126,35],[129,42],[135,45],[142,54],[155,59],[162,61],[170,60],
+     [180,65],[180,73],[140,74],[100,77],[70,73],[45,70],[30,70],[15,68],[5,62],[8,55],[3,48],[-2,43]],
+    /* 오스트레일리아 */
+    [[113,-22],[114,-33],[118,-35],[129,-32],[137,-35],[141,-38],[147,-43],[150,-37],[153,-28],
+     [146,-19],[142,-11],[136,-12],[130,-11],[125,-14],[117,-20]],
+    /* 영국 · 일본 · 뉴질랜드 · 마다가스카르 */
+    [[-6,50],[1,51],[2,53],[-1,56],[-3,58],[-6,58],[-5,54]],
+    [[130,31],[136,34],[140,36],[142,40],[142,45],[139,42],[135,34],[131,32]],
+    [[173,-35],[178,-38],[174,-41],[171,-44],[167,-46],[170,-43],[172,-40]],
+    [[43,-12],[50,-15],[48,-25],[45,-22],[43,-16]]
+  ];
+  function draw(){
+    cv.width=W; cv.height=H;
+    const g=cv.getContext('2d');
+    g.fillStyle='#0d1b2a'; g.fillRect(0,0,W,H);
+    /* 위도선 */
+    g.strokeStyle='rgba(148,180,210,.16)'; g.lineWidth=1;
+    for(let la=-60;la<=60;la+=30){ g.beginPath(); g.moveTo(0,lat2y(la)); g.lineTo(W,lat2y(la)); g.stroke(); }
+    for(let lo=-150;lo<=150;lo+=30){ g.beginPath(); g.moveTo(lon2x(lo),0); g.lineTo(lon2x(lo),H); g.stroke(); }
+    /* 적도 */
+    g.strokeStyle='rgba(250,204,21,.55)'; g.lineWidth=1.6; g.setLineDash([7,5]);
+    g.beginPath(); g.moveTo(0,lat2y(0)); g.lineTo(W,lat2y(0)); g.stroke(); g.setLineDash([]);
+    g.fillStyle='rgba(250,204,21,.85)'; g.font='bold 11px system-ui'; g.textAlign='left';
+    g.fillText('적도 0°', 6, lat2y(0)-6);
+    /* 육지 */
+    g.fillStyle='#274156'; g.strokeStyle='#3d5e78'; g.lineWidth=1;
+    LAND.forEach(poly=>{
+      g.beginPath();
+      poly.forEach((p,i)=>{ const x=lon2x(p[0]), y=lat2y(p[1]); i?g.lineTo(x,y):g.moveTo(x,y); });
+      g.closePath(); g.fill(); g.stroke();
+    });
+    /* 정답 겹치기 */
+    if(HK.shown){
+      [30,-30].forEach(la=>{
+        g.strokeStyle='rgba(239,68,68,.75)'; g.lineWidth=2; g.setLineDash([9,6]);
+        g.beginPath(); g.moveTo(0,lat2y(la)); g.lineTo(W,lat2y(la)); g.stroke(); g.setLineDash([]);
+        g.fillStyle='rgba(239,68,68,.9)'; g.font='bold 11px system-ui'; g.textAlign='left';
+        g.fillText('위도 '+Math.abs(la)+'°'+(la>0?'N':'S'), 6, lat2y(la)-6);
+      });
+      HKDESERTS.forEach(d=>{
+        const x=lon2x(d.lon), y=lat2y(d.lat);
+        g.fillStyle='rgba(251,191,36,.85)';
+        g.beginPath(); g.ellipse(x,y,16,9,0,0,7); g.fill();
+        g.fillStyle='#fff7ed'; g.font='bold 10px system-ui'; g.textAlign='center';
+        g.fillText(d.n, x, y+21);
+      });
+    }
+    /* 내가 찍은 곳 */
+    HK.pins.forEach((p,i)=>{
+      const x=lon2x(p.lon), y=lat2y(p.lat);
+      g.strokeStyle='#38bdf8'; g.lineWidth=2.5;
+      g.beginPath(); g.arc(x,y,11,0,7); g.stroke();
+      g.fillStyle='#38bdf8'; g.beginPath(); g.arc(x,y,4,0,7); g.fill();
+      g.fillStyle='#e0f2fe'; g.font='bold 11px system-ui'; g.textAlign='center';
+      g.fillText((i+1)+' · '+latLabel(p.lat), x, y-16);
+    });
+  }
+  cv.addEventListener('click',e=>{
+    if(HK.shown) return;
+    const r=cv.getBoundingClientRect();
+    const x=(e.clientX-r.left)*(W/r.width), y=(e.clientY-r.top)*(H/r.height);
+    const lon=x2lon(x), lat=y2lat(y);
+    const hit=HK.pins.findIndex(p=>Math.hypot(lon2x(p.lon)-x, lat2y(p.lat)-y)<16);
+    if(hit>=0) HK.pins.splice(hit,1);
+    else if(HK.pins.length<3) HK.pins.push({lat,lon});
+    draw(); bar();
+  });
+  function bar(){
+    document.getElementById('hkmap-cnt').textContent=HK.pins.length+' / 3 표시함';
+    document.getElementById('hkmap-check').disabled = HK.pins.length!==3 || HK.shown;
+  }
+  document.getElementById('hkmap-clear').addEventListener('click',()=>{
+    HK.pins=[]; HK.shown=false; document.getElementById('hkmap-out').innerHTML=''; draw(); bar();
+  });
+  document.getElementById('hkmap-check').addEventListener('click',()=>{
+    HK.shown=true; draw(); bar(); result();
+  });
+  function result(){
+    const mine=HK.pins.map(p=>Math.abs(p.lat));
+    const near30=mine.filter(a=>a>=20&&a<=40).length;
+    const nearEq=mine.filter(a=>a<15).length;
+    const avg=(mine.reduce((a,b)=>a+b,0)/mine.length).toFixed(0);
+    const realAvg=(HKDESERTS.reduce((a,d)=>a+Math.abs(d.lat),0)/HKDESERTS.length).toFixed(0);
+    let msg;
+    if(near30>=2) msg='세 곳 중 <b>'+near30+'곳</b>을 위도 20~40° 사이에 찍었습니다. 실제 사막 띠와 잘 맞습니다.';
+    else if(nearEq>=2) msg='세 곳 중 <b>'+nearEq+'곳</b>을 적도 부근(위도 15° 안쪽)에 찍었습니다. 그런데 실제 큰 사막은 <b>적도에 거의 없습니다.</b> 적도는 오히려 비가 많이 오는 초록 지대입니다.';
+    else msg='찍은 곳이 여기저기 흩어져 있습니다. 실제 사막은 두 줄로 <b>가지런히</b> 늘어서 있습니다.';
+    document.getElementById('hkmap-out').innerHTML=
+      '<div class="hkmap-res"><span class="big">노란 점이 실제 큰 사막입니다.</span>'+msg+
+      '<table class="hkmap-t"><tr><th></th><th>평균 위도</th><th>적도 부근</th><th>위도 20~40°</th></tr>'+
+      '<tr><td><b>내가 찍은 곳</b></td><td>'+avg+'°</td><td>'+nearEq+'곳</td><td>'+near30+'곳</td></tr>'+
+      '<tr><td><b>실제 사막 9곳</b></td><td>'+realAvg+'°</td><td>0곳</td><td>'+
+        HKDESERTS.filter(d=>Math.abs(d.lat)>=20&&Math.abs(d.lat)<=40).length+'곳</td></tr></table>'+
+      '<div style="margin-top:10px">사막은 <b>가장 더운 곳</b>이 아니라 <b>위도 30° 부근</b>에 두 줄로 늘어서 있습니다. '+
+      '고비와 타클라마칸처럼 이 띠를 벗어난 것도 있는데, 그건 또 다른 까닭이 있습니다.<br>'+
+      '<b style="color:var(--accent)">왜 하필 30°일까요?</b> 그 답이 이 활동의 첫 장에 있습니다.</div></div>';
+  }
+  draw(); bar();
+})();
+
 document.querySelectorAll('.tab').forEach(t=>{
   t.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
@@ -684,8 +965,8 @@ document.querySelectorAll('.tab').forEach(t=>{
     t.classList.add('on');
     document.querySelector('.page[data-page="'+t.dataset.tab+'"]').classList.add('on');
     const tb=t.dataset.tab;
-    if(tb==='2'){ initDesMap(); if(desMap) setTimeout(()=>desMap.invalidateSize(),60); }
-    if(tb==='6') renderSummaryTab();
+    if(tb==='3'){ initDesMap(); if(desMap) setTimeout(()=>desMap.invalidateSize(),60); }
+    if(tb==='7') renderSummaryTab();
   });
 });
 function arw(x1,y1,x2,y2,col,w,head){
@@ -1732,8 +2013,15 @@ const CHECKS=[
 ];
 let chkState={};
 function collectAnswers(){
-  return QIDS.map(id=>{const el=document.getElementById(id);
+  /* 활동지 한 장에서 '처음 예상 → 지금 생각'이 한눈에 보이도록 앞뒤에 붙인다. */
+  const head=[{q:'[생각 열기] 사막이 있을 것 같은 곳 — 내가 찍은 세 곳', a:hookFirstPlain(), lines:2},
+              {q:'[생각 열기] 그렇게 고른 근거', a:hookWhy(), lines:3}];
+  const body=QIDS.map(id=>{const el=document.getElementById(id);
     return {q:el.dataset.q, a:el.value.trim(), lines:4};});
+  const nowEl=document.getElementById('hk-now');
+  const tail=[{q:'[되감기] 지금은 어떻게 생각하나 — 무엇을 보고 바뀌었나',
+               a:(nowEl? nowEl.value : (HOOK.now||'')).trim(), lines:5}];
+  return head.concat(body, tail);
 }
 function scoreRows(){
   return [
@@ -1774,6 +2062,7 @@ const SUMMARY=[
          ['서태평양 날씨','가뭄·산불','비 많음','홍수']]}
 ];
 function renderSummaryTab(){
+  renderHookBack();
   document.getElementById('scoretbl').innerHTML='<tr><th>활동</th><th>결과</th></tr>'+
     scoreRows().map(r=>'<tr><td>'+r[0]+'</td><td class="num"><b>'+r[1]+'</b></td></tr>').join('');
   document.getElementById('anshost').innerHTML=collectAnswers().map(x=>

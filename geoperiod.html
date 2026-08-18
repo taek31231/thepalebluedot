@@ -1019,6 +1019,10 @@ const PHOTOS = [
    d:'중생대 육상을 지배한 파충류입니다. 중생대 말 대멸종으로 대부분 사라졌지만, 한 갈래가 살아남아 오늘날의 새가 되었습니다.'},
   {id:'crurotarsi', n:'원시 악어류', era:'중생대 초기', kind:'체화석', single:true,
    d:'트라이아스기에 공룡과 함께 번성한 파충류 무리입니다. 트라이아스기 말 대멸종으로 크게 줄었고, 그 빈자리를 공룡이 채우며 쥐라기에 번성하게 됩니다.'},
+  {id:'foraminifera', n:'유공충', era:'캄브리아기 ~ 현재', kind:'체화석', pair:'shale',
+   d:'세포 하나로 된 아주 작은 생물인데, 석회질 껍데기를 두르고 삽니다. 껍데기에 뚫린 작은 구멍(孔)으로 실 같은 발을 내밀어 먹이를 잡아 <b>유공충</b>입니다. 대부분 0.1 mm 안팎이라 눈에 잘 보이지 않지만 수가 어마어마해서, 바다 밑에 쌓인 껍데기가 두꺼운 석회암층을 이룹니다. 캄브리아기부터 지금까지 이어져 온 무리라 무리 전체로는 시대를 좁혀 주지 못하지만, 그 안의 방추충·화폐석은 표준화석입니다.'},
+  {id:'fusulina', n:'방추충', era:'고생대 후기 (석탄기~페름기)', kind:'체화석 · 표준화석', pair:'shale',
+   d:'유공충 무리에 속하는 단세포 생물로, 쌀알처럼 <b>길쭉한 방추 모양</b>입니다. 껍데기 속이 작은 방으로 촘촘히 나뉘어 있어 단면을 자르면 나선이 보입니다. 약 9천만 년 동안 모습이 빠르게 바뀌었고 <b>페름기 말 대멸종으로 완전히 사라져</b>, 고생대 후기 지층을 가려내는 좋은 표준화석이 되었습니다. 같은 유공충인 화폐석(신생대)과 견주어 보세요.'},
   {id:'nummulites', n:'화폐석', era:'신생대 전기', kind:'체화석 · 표준화석',
    d:'동전처럼 생긴 큰 단세포 생물(유공충)입니다. 신생대 전기 따뜻한 바다에 엄청나게 많아, 이집트 피라미드의 석회암에도 들어 있습니다.'},
   {id:'mammoth', n:'매머드', era:'신생대 후기', kind:'체화석 · 표준화석',
@@ -1026,7 +1030,7 @@ const PHOTOS = [
 ];
 function drawGallery(){
   document.getElementById('galHost').innerHTML = PHOTOS.map(p=>{
-    const src = p.single ? 'images/'+p.id+'.jpeg' : 'images/'+p.id+'_restore.jpeg';
+    const src = (p.single||p.pair) ? 'images/'+p.id+'.jpeg' : 'images/'+p.id+'_restore.jpeg';
     return '<button class="pcard" data-id="'+p.id+'">'+
       '<img class="ph" src="'+src+'" alt="'+p.n+'" loading="lazy" '+
       'onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\');">'+
@@ -1036,10 +1040,15 @@ function drawGallery(){
 drawGallery();
 function openPhoto(id){
   const p=PHOTOS.find(x=>x.id===id); if(!p) return;
-  const imgs = p.single
-    ? '<figure><img src="images/'+p.id+'.jpeg" alt="'+p.n+'" onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')"><figcaption>'+p.n+'</figcaption></figure>'
-    : '<figure><img src="images/'+p.id+'_restore.jpeg" alt="복원도" onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')"><figcaption>살아 있을 때의 모습 (복원도)</figcaption></figure>'+
-      '<figure><img src="images/'+p.id+'_real.jpeg" alt="실제 화석" onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')"><figcaption>실제 화석</figcaption></figure>';
+  const ph=(src,cap,alt)=>'<figure><img src="'+src+'" alt="'+alt+'" '+
+    'onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')">'+
+    '<figcaption>'+cap+'</figcaption></figure>';
+  /* pair:'shale' — 파일 이름이 _restore/_real 규칙을 따르지 않는 쌍 사진 */
+  const imgs = p.single ? ph('images/'+p.id+'.jpeg', p.n, p.n)
+    : p.pair ? ph('images/'+p.id+'.jpeg','생물의 모습',p.n)+
+               ph('images/'+p.id+'_'+p.pair+'.jpeg','암석 속의 실제 화석',p.n+' 화석')
+    : ph('images/'+p.id+'_restore.jpeg','살아 있을 때의 모습 (복원도)','복원도')+
+      ph('images/'+p.id+'_real.jpeg','실제 화석','실제 화석');
   document.getElementById('mbox').innerHTML =
     '<div class="row" style="justify-content:space-between"><h3>'+p.n+'</h3>'+
     '<button class="btn sm" id="mClose">닫기 ✕</button></div>'+
@@ -1701,7 +1710,7 @@ function drawEra(){
   const e=ERAINFO[eraIdx];
   const pics = e.fossils.map(id=>{
     const p=PHOTOS.find(x=>x.id===id); if(!p) return '';
-    const src = p.single ? 'images/'+p.id+'.jpeg' : 'images/'+p.id+'_restore.jpeg';
+    const src = (p.single||p.pair) ? 'images/'+p.id+'.jpeg' : 'images/'+p.id+'_restore.jpeg';
     return '<button class="pcard" data-id="'+p.id+'">'+
       '<img class="ph" src="'+src+'" alt="'+p.n+'" loading="lazy" '+
       'onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')">'+

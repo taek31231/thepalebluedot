@@ -87,7 +87,7 @@ textarea{resize:vertical;min-height:62px;line-height:1.6;}
 .fill-row input{max-width:110px;text-align:right;}
 .chk-msg{font-size:.82rem;line-height:1.75;padding:11px 13px;border-radius:9px;margin-top:11px;word-break:keep-all;}
 .chk-msg.ok{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.35);color:#a7f3d0;}
-.chk-msg.no{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.35);color:#fca5a5;}
+.chk-msg.no{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.35);color:#b91c1c;}
 .chk-msg.wait{background:var(--surface-2);border:1px solid var(--line);color:var(--mid);}
 
 /* 체류시간 */
@@ -662,12 +662,20 @@ function drawBudget(){
     c.fillStyle='rgba(52,211,153,.9)'; c.beginPath(); c.arc(x,gY+18,3,0,Math.PI*2); c.fill(); }
   chip(370,gY+54, ok?'유출 40':'유출  ?', ok?'#0b7d73':'#dc2626','육지 → 바다');
 
-  /* --- 요약 --- */
-  c.fillStyle='#0b1420'; c.font='bold 13px Pretendard'; c.textAlign='center';
-  c.fillText('단위 : 1,000 km³ / 년      전체 증발 486  =  전체 강수 486', W/2, H-12);
-  c.fillStyle='#4a5a6b'; c.font='11px Pretendard'; c.textAlign='left';
-  c.fillText('육 지', 18, gY+24); c.textAlign='right';
-  c.fillText('바 다', W-16, gY+16);
+  /* --- 요약 ---
+     이 글자는 왼쪽 갈색 땅과 오른쪽 파란 바다에 걸쳐 놓인다.
+     어느 한 색으로는 한쪽에서 반드시 묻히므로, 흰 판을 깔고 그 위에 쓴다. */
+  c.font='bold 13px Pretendard'; c.textAlign='center';
+  const cap='단위 : 1,000 km³ / 년      전체 증발 486  =  전체 강수 486';
+  const cw=c.measureText(cap).width+26;
+  c.fillStyle='rgba(255,255,255,.92)';
+  if(c.roundRect){ c.beginPath(); c.roundRect(W/2-cw/2, H-28, cw, 22, 6); c.fill(); }
+  else c.fillRect(W/2-cw/2, H-28, cw, 22);
+  c.fillStyle='#0b1420'; c.fillText(cap, W/2, H-12);
+  /* 땅 이름표는 짙은 갈색 위에 있으므로 밝은 색으로 */
+  c.font='bold 11px Pretendard'; c.textAlign='left';
+  c.fillStyle='#e7d7c3'; c.fillText('육 지', 18, gY+24);
+  c.textAlign='right'; c.fillStyle='#0c4a6e'; c.fillText('바 다', W-16, gY+16);
 }
 function loopBudget(){
   if($('page1').classList.contains('on')){ tw++; drawBudget(); }

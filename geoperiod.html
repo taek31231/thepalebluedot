@@ -228,6 +228,11 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
   .two-photo,.kind2{grid-template-columns:1fr;}
   .hj-row{justify-content:center;} .hj .ch{font-size:1.6rem;}
 }
+.noimg{width:100%;aspect-ratio:4/3;display:grid;place-items:center;background:var(--surface-3);
+  border:1px dashed var(--line-2);border-radius:6px;}
+.noimg span{font-size:.74rem;color:var(--dim);font-weight:700;}
+.noimg.big{aspect-ratio:4/3;min-height:180px;}
+.pcard.nophoto{opacity:.85;}
 .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:11px;}
 .pcard{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;overflow:hidden;
   cursor:pointer;transition:.15s;text-align:left;padding:0;color:var(--text);width:100%;}
@@ -327,6 +332,10 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
 .dbstat span{font-size:.68rem;color:var(--dim);}
 
 /* 분포 지도 */
+/* 지도 바탕을 옅은 회색으로 — 표시한 점이 도드라지게.
+   CARTO 기본 지도는 API 키를 요구하게 바뀌어 OpenStreetMap 으로 교체했다. */
+.leaflet-tile-pane{filter:grayscale(1) brightness(1.06) contrast(.9) opacity(.72);}
+.leaflet-control-attribution{font-size:9px;opacity:.65;}
 #map{height:400px;border-radius:10px;border:1px solid var(--line-2);background:#f8fafc;}
 .leaflet-container{background:#f8fafc;}
 .maptools{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
@@ -1000,37 +1009,50 @@ document.getElementById('condReset').addEventListener('click',()=>{
 /* 사진 갤러리 */
 const PHOTOS = [
   {id:'stromatolite', n:'스트로마톨라이트', era:'선캄브리아 시대', kind:'체화석',
+   caps:['지금도 자라고 있는 스트로마톨라이트','화석이 된 단면'],
    d:'남세균이 얕은 바다에서 층층이 쌓여 만든 돌기둥입니다. 남세균의 광합성으로 바다와 대기에 산소가 쌓이기 시작했고, 그 결과가 뒷날 오존층과 육상 생물로 이어집니다. 약 35억 년 전 것까지 발견됩니다.'},
   {id:'ediacara', n:'에디아카라 동물군', era:'선캄브리아 시대 말', kind:'체화석',
    d:'약 6억 년 전, 단단한 껍데기가 없는 납작한 다세포 생물들입니다. 몸이 부드러워 화석이 드물게 남았습니다. 최초의 다세포 동물 화석군으로 꼽힙니다.'},
   {id:'trilobite', n:'삼엽충', era:'고생대', kind:'체화석 · 표준화석',
    d:'몸이 세로로 세 갈래로 나뉘어 삼엽충입니다. 캄브리아기에 나타나 고생대 내내 바다에 번성하다가 고생대 말 대멸종으로 완전히 사라졌습니다. 고생대의 대표 표준화석입니다.'},
-  {id:'brachiopod', n:'완족류', era:'고생대 번성 (현재도 생존)', kind:'체화석',
+  {id:'brachiopod', n:'완족류', era:'고생대 번성 (현재도 생존)', kind:'체화석', pair:'restore',
+   caps:['화석 (고생대 스피리퍼류)','지금도 살아 있는 완족류 — 껍데기 뒤의 <b>육경</b>으로 바닥에 붙는다'],
    d:'조개처럼 보이지만 다른 무리입니다. 고생대에 크게 번성했고 지금도 살아 있습니다. 지금도 살아 있기 때문에 시대를 좁혀주지 못해 표준화석으로는 쓰지 않습니다.'},
   {id:'graptolite', n:'필석', era:'고생대 전기', kind:'체화석 · 표준화석', single:true,
-   d:'톱니 모양으로 생긴 군체 생물입니다. 바다에 떠다니며 넓게 퍼졌고 형태가 빠르게 바뀌어, 고생대 전기 지층을 맞추는 데 매우 유용합니다.'},
-  {id:'ostracoderm', n:'갑주어', era:'고생대 (데본기 번성)', kind:'체화석 · 표준화석', single:true,
+   caps:['복원도 — 위쪽 <b>부유기</b>에 매달려 떠다녔다'],
+   d:'톱니 모양으로 생긴 군체 생물입니다. 바다에 떠다니며 넓게 퍼졌고 형태가 빠르게 바뀌어, 고생대 전기 지층을 맞추는 데 매우 유용합니다.<br><b>오르도비스기 말 대멸종</b>으로 종의 대부분이 사라졌지만, 살아남은 한 갈래가 <b>실루리아기에 다시 번성</b>했고 데본기 전기까지 이어졌습니다. 위 생존 기간 막대가 오르도비스기를 넘어 길게 뻗은 것은 그 때문입니다 — <b>막대는 무리 전체의 기간</b>입니다.'},
+  {id:'ostracoderm', n:'갑주어', era:'고생대 (데본기 번성)', kind:'체화석 · 표준화석', pair:'real',
+   caps:['복원도 — 눈이 <b>등 쪽</b>에 붙어 있고 <b>턱이 없다</b>','실제 화석 (올드레드사암)'],
    d:'턱이 없고 머리에 단단한 갑옷을 두른 원시 어류입니다. 데본기에 번성해 이 시기를 "어류의 시대"라 부르게 했고, 고생대 말 이전에 사라졌습니다.'},
   {id:'ammonite', n:'암모나이트', era:'중생대', kind:'체화석 · 표준화석',
    d:'나선형 껍데기를 가진 바다 연체동물입니다. 종류가 매우 빠르게 바뀌어 중생대 지층의 시대를 세밀하게 나누는 데 쓰입니다. 중생대 말 대멸종으로 사라졌습니다.'},
   {id:'dino_tracks', n:'공룡 발자국', era:'중생대', kind:'생흔화석',
+   caps:['발자국을 남긴 공룡 (복원도)','실제 발자국 화석'],
    d:'몸이 아니라 걸어간 흔적이 굳은 것입니다. 발자국의 크기·보폭·방향으로 공룡의 몸집과 걷는 속도, 무리 생활 여부까지 추정할 수 있습니다. 우리나라 경상도 일대에 세계적인 산지가 있습니다.'},
   {id:'dinosaur', n:'공룡', era:'중생대', kind:'체화석 · 표준화석', single:true,
    d:'중생대 육상을 지배한 파충류입니다. 중생대 말 대멸종으로 대부분 사라졌지만, 한 갈래가 살아남아 오늘날의 새가 되었습니다.'},
   {id:'crurotarsi', n:'원시 악어류', era:'중생대 초기', kind:'체화석', single:true,
    d:'트라이아스기에 공룡과 함께 번성한 파충류 무리입니다. 트라이아스기 말 대멸종으로 크게 줄었고, 그 빈자리를 공룡이 채우며 쥐라기에 번성하게 됩니다.'},
   {id:'foraminifera', n:'유공충', era:'캄브리아기 ~ 현재', kind:'체화석', pair:'shale',
+   caps:['전자현미경으로 본 껍데기','실제 껍데기 (확대)'],
    d:'세포 하나로 된 아주 작은 생물인데, 석회질 껍데기를 두르고 삽니다. 껍데기에 뚫린 작은 구멍(孔)으로 실 같은 발을 내밀어 먹이를 잡아 <b>유공충</b>입니다. 대부분 0.1 mm 안팎이라 눈에 잘 보이지 않지만 수가 어마어마해서, 바다 밑에 쌓인 껍데기가 두꺼운 석회암층을 이룹니다. 캄브리아기부터 지금까지 이어져 온 무리라 무리 전체로는 시대를 좁혀 주지 못하지만, 그 안의 방추충·화폐석은 표준화석입니다.'},
   {id:'fusulina', n:'방추충', era:'고생대 후기 (석탄기~페름기)', kind:'체화석 · 표준화석', pair:'shale',
+   caps:['구조와 단면','실제 화석 (파키스탄 · 페름기)'],
    d:'유공충 무리에 속하는 단세포 생물로, 쌀알처럼 <b>길쭉한 방추 모양</b>입니다. 껍데기 속이 작은 방으로 촘촘히 나뉘어 있어 단면을 자르면 나선이 보입니다. 약 9천만 년 동안 모습이 빠르게 바뀌었고 <b>페름기 말 대멸종으로 완전히 사라져</b>, 고생대 후기 지층을 가려내는 좋은 표준화석이 되었습니다. 같은 유공충인 화폐석(신생대)과 견주어 보세요.'},
   {id:'nummulites', n:'화폐석', era:'신생대 전기', kind:'체화석 · 표준화석',
+   caps:['옛 도판 — 겉모습과 <b>단면의 나선 구조</b>','실제 화석'],
    d:'동전처럼 생긴 큰 단세포 생물(유공충)입니다. 신생대 전기 따뜻한 바다에 엄청나게 많아, 이집트 피라미드의 석회암에도 들어 있습니다.'},
   {id:'mammoth', n:'매머드', era:'신생대 후기', kind:'체화석 · 표준화석',
    d:'털이 길게 난 코끼리 무리로 빙하기의 추운 초원에 살았습니다. 시베리아 얼음 속에서 살과 털까지 그대로 남은 개체가 발견되기도 합니다.'}
 ];
 function drawGallery(){
   document.getElementById('galHost').innerHTML = PHOTOS.map(p=>{
-    const src = (p.single||p.pair) ? 'images/'+p.id+'.jpeg' : 'images/'+p.id+'_restore.jpeg';
+    /* nophoto — 사진이 과학적으로 맞지 않거나 저작권 문제가 있어 잠시 내린 항목 */
+    if(p.nophoto) return '<button class="pcard nophoto" data-id="'+p.id+'">'+
+      '<div class="ph noimg"><span>사진 준비 중</span></div>'+
+      '<div class="cap"><b>'+p.n+'</b><span>'+p.era+'</span></div></button>';
+    const src = p.only ? 'images/'+p.only+'.jpeg'
+              : (p.single||p.pair) ? 'images/'+p.id+'.jpeg' : 'images/'+p.id+'_restore.jpeg';
     return '<button class="pcard" data-id="'+p.id+'">'+
       '<img class="ph" src="'+src+'" alt="'+p.n+'" loading="lazy" '+
       'onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\');">'+
@@ -1043,12 +1065,19 @@ function openPhoto(id){
   const ph=(src,cap,alt)=>'<figure><img src="'+src+'" alt="'+alt+'" '+
     'onerror="this.style.background=\'#e2e8f0\';this.removeAttribute(\'src\')">'+
     '<figcaption>'+cap+'</figcaption></figure>';
-  /* pair:'shale' — 파일 이름이 _restore/_real 규칙을 따르지 않는 쌍 사진 */
-  const imgs = p.single ? ph('images/'+p.id+'.jpeg', p.n, p.n)
-    : p.pair ? ph('images/'+p.id+'.jpeg','생물의 모습',p.n)+
-               ph('images/'+p.id+'_'+p.pair+'.jpeg','암석 속의 실제 화석',p.n+' 화석')
-    : ph('images/'+p.id+'_restore.jpeg','살아 있을 때의 모습 (복원도)','복원도')+
-      ph('images/'+p.id+'_real.jpeg','실제 화석','실제 화석');
+  /* caps — 사진의 성격이 항목마다 다르다. 어떤 것은 화가가 그린 복원도이고,
+     어떤 것은 지금도 살아 있는 생물을 찍은 사진이며, 옛 도판인 것도 있다.
+     일률적으로 "복원도"라고 붙이면 거짓말이 되므로 항목마다 지정한다. */
+  const C = p.caps || ['살아 있을 때의 모습 (복원도)','실제 화석'];
+  const imgs = p.nophoto
+      ? '<figure><div class="noimg big"><span>사진 준비 중</span></div>'+
+        '<figcaption>알맞은 사진을 확보하는 대로 넣겠습니다.</figcaption></figure>'
+    : p.only ? ph('images/'+p.only+'.jpeg', C[0], p.n)
+    : p.single ? ph('images/'+p.id+'.jpeg', C[0], p.n)
+    : p.pair ? ph('images/'+p.id+'.jpeg', C[0], p.n)+
+               ph('images/'+p.id+'_'+p.pair+'.jpeg', C[1], p.n)
+    : ph('images/'+p.id+'_restore.jpeg', C[0], p.n)+
+      ph('images/'+p.id+'_real.jpeg', C[1], p.n);
   document.getElementById('mbox').innerHTML =
     '<div class="row" style="justify-content:space-between"><h3>'+p.n+'</h3>'+
     '<button class="btn sm" id="mClose">닫기 ✕</button></div>'+
@@ -1263,7 +1292,7 @@ let map=null, ptLayer=null, curTaxon=null, locMode='now', occCache={}, paleoCach
 function initMap(){
   if(map || typeof L==='undefined') return;
   map = L.map('map',{worldCopyJump:true, minZoom:1, attributionControl:false}).setView([15,10],1);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:8})
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:8,attribution:'© OpenStreetMap contributors'})
     .addTo(map);
   // 위도 띠 (열대 / 온대 / 한대)
   const bands=[[23.44,66.56,'#2563eb',.07],[-66.56,-23.44,'#2563eb',.07],[-23.44,23.44,'#9c5c00',.09],
@@ -1586,7 +1615,7 @@ drawTimeline();
 /* 지층 A~G 문제 */
 const LAYERS = [
   {n:'G층', c:'#c4b49a', fos:['㉣']},
-  {n:'F층', c:'#b9a998', fos:['㉢','㉣']},
+  {n:'F층', c:'#b9a998', fos:['㉢']},
   {n:'E층', c:'#a98263', fos:['㉡','㉢']},
   {n:'D층', c:'#9fc6c0', fos:['㉠','㉡']},
   {n:'C층', c:'#8fa3ab', fos:['㉠','㉡']},
@@ -1597,7 +1626,10 @@ const SQS = [
   {q:'㉠~㉣ 중 <b>생존 기간이 가장 긴</b> 화석은?', opts:['㉠','㉡','㉢','㉣'], ans:'㉠',
    w:'㉠은 A·B·C·D 네 개 층에서 나옵니다. 여러 층에 걸쳐 나온다는 것은 그만큼 <b>오래 살았다</b>는 뜻입니다.'},
   {q:'㉠~㉣ 중 <b>표준화석으로 가장 알맞은</b> 것은?', opts:['㉠','㉡','㉢','㉣'], ans:'㉣',
-   w:'㉣은 F·G 두 층에서만 나와 생존 기간이 짧습니다. 생존 기간이 짧을수록 지층의 시대를 좁게 찍어 주므로 표준화석으로 알맞습니다. (㉢도 E·F 두 층이라 비슷하지만, ㉣이 가장 위쪽의 좁은 구간에 몰려 있어 시대를 가장 잘 갈라 줍니다.)'},
+   w:'나타나는 층의 수를 세어 보세요. ㉠은 네 층(A~D), ㉡은 세 층(C~E), ㉢은 두 층(E·F), <b>㉣은 G층 한 곳뿐</b>입니다. '+
+     '구간이 좁을수록 지층의 시대를 좁게 찍어 주므로 ㉣이 가장 알맞습니다.<br>'+
+     '<b>다만 이것만으로는 부족합니다.</b> 표준화석의 조건은 두 가지 — 짧은 생존 기간과 <b>넓은 분포</b>입니다. '+
+     '이 그림은 <b>한 지역</b>만 보여 주므로, 실제로는 다른 지역에서도 ㉣이 나오는지 확인해야 합니다.'},
   {q:'<b>C층과 D층</b>이 같은 시기에 쌓였는지 판단할 근거로 알맞은 것은?',
    opts:['㉠과 ㉡이 모두 나온다','색이 다르다','층의 두께가 다르다','G층에서 멀다'], ans:'㉠과 ㉡이 모두 나온다',
    w:'멀리 떨어진 지층이라도 <b>같은 화석 무리</b>가 나오면 비슷한 시기에 쌓인 것으로 봅니다. C층과 D층은 ㉠·㉡이 함께 나오므로 시기가 겹칩니다. 이것이 화석으로 지층을 맞추는 방법입니다.'},

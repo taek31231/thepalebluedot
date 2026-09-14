@@ -30,6 +30,10 @@ button{font:inherit;cursor:pointer;color:var(--text);}
   padding:3px 8px;border-radius:5px;white-space:nowrap;}
 .tabs{display:flex;gap:3px;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-behavior:smooth;padding-bottom:2px;}
 .tabs::-webkit-scrollbar{height:0;width:0;}
+/* 지도 바탕을 옅은 회색으로 — 표시한 점이 도드라지게.
+   CARTO 기본 지도는 API 키를 요구하게 바뀌어 OpenStreetMap 으로 교체했다. */
+.leaflet-tile-pane{filter:grayscale(1) brightness(1.06) contrast(.9) opacity(.72);}
+.leaflet-control-attribution{font-size:9px;opacity:.65;}
 .tab{flex:0 0 auto;}
 /* 화면이 좁아지면 탭에 자리를 내준다 — 부제 → 성취기준 순으로 접는다.
    제목은 nowrap 이라 그냥 두면 탭 줄을 통째로 밀어내 버린다. */
@@ -118,10 +122,10 @@ textarea{resize:vertical;min-height:62px;line-height:1.6;}
   border:1px solid var(--line-2);background:var(--surface-2);transition:.15s;}
 .jb:hover{background:var(--surface-3);}
 .jb.ok{border-color:var(--good);background:rgba(52,211,153,.15);color:#a7f3d0;}
-.jb.no{border-color:var(--bad);background:rgba(248,113,113,.13);color:#fca5a5;}
+.jb.no{border-color:var(--bad);background:rgba(248,113,113,.13);color:#b91c1c;}
 .fb{font-size:.78rem;line-height:1.7;padding:10px 12px;border-radius:8px;display:none;word-break:keep-all;}
 .fb.on{display:block;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.35);color:#a7f3d0;}
-.fb.bad{display:block;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.35);color:#fca5a5;}
+.fb.bad{display:block;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.35);color:#b91c1c;}
 
 /* 경계 표 */
 .bt-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;}
@@ -643,8 +647,7 @@ function initMap(){
       /* 좌우로 끝없이 이어지는 지도 (태평양이 잘리지 않는다) */
       map=L.map('lmap',{zoomControl:true,minZoom:1,maxZoom:8,worldCopyJump:true,
         attributionControl:true}).setView([0,160],2);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-        {subdomains:'abcd',maxZoom:8,attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:8,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
       map.on('move zoom resize',drawOverlay);
       map.on('click',onMapClick);
       useL=true; $('map-badge').textContent='실제 지도 · 좌우로 끝없이 이어집니다';

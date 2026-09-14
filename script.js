@@ -131,34 +131,6 @@ const ACTIVITIES = [
     }
 ];
 
-/* 준비 중인 활동 — 센서 기반 탐구로 개발 예정 */
-const UPCOMING = [
-    {
-        glyph: '📈',
-        title: '지진파 주시 곡선 분석',
-        goal:  '마이크로비트 가속도 센서로 진동을 측정하고, P파와 S파의 도달 시간 차로 진원 거리를 구합니다.',
-        note:  '마이크로비트 · 가속도 센서'
-    },
-    {
-        glyph: '🔆',
-        title: '태양 고도와 일사량',
-        goal:  '조도 센서를 각도별로 기울여 측정하고, 계절 변화가 기온에 미치는 영향을 데이터로 설명합니다.',
-        note:  '마이크로비트 · 조도 센서'
-    },
-    {
-        glyph: '🧭',
-        title: '지구 자기장 측정',
-        goal:  '스마트폰 자기 센서로 편각과 복각을 측정하고, 위도에 따른 자기장 변화를 지도에 기록합니다.',
-        note:  '스마트폰 · 자기 센서'
-    },
-    {
-        glyph: '🌊',
-        title: '엘니뇨와 라니냐',
-        goal:  '실제 해수면 온도 관측 자료를 불러와 평년과 비교하고, 무역풍 변화와의 관계를 분석합니다.',
-        note:  '기상 관측 실데이터'
-    }
-];
-
 /* ========================= 과목 정의 ========================= */
 const TRACKS = [
   {id:'mid3', n:'중학교 3학년 과학', short:'중3 과학', glyph:'🌦️', color:'var(--mid3)',
@@ -219,7 +191,6 @@ function renderHome(){
   $('stat-row').innerHTML =
     '<div><b>'+ACTIVITIES.length+'</b><span>전체 활동</span></div>'+
     '<div><b>'+TRACKS.length+'</b><span>과목</span></div>'+
-    '<div><b>'+UPCOMING.length+'</b><span>준비 중</span></div>'+
     '<div><b>'+types.size+'</b><span>활동 유형</span></div>';
 }
 
@@ -242,16 +213,6 @@ function renderTrack(id){
       '<div class="card-meta"><span>⏱ '+esc(a.time)+'</span><span>'+esc(a.type)+'</span></div>'+
     '</a>').join('');
 
-  const soon = (id==='int1'||id==='mid3') ? UPCOMING : [];
-  $('soon-wrap').style.display = soon.length ? 'block' : 'none';
-  if(soon.length) $('soon-grid').innerHTML = soon.map(u=>
-    '<div class="card is-soon">'+
-      '<div class="card-top"><span class="badge-soon">준비 중</span>'+
-      '<span class="card-glyph" aria-hidden="true">'+u.glyph+'</span></div>'+
-      '<h3 class="card-title">'+esc(u.title)+'</h3>'+
-      '<p class="card-goal">'+esc(u.goal)+'</p>'+
-      '<div class="card-meta"><span>'+esc(u.note)+'</span></div>'+
-    '</div>').join('');
 }
 
 /* ========================= 활동 실행 ========================= */

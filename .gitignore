@@ -1,0 +1,14 @@
+# 예전 파일 사본 — 배포에 필요 없음
+.bak/
+
+# 운영체제가 만드는 찌꺼기
+Thumbs.db
+desktop.ini
+.DS_Store
+._*
+
+# 편집기
+.vscode/
+.idea/
+*.swp
+*~

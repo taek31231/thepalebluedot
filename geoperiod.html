@@ -630,7 +630,7 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
         <b style="color:var(--warm);font-size:.85rem">시상화석 — 환경을 알려준다</b>
         <p class="note" style="margin-top:6px">분포 면적이 <b class="hl-w">좁고</b> 생존 기간이 <b class="hl-w">긴</b> 화석.
           특정 환경에서만 살기 때문에, 그 화석이 나오면 당시 그곳이 어떤 환경이었는지 알 수 있습니다.</p>
-        <p class="note" style="margin-top:5px">산호 → 따뜻하고 얕은 바다 / 고사리 → 따뜻하고 습한 육지 / 조개 → 얕은 바다·갯벌</p>
+        <p class="note" style="margin-top:5px">산호 → 따뜻하고 얕은 바다 / 고사리 → 따뜻하고 습한 육지 / 완족류 → 얕은 바다</p>
       </div>
     </div>
   </div>
@@ -715,9 +715,9 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
     <label class="lbl" for="q1a">Q3. 어떤 지층에서 <b>산호 화석</b>과 <b>삼엽충 화석</b>이 함께 나왔습니다.
       이 지층이 쌓일 당시의 시대와 환경을 각각 말하고, 어느 화석이 어느 정보를 주었는지 쓰세요.</label>
     <textarea id="q1a" data-q="Q3. 산호와 삼엽충이 함께 나온 지층의 시대와 환경"></textarea>
-    <label class="lbl" style="margin-top:11px" for="q1b">Q4. 조개는 지금도 살아 있습니다.
-      그런데도 조개 화석이 쓸모 있는 이유는 무엇인가요?</label>
-    <textarea id="q1b" data-q="Q4. 지금도 살아 있는 조개의 화석이 쓸모 있는 이유"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q1b">Q4. 산호는 지금도 살아 있어서 지층의 <b>시대</b>를 좁혀 주지 못합니다.
+      그런데도 산호 화석이 쓸모 있는 이유는 무엇인가요?</label>
+    <textarea id="q1b" data-q="Q4. 지금도 살아 있는 산호의 화석이 쓸모 있는 이유"></textarea>
     <label class="lbl" style="margin-top:11px" for="q1c">Q5. 지도에서 <b>매머드</b>와 <b>삼엽충</b>의 분포를 비교해 보세요.
       매머드는 삼엽충보다 훨씬 좁은 지역에서만 나오는데도 표준화석으로 씁니다.
       매머드 화석이 그 지역에 몰려 있는 이유와, 그래도 표준화석이 될 수 있는 까닭을 함께 생각해 쓰세요.</label>
@@ -1122,7 +1122,7 @@ document.getElementById('conceptSvg').innerHTML = `
   <rect x="295" y="135" width="225" height="115" fill="rgba(56,189,248,.13)"/>
   <text x="182" y="72" text-anchor="middle" font-size="17" font-weight="900" fill="#9c5c00">시상화석</text>
   <text x="182" y="94" text-anchor="middle" font-size="11.5" fill="#243141">분포 좁음 · 생존 기간 긺</text>
-  <text x="182" y="112" text-anchor="middle" font-size="11" fill="#4a5a6b">산호 · 고사리 · 조개</text>
+  <text x="182" y="112" text-anchor="middle" font-size="11" fill="#4a5a6b">산호 · 고사리 · 완족류</text>
   <text x="407" y="187" text-anchor="middle" font-size="17" font-weight="900" fill="#03699f">표준화석</text>
   <text x="407" y="209" text-anchor="middle" font-size="11.5" fill="#243141">분포 넓음 · 생존 기간 짧음</text>
   <text x="407" y="227" text-anchor="middle" font-size="11" fill="#4a5a6b">삼엽충 · 암모나이트 · 화폐석</text>
@@ -1146,9 +1146,10 @@ const FDATA = [
   {n:'암모나이트',  taxon:'Ammonoidea',   kind:'index',  a:409,   z:66,    c:'#3f7fb8'},
   {n:'공룡',        taxon:'Ornithischia', kind:'index',  a:233,   z:66,    c:'#3070a8'},
   {n:'화폐석',      taxon:'Nummulites',   kind:'index',  a:56,    z:34,    c:'#c08c1f'},
-  {n:'매머드',      taxon:'Mammuthus',    kind:'index',  a:5,     z:0.004, c:'#a8761f'},
-  {n:'산호',        taxon:'Scleractinia', kind:'facies', a:247,   z:0,     c:'#9c5c00'},
-  {n:'조개',        taxon:'Bivalvia',     kind:'facies', a:520,   z:0,     c:'#d98a3c'},
+  {n:'털매머드',    taxon:'Mammuthus primigenius', kind:'index', a:0.4, z:0.004, c:'#a8761f'},
+  {n:'산호',        taxon:'Anthozoa',     kind:'facies', a:538.8, z:0,     c:'#9c5c00'},
+  {n:'고사리',      taxon:'Polypodiopsida', alt:['Filicopsida','Filicales','Polypodiophyta'],
+                                        kind:'facies', a:390,   z:0,     c:'#4d7c2f'},
   {n:'완족류',      taxon:'Brachiopoda',  kind:'facies', a:538.8, z:0,     c:'#bf7434'}
 ];
 let spanLive = null;   // PBDB 결과 저장
@@ -1205,10 +1206,12 @@ function drawSpanChart(){
     '막대가 <b>짧을수록</b>, 그리고 <b>현재까지 이어지지 않을수록</b> 시대를 좁혀 주는 좋은 표준화석입니다.</div>'+
     '<div class="verdict info show" style="margin-top:10px">'+
     '<b>막대를 보고 이상한 점을 찾았나요?</b><br>'+
-    '삼엽충(269 Ma)과 암모나이트(343 Ma)의 막대가 시상화석인 산호(247 Ma)보다 오히려 <b>깁니다</b>. '+
-    '그래도 이들이 표준화석인 이유는 두 가지입니다.<br>'+
-    '① <b>현재까지 이어지지 않습니다.</b> 산호·조개·완족류의 막대는 오른쪽 끝(현재)에 닿아 있습니다. '+
-    '지금도 살아 있으면 그 화석이 나와도 "언제인지"를 좁힐 수 없습니다.<br>'+
+    '암모나이트(343 Ma)와 삼엽충(269 Ma)의 막대는 <b>꽤 깁니다</b>. '+
+    '반대로 털매머드는 너무 짧아 선 하나로 보입니다. '+
+    '그런데도 이들이 모두 표준화석인 이유는 두 가지입니다.<br>'+
+    '① <b>현재까지 이어지지 않습니다.</b> 시상화석 후보인 산호·고사리·완족류의 막대는 '+
+    '오른쪽 끝(현재)에 닿아 있습니다. 지금도 살아 있으면 그 화석이 나와도 "언제인지"를 좁힐 수 없습니다. '+
+    '표준화석 후보는 모두 중간에서 <b>끊깁니다</b> — 끊기는 자리가 곧 그 화석이 가리키는 시대입니다.<br>'+
     '② 위 막대는 <b>무리 전체</b>의 기간입니다. 실제로는 그 안에서 종류가 계속 바뀌었고, '+
     '<b>종류 하나하나의 생존 기간은 훨씬 짧습니다</b>. 고생물학자는 이 세밀한 종류로 지층의 시대를 아주 좁게 찍어냅니다.</div>';
 }
@@ -1282,9 +1285,9 @@ const FALLBACK_DIST = {
   'Ammonoidea':   '<b>모든 대륙</b>에서 나옵니다. 바다에 널리 퍼져 살았습니다.',
   'Ornithischia': '남극을 포함한 <b>모든 대륙</b>에서 나옵니다. 우리나라 경상도 일대에도 발자국 화석 산지가 있습니다.',
   'Nummulites':   '<b>유럽 남부·북아프리카·서아시아·인도</b>에 몰려 있습니다. 당시 이 지역을 잇던 따뜻한 바다(테티스해)에서만 번성했기 때문입니다.',
-  'Mammuthus':    '<b>북반구 고위도</b>(시베리아·유럽 북부·북아메리카)에 몰려 있습니다. 빙하기의 추운 초원에 살았기 때문입니다.',
-  'Scleractinia': '<b>따뜻한 바다였던 지역</b>에서 나옵니다. 지금은 추운 곳에서 발견되기도 하는데, 그때는 그곳이 따뜻한 바다였기 때문입니다.',
-  'Bivalvia':     '<b>모든 대륙</b>에서 아주 흔하게 나옵니다.',
+  'Mammuthus primigenius': '<b>북반구 고위도</b>(시베리아·유럽 북부·북아메리카)에 몰려 있습니다. 빙하기의 추운 초원에 살았기 때문입니다.',
+  'Anthozoa':     '<b>따뜻한 바다였던 지역</b>에서 나옵니다. 지금은 추운 곳에서 발견되기도 하는데, 그때는 그곳이 따뜻한 바다였기 때문입니다.',
+  'Polypodiopsida':'<b>모든 대륙</b>에서 나옵니다. 특히 석탄기의 <b>거대한 양치식물 숲</b>이 묻혀 석탄이 되었습니다. 나오는 자리는 늘 <b>따뜻하고 습했던 육지</b>입니다.',
   'Brachiopoda':  '<b>모든 대륙</b>에서 나옵니다. 고생대 지층에 특히 많습니다.'
 };
 let map=null, ptLayer=null, curTaxon=null, locMode='now', occCache={}, paleoCache={};
@@ -1360,11 +1363,28 @@ function renderPoints(){
   const lats=pts.map(p=>p[0]);
   const span=Math.max(...lats)-Math.min(...lats);
   const trop=pts.filter(p=>Math.abs(p[0])<=23.44).reduce((s,p)=>s+(p[2]||1),0);
+  /* 받은 건수가 전체보다 적으면, 그것이 '무작위 표본'이 아니라는 점을 밝혀야 한다.
+     PBDB 는 등록된 순서대로 돌려주므로, 앞에서 자르면 연구가 일찍·많이 이루어진
+     지역(유럽·북미)에 치우친 표본이 된다. */
+  const partial = rec.total && rec.fetched && rec.fetched < rec.total;
+  const pct = partial ? Math.round(rec.fetched/rec.total*100) : 100;
   const src = rec.mode==='cluster'
       ? '<b>전체 자료</b>를 지역별로 묶어 표시했습니다. 원이 클수록 그곳에서 많이 발견되었다는 뜻입니다.'
     : rec.mode==='grid'
       ? '<b>'+rec.fetched.toLocaleString()+'건</b>을 받아 2° 격자로 묶어 표시했습니다.'
+        + (partial ? ' (전체의 <b>'+pct+'%</b>)' : '')
       : '<b>'+rec.fetched.toLocaleString()+'건</b>의 표본입니다.';
+  const biasNote = partial
+    ? '<div class="verdict warn show" style="margin-top:9px">'
+      +'<b>이 지도는 전체가 아닙니다 — 전체 '+rec.total.toLocaleString()+'건 중 '
+      +rec.fetched.toLocaleString()+'건('+pct+'%)만 받았습니다.</b><br>'
+      +'게다가 이 '+pct+'%는 <b>무작위로 고른 것이 아닙니다.</b> 데이터베이스는 '
+      +'<b>등록된 순서대로</b> 돌려주는데, 먼저 등록된 것일수록 연구가 일찍 이루어진 곳입니다.<br>'
+      +'그래서 이 지도에서 <b class="hl-w">유럽과 북아메리카가 유난히 빽빽한 것</b>은 '
+      +'거기에 화석이 더 많았다는 뜻이 아니라 <b>거기서 더 많이 조사했다는 뜻</b>일 수 있습니다. '
+      +'같은 자료로 다른 화석을 눌러 보고, <b>봉우리가 늘 같은 자리에 생기는지</b> 확인해 보세요. '
+      +'늘 같다면 그것은 화석의 이야기가 아니라 <b>연구자의 이야기</b>입니다.</div>'
+    : '';
   msg.className='verdict info show';
   msg.innerHTML=
     '<b>'+f.n+'</b> — PBDB에 기록된 발견 건수 <b class="hl">'+
@@ -1373,7 +1393,8 @@ function renderPoints(){
     '<br>지도에 표시된 지역 <b>'+pts.length.toLocaleString()+'곳</b> · '+
     '위도 범위 <b>'+span.toFixed(0)+'°</b> · 열대 발견 비율 <b>'+
       Math.round(trop/totOcc*100)+'%</b>'+
-    '<br><span class="note">'+src+'</span>';
+    '<br><span class="note">'+src+'</span>'
+    + biasNote;
 }
 
 /* 좌표를 격자로 묶기 */
@@ -1407,6 +1428,18 @@ const BASE='https://paleobiodb.org/data1.2/occs/';
 const SUM_URL  = t => BASE+'summary.json?base_name='+encodeURIComponent(t)+'&level=2&vocab=pbdb';
 const LIST_URL = (t,lim,show) => BASE+'list.json?base_name='+encodeURIComponent(t)+
   '&show='+show+'&limit='+lim+'&vocab=pbdb';
+/* PBDB 의 분류 이름은 학계를 따라 바뀐다(고사리류가 그렇다).
+   한 이름으로 실패하면 같은 무리의 다른 이름으로 다시 물어본다. */
+const namesOf = t => { const f=FDATA.find(x=>x.taxon===t); return [t].concat((f&&f.alt)||[]); };
+async function tryNames(t, mk, ms){
+  let last=null;
+  for(const nm of namesOf(t)){
+    try{ const j=await fetchWithTimeout(mk(nm), ms);
+         if(j && j.records && j.records.length) return j; }
+    catch(e){ last=e; }
+  }
+  throw last || new Error('empty');
+}
 const numOf = r => +(r.n_occs ?? r.noc ?? r.n_colls ?? r.nco ?? 1);
 
 /* 현재 위치 — 전체 자료를 지역별로 묶어서 가져온다 */
@@ -1422,7 +1455,7 @@ async function loadOcc(taxon){
 
   /* 1순위 — 집계(summary) 요청: 건수가 아무리 많아도 지역별로 묶여서 오므로 전체를 다 볼 수 있다 */
   try{
-    const j = await fetchWithTimeout(SUM_URL(taxon), 7000);
+    const j = await tryNames(taxon, SUM_URL, 7000);
     const rows=(j&&j.records)||[];
     const pts=[];
     rows.forEach(r=>{ const la=+r.lat, ln=+r.lng;
@@ -1437,7 +1470,7 @@ async function loadOcc(taxon){
 
   /* 2순위 — 좌표를 많이 받아 격자로 직접 묶는다 */
   try{
-    const j = await fetchWithTimeout(LIST_URL(taxon,10000,'coords'), 15000);
+    const j = await tryNames(taxon, nm=>LIST_URL(nm,20000,'coords'), 20000);
     const rows=(j&&j.records)||[];
     if(!rows.length) throw new Error('empty');
     const raw=[];
@@ -1466,7 +1499,7 @@ async function loadPaleo(taxon){
   msg.className='verdict info show';
   msg.innerHTML=f.n+'이(가) 살던 <b>당시 위치</b>를 계산한 좌표를 가져오는 중입니다…';
   try{
-    const j = await fetchWithTimeout(LIST_URL(taxon,10000,'paleoloc'), 15000);
+    const j = await tryNames(taxon, nm=>LIST_URL(nm,20000,'paleoloc'), 20000);
     const rows=(j&&j.records)||[];
     const raw=[];
     rows.forEach(r=>{ const la=+(r.paleolat ?? r.pla), ln=+(r.paleolng ?? r.pln);
@@ -1520,7 +1553,7 @@ const STF = [
   {t:'공룡',        k:'index',  w:'중생대에만 육상을 지배했습니다.'},
   {t:'산호',        k:'facies', w:'따뜻하고 얕은 바다에서만 삽니다. 지금도 살아 있어 시대는 못 알려 줍니다.'},
   {t:'고사리',      k:'facies', w:'따뜻하고 습한 육지에서 자랍니다. 오래 살아남아 환경만 알려 줍니다.'},
-  {t:'조개',        k:'facies', w:'얕은 바다나 갯벌에 삽니다. 지금도 살아 있습니다.'}
+  {t:'완족류',      k:'facies', w:'얕은 바다 바닥에 붙어 삽니다. 지금도 살아 있어 시대는 못 알려 줍니다.'}
 ];
 let stPlaced={}, stScore=0;
 function drawST(done){
@@ -1828,10 +1861,10 @@ const SUMMARY=[
   {h:'3. 표준화석과 시상화석',
    body:['<b>표준화석</b>은 <b>지층이 쌓인 시대</b>를 알려줍니다. 분포 면적이 넓고 생존 기간이 짧아야 합니다.',
          '<b>시상화석</b>은 <b>당시의 환경</b>을 알려줍니다. 분포 면적이 좁고 생존 기간이 길어야 합니다.',
-         '지금도 살아 있는 생물(완족류·조개·산호)은 시대를 좁혀 주지 못하므로 표준화석이 될 수 없습니다.'],
+         '지금도 살아 있는 생물(완족류·산호·고사리)은 시대를 좁혀 주지 못하므로 표준화석이 될 수 없습니다.'],
    table:[['구분','분포 면적','생존 기간','알려주는 것','예'],
           ['표준화석','넓다','짧다','지질 시대','삼엽충 · 갑주어 · 방추충(고생대) / 암모나이트 · 공룡(중생대) / 화폐석 · 매머드(신생대)'],
-          ['시상화석','좁다','길다','퇴적 환경','산호(따뜻하고 얕은 바다) / 고사리(따뜻하고 습한 육지) / 조개(얕은 바다 · 갯벌)']]},
+          ['시상화석','좁다','길다','퇴적 환경','산호(따뜻하고 얕은 바다) / 고사리(따뜻하고 습한 육지) / 완족류(얕은 바다)']]},
   {h:'4. 지질 시대의 구분',
    body:['지질 시대는 지구 탄생부터 현재까지의 시간이며, <b>생물의 급격한 변화</b>를 기준으로 나눕니다. 지구 환경이 크게 바뀌면 생물이 크게 바뀌고, 그것이 화석으로 남기 때문입니다.',
          '선캄브리아 시대가 전체의 약 88%를 차지하고, 신생대는 1.4%에 지나지 않습니다.'],

@@ -1148,8 +1148,11 @@ const FDATA = [
   {n:'화폐석',      taxon:'Nummulites',   kind:'index',  a:56,    z:34,    c:'#c08c1f'},
   {n:'털매머드',    taxon:'Mammuthus primigenius', kind:'index', a:0.4, z:0.004, c:'#a8761f'},
   {n:'산호',        taxon:'Anthozoa',     kind:'facies', a:538.8, z:0,     c:'#9c5c00'},
+  /* 고사리 — nomap:true. 생존 기간 막대·분류 활동에는 쓰지만, 발견 장소 지도 버튼에서는 뺀다.
+     PBDB 의 양치식물 기록 대부분이 석탄 채굴 과정에서 나와 유럽·북미에 심하게 쏠려 있어,
+     "분포가 좁다"는 시상화석 설명과 지도가 정면으로 부딪히기 때문이다. */
   {n:'고사리',      taxon:'Polypodiopsida', alt:['Filicopsida','Filicales','Polypodiophyta'],
-                                        kind:'facies', a:390,   z:0,     c:'#4d7c2f'},
+                                        kind:'facies', a:390,   z:0,     c:'#4d7c2f', nomap:true},
   {n:'완족류',      taxon:'Brachiopoda',  kind:'facies', a:538.8, z:0,     c:'#bf7434'}
 ];
 let spanLive = null;   // PBDB 결과 저장
@@ -1236,7 +1239,7 @@ document.getElementById('pbdbBtn').addEventListener('click',async()=>{
   const got={}; let fail=0; const notes=[];
   await Promise.all(FDATA.map(async f=>{
     try{
-      const j = await fetchWithTimeout(PBDB_URL(f.taxon), 9000);
+      const j = await tryNames(f.taxon, PBDB_URL, 9000);
       const r = j && j.records && j.records[0];
       if(!r) throw new Error('no record');
       const a = r.firstapp_max_ma ?? r.firstapp_min_ma;
@@ -1287,7 +1290,6 @@ const FALLBACK_DIST = {
   'Nummulites':   '<b>유럽 남부·북아프리카·서아시아·인도</b>에 몰려 있습니다. 당시 이 지역을 잇던 따뜻한 바다(테티스해)에서만 번성했기 때문입니다.',
   'Mammuthus primigenius': '<b>북반구 고위도</b>(시베리아·유럽 북부·북아메리카)에 몰려 있습니다. 빙하기의 추운 초원에 살았기 때문입니다.',
   'Anthozoa':     '<b>따뜻한 바다였던 지역</b>에서 나옵니다. 지금은 추운 곳에서 발견되기도 하는데, 그때는 그곳이 따뜻한 바다였기 때문입니다.',
-  'Polypodiopsida':'<b>모든 대륙</b>에서 나옵니다. 특히 석탄기의 <b>거대한 양치식물 숲</b>이 묻혀 석탄이 되었습니다. 나오는 자리는 늘 <b>따뜻하고 습했던 육지</b>입니다.',
   'Brachiopoda':  '<b>모든 대륙</b>에서 나옵니다. 고생대 지층에 특히 많습니다.'
 };
 let map=null, ptLayer=null, curTaxon=null, locMode='now', occCache={}, paleoCache={};
@@ -1417,7 +1419,7 @@ function capAgg(pts){
 }
 
 function drawMapBtns(){
-  document.getElementById('mapBtns').innerHTML = FDATA.map(f=>
+  document.getElementById('mapBtns').innerHTML = FDATA.filter(f=>!f.nomap).map(f=>
     '<button class="fbtn'+(curTaxon===f.taxon?' on':'')+'" data-t="'+f.taxon+'"'+
     (curTaxon===f.taxon?' style="background:'+f.c+';border-color:'+f.c+'"':'')+'>'+
     (f.kind==='index'?'🔵':'🟠')+' '+f.n+'</button>').join('');
@@ -1428,8 +1430,8 @@ const BASE='https://paleobiodb.org/data1.2/occs/';
 const SUM_URL  = t => BASE+'summary.json?base_name='+encodeURIComponent(t)+'&level=2&vocab=pbdb';
 const LIST_URL = (t,lim,show) => BASE+'list.json?base_name='+encodeURIComponent(t)+
   '&show='+show+'&limit='+lim+'&vocab=pbdb';
-/* PBDB 의 분류 이름은 학계를 따라 바뀐다(고사리류가 그렇다).
-   한 이름으로 실패하면 같은 무리의 다른 이름으로 다시 물어본다. */
+/* PBDB 의 분류 이름은 학계를 따라 바뀐다.
+   FDATA 에 alt 가 있으면, 한 이름으로 실패했을 때 다른 이름으로 다시 물어본다. */
 const namesOf = t => { const f=FDATA.find(x=>x.taxon===t); return [t].concat((f&&f.alt)||[]); };
 async function tryNames(t, mk, ms){
   let last=null;

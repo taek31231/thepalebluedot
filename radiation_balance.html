@@ -114,7 +114,7 @@ p.sub{font-size:.82rem;color:var(--mid);line-height:1.75;margin-bottom:16px;word
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 @media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr;}}
-label.lbl{display:block;font-size:.75rem;font-weight:700;color:var(--mid);margin-bottom:5px;
+label.lbl,div.lbl{display:block;font-size:.75rem;font-weight:700;color:var(--mid);margin-bottom:5px;
   word-break:keep-all;line-height:1.6;}
 input[type=text],input[type=number],textarea{width:100%;padding:8px 10px;background:var(--surface-2);
   border:1px solid var(--line-2);border-radius:7px;color:var(--text);font-size:.85rem;}
@@ -211,6 +211,57 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
 .sumblk h4{font-size:.84rem;font-weight:800;margin-bottom:6px;color:var(--accent);}
 .sumblk p{font-size:.78rem;line-height:1.8;color:var(--mid);word-break:keep-all;margin-bottom:4px;}
 .srcs{font-size:.7rem;color:var(--mid);line-height:1.9;word-break:keep-all;}
+
+/* ═══════════ 하위 탭 + 발포 비타민 실험 ═══════════ */
+.subtabs{display:flex;gap:4px;padding:4px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:10px;margin-bottom:14px;width:max-content;max-width:100%;overflow-x:auto;}
+.stab{flex:0 0 auto;padding:8px 14px;font-size:.8rem;font-weight:700;color:var(--dim);background:transparent;
+  border:0;border-radius:7px;white-space:nowrap;transition:.15s;}
+.stab:hover{color:var(--mid);}
+.stab.on{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(15,30,50,.12);}
+.subpage{display:none;}
+.subpage.on{display:block;}
+.lab-var{padding:11px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);}
+.lab-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:start;}
+.labbox{background:linear-gradient(180deg,#1e293b 0%,#273449 100%);border:1px solid var(--line-2);border-radius:11px;overflow:hidden;}
+.labbox svg{width:100%;height:auto;display:block;}
+.lab-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:.7rem;color:var(--mid);}
+.lab-legend span{display:inline-flex;align-items:center;gap:5px;}
+.lab-legend i{display:inline-block;width:14px;height:4px;border-radius:2px;}
+.lab-legend i.mol{width:16px;height:7px;background:
+  radial-gradient(circle at 3px 3.5px,#ef4444 2.6px,transparent 3px),
+  radial-gradient(circle at 8px 3.5px,#334155 3px,transparent 3.4px),
+  radial-gradient(circle at 13px 3.5px,#ef4444 2.6px,transparent 3px);}
+.lab-ctrl{display:flex;flex-direction:column;gap:10px;}
+.lab-step{padding:11px 12px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);transition:.2s;}
+.lab-step.dim{opacity:.4;pointer-events:none;}
+.lab-step.cur{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);}
+.lab-sh{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:800;margin-bottom:8px;}
+.lab-sh .n{flex:0 0 22px;height:22px;border-radius:6px;display:grid;place-items:center;
+  font-size:.72rem;font-weight:900;background:var(--accent);color:#fff;}
+.lab-clock{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--accent);font-size:.9rem;}
+.lab-ctrl input[type=range]{width:100%;accent-color:var(--violet);}
+.lab-ctrl .itm.ok{background:var(--accent);border-color:var(--accent);}
+.lab-bars{padding:11px 12px;border-radius:10px;background:var(--surface);border:1px solid var(--line-2);}
+.lab-bars h4{font-size:.78rem;font-weight:800;margin-bottom:8px;}
+.lab-bot{margin-bottom:9px;}
+.lab-bot:last-of-type{margin-bottom:4px;}
+.lab-bot .hd{display:flex;justify-content:space-between;align-items:baseline;font-size:.74rem;font-weight:800;margin-bottom:4px;}
+.lab-bot .st{font-size:.68rem;font-weight:800;padding:1px 7px;border-radius:5px;}
+.lab-br{display:grid;grid-template-columns:30px 1fr 28px;gap:6px;align-items:center;font-size:.68rem;color:var(--dim);margin-bottom:3px;}
+.lab-br .tr{height:10px;background:var(--surface-3);border-radius:3px;overflow:hidden;}
+.lab-br .tr b{display:block;height:100%;}
+.lab-br .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--mid);}
+.lab-step.lock{pointer-events:none;opacity:.78;}
+.lab-tblwrap{max-height:268px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;}
+.lab-tblwrap table.dt{border:0;display:table;overflow:visible;border-collapse:separate;border-spacing:0;}
+.lab-tblwrap table.dt th,.lab-tblwrap table.dt td{border-width:0 0 1px 0;}
+.lab-tblwrap table.dt th{position:sticky;top:0;z-index:1;}
+.lab-tblwrap table.dt td,.lab-tblwrap table.dt th{text-align:center;}
+#labTbl tr.eq td{background:rgba(11,125,115,.08);}
+.lab-graphrow{grid-template-columns:1.6fr 1fr;}
+.lab-tblwrap table.dt tbody{min-width:0;}
+@media(max-width:900px){.lab-grid,.lab-graphrow{grid-template-columns:1fr;}}
 
 /* ═══════════ 모바일 대응 ═══════════ */
 @supports (height:100dvh){ body{height:100dvh;} }
@@ -314,6 +365,12 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
     그런데 지구의 연평균 기온은 거의 일정하게 유지됩니다.
     <b class="hl">받은 만큼 돌려주고 있기 때문</b>입니다. 그 원리를 알아봅시다.</p>
 
+  <div class="subtabs" role="tablist">
+    <button class="stab on" data-sub="concept" role="tab">① 개념 정리</button>
+    <button class="stab" data-sub="lab" role="tab">② 탐구 — 발포 비타민 온실 실험 🧪</button>
+  </div>
+
+  <div class="subpage on" data-subpage="concept">
   <div class="card">
     <h3 class="sub3" style="margin-top:0">복사 — 물질 없이 전달되는 에너지</h3>
     <p class="note">태양과 지구 사이는 거의 진공입니다. 전달해 줄 물질이 없는데도 에너지는 옵니다.
@@ -373,6 +430,125 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
       이 파장 차이가 왜 생기는지, 그리고 그것이 온실효과와 어떻게 연결되는지 설명하세요.</label>
     <textarea id="q0a" data-q="Q1. 태양 복사와 지구 복사의 파장 차이, 그리고 온실효과와의 연결"></textarea>
   </div>
+  <div style="margin-top:16px"><button class="btn primary" data-subjump="lab">탐구 실험으로 — 페트병 속 복사 평형 직접 보기 →</button></div>
+  </div><!-- /concept -->
+
+  <!-- ─────────── 탐구: 발포 비타민 온실 실험 ─────────── -->
+  <div class="subpage" data-subpage="lab">
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">실험 설계 — 이산화 탄소는 복사 평형 온도를 바꿀까?</h3>
+    <p class="note">교과서 탐구처럼 <b>같은 크기의 페트병 두 개</b>에 <b>같은 양의 물</b>을 넣습니다.
+      한쪽(B)에만 <b class="hl">발포 비타민</b>을 넣으면 물과 반응하여 <b>이산화 탄소(CO₂)</b> 기포가 생기고,
+      병 속 공기에 CO₂가 많아집니다. 온도계를 꽂은 뚜껑을 닫고 <b>같은 거리</b>에서 전등을 비춘 뒤 온도 변화를 기록합니다.</p>
+    <div class="grid3" style="margin-top:12px">
+      <div class="lab-var"><span class="tagline" style="background:rgba(124,58,237,.1);color:var(--violet);border-color:rgba(124,58,237,.35)">조작 변인</span>
+        <p class="note" style="margin-top:6px">병 속 <b>이산화 탄소의 양</b> (발포 비타민 개수)</p></div>
+      <div class="lab-var"><span class="tagline">통제 변인</span>
+        <p class="note" style="margin-top:6px">페트병 크기 · 물의 양 · 전등까지 거리 · 처음 온도 · 측정 시간</p></div>
+      <div class="lab-var"><span class="tagline" style="background:rgba(220,38,38,.08);color:var(--bad);border-color:rgba(220,38,38,.3)">종속 변인</span>
+        <p class="note" style="margin-top:6px">병 속 공기의 <b>온도</b> (1분마다 기록)</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="lab-grid">
+      <div>
+        <div class="labbox" id="labSvgBox"></div>
+        <div class="lab-legend">
+          <span><i style="background:#f2b705"></i>전등 빛 (짧은 파장)</span>
+          <span><i style="background:#dc2626"></i>적외선 (긴 파장)</span>
+          <span><i class="mol"></i>이산화 탄소 분자</span>
+          <span><i style="background:#94a3b8;border-radius:50%"></i>공기 (질소·산소)</span>
+        </div>
+        <div id="labBars" style="margin-top:10px"></div>
+      </div>
+      <div class="lab-ctrl">
+        <div class="lab-step" id="labStep1">
+          <div class="lab-sh"><span class="n">1</span>실험 준비</div>
+          <label class="lbl">B 병에 넣을 발포 비타민 <b id="labTabsV" class="hl">2개</b></label>
+          <input type="range" id="labTabs" min="0" max="4" step="1" value="2">
+          <label class="lbl" style="margin-top:8px">전등까지 거리 (두 병 모두 같게)</label>
+          <div class="row" id="labDist">
+            <button class="itm" data-d="20">20 cm</button>
+            <button class="itm ok" data-d="30">30 cm</button>
+            <button class="itm" data-d="40">40 cm</button>
+          </div>
+          <button class="btn sm primary" id="labFizz" style="margin-top:10px">발포 비타민 넣고 뚜껑 닫기</button>
+        </div>
+        <div class="lab-step dim" id="labStep2">
+          <div class="lab-sh"><span class="n">2</span>먼저 예상하기</div>
+          <div class="lbl">전등을 켜면 어느 병의 온도가 더 높아질까?</div>
+          <div class="row" id="labP1">
+            <button class="itm" data-v="A">A가 더 높다</button>
+            <button class="itm" data-v="B">B가 더 높다</button>
+            <button class="itm" data-v="=">같다</button>
+          </div>
+          <div class="lbl" style="margin-top:8px">전등을 계속 켜 두면 온도는?</div>
+          <div class="row" id="labP2">
+            <button class="itm" data-v="up">끝없이 계속 오른다</button>
+            <button class="itm" data-v="flat">어느 온도에서 더 오르지 않는다</button>
+          </div>
+        </div>
+        <div class="lab-step dim" id="labStep3">
+          <div class="lab-sh"><span class="n">3</span>측정하기 <b id="labClock" class="lab-clock">0.0분</b></div>
+          <div class="row">
+            <button class="btn sm primary" id="labLamp">💡 전등 켜기</button>
+            <button class="btn sm" id="labPause">⏸ 일시정지</button>
+            <button class="btn sm" id="labReset">처음부터</button>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <span class="note">진행 속도</span>
+            <div class="row" id="labSpeed">
+              <button class="itm" data-s="0.5">느리게</button>
+              <button class="itm ok" data-s="1">보통</button>
+              <button class="itm" data-s="4">빠르게</button>
+            </div>
+          </div>
+          <p class="note" style="margin-top:6px;font-size:.7rem;color:var(--dim)">가상 시간 1분 = 실제 1초(보통). 전등은 원할 때 끌 수 있고, 30분이 되면 측정이 끝납니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2 lab-graphrow" style="margin-top:14px">
+      <div>
+        <h3 class="sub3" style="margin-top:0">시간에 따른 온도 변화</h3>
+        <div class="latbox" id="labGraph" style="cursor:default"></div>
+      </div>
+      <div>
+        <h3 class="sub3" style="margin-top:0">측정 기록 <span class="note" style="font-weight:500">(1분 간격)</span></h3>
+        <div class="lab-tblwrap"><table class="dt" id="labTbl"></table></div>
+      </div>
+    </div>
+    <div class="verdict" id="labVerdict"></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">페트병을 지구로 바꾸어 보면</h3>
+    <table class="dt">
+      <tr><th>실험</th><th>지구</th><th>하는 일</th></tr>
+      <tr><td>전등</td><td>태양</td><td>짧은 파장의 빛으로 에너지를 공급한다</td></tr>
+      <tr><td>병 속 물과 바닥</td><td>지표</td><td>빛을 흡수해 데워지고 적외선을 내보낸다</td></tr>
+      <tr><td>병 속 공기</td><td>대기</td><td>지표가 내보낸 적외선 일부를 흡수·재복사한다</td></tr>
+      <tr><td>발포 비타민으로 늘린 CO₂</td><td>늘어난 온실기체</td><td>빠져나가는 적외선을 더 많이 붙잡는다</td></tr>
+      <tr><td>온도가 일정해진 상태</td><td>복사 평형</td><td>흡수하는 에너지 = 방출하는 에너지</td></tr>
+    </table>
+    <div class="verdict warn show">
+      <b>실험의 한계</b> — 실제 페트병은 복사뿐 아니라 병 표면을 통한 <b>전도</b>와 공기의 <b>대류</b>로도 열을 잃습니다.
+      또 발포 비타민 반응으로 생긴 수증기, 병 속 압력 변화도 온도에 영향을 줄 수 있습니다.
+      전등으로 백열전구를 쓰면 적외선도 많이 나오므로, CO₂가 전등의 적외선을 직접 흡수하는 효과도 섞여 있습니다.
+      이 시뮬레이션은 그런 효과를 하나로 묶어 단순화한 모형입니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="q0b">탐구 Q1. 전등을 계속 켜 두었는데도 두 병의 온도가 어느 순간부터 더 오르지 않은 까닭을
+      '흡수하는 에너지'와 '방출하는 에너지'를 써서 설명하세요.</label>
+    <textarea id="q0b" data-q="탐구 Q1. 전등을 켜 두어도 온도가 일정해진 까닭 (흡수·방출)"></textarea>
+    <label class="lbl" for="q0c" style="margin-top:12px">탐구 Q2. 이산화 탄소가 많은 B 병이 더 높은 온도에서 일정해진 까닭은 무엇일까요?
+      이 결과를 지구 온난화와 연결해 보세요.</label>
+    <textarea id="q0c" data-q="탐구 Q2. CO₂가 많은 병의 평형 온도가 더 높은 까닭과 지구 온난화"></textarea>
+  </div>
+  </div><!-- /lab -->
 </div></div></section>
 
 <!-- ══════ 1 ══════ -->
@@ -597,6 +773,422 @@ document.querySelectorAll('.tab').forEach(t=>{
     if(t.dataset.tab==='5') renderSummaryTab();
   });
 });
+
+/* ══════════════ 탭 1-② : 발포 비타민 온실 실험 ══════════════
+   두 병은 열용량(같은 물의 양)과 흡수량(같은 전등·같은 거리)이 같다.
+   다른 것은 '같은 온도에서 바깥으로 빠져나가는 에너지'뿐이다.
+   CO₂가 적외선 일부를 붙잡아 되돌리므로 B의 방출 계수 k 가 작고,
+   그래서 평형 온도 T* = T₀ + P/k 가 더 높다.                        */
+function showSub(k){
+  document.querySelectorAll('.stab').forEach(x=>x.classList.toggle('on',x.dataset.sub===k));
+  document.querySelectorAll('.subpage').forEach(x=>x.classList.toggle('on',x.dataset.subpage===k));
+}
+document.querySelectorAll('.stab').forEach(b=>b.addEventListener('click',()=>showSub(b.dataset.sub)));
+document.querySelectorAll('[data-subjump]').forEach(b=>b.addEventListener('click',()=>{
+  showSub(b.dataset.subjump);
+  const sc=document.querySelector('.page[data-page="1"] .scroll'); if(sc) sc.scrollTop=0;
+}));
+
+const LAB_T0=20, LAB_C=3.5, LAB_END=30, LAB_GAIN=0.3, LAB_WATER=338;
+const LAB_BASE={20:13,30:9,40:6};          /* 대조군이 오르는 온도 (℃) */
+const LAB_X={A:170,B:470};
+const LAB_COL={A:'#2563eb',B:'#dc2626'};
+const LAB={tabs:2,dist:30,speed:1,phase:'ready',c:0,t:0,T:{A:LAB_T0,B:LAB_T0},
+  lamp:false,paused:false,tOff:null,Toff:null,eq:{A:null,B:null},series:[],rows:[],
+  p1:null,p2:null,fizz:0,ph:[],mol:{A:[],B:[]},bub:[],fl:[],acc:{},ui:0};
+const labCO2=n=>n? 1-Math.exp(-n/1.5) : 0;
+const labK=b=>b==='A'? 1 : 1/(1+LAB_GAIN*LAB.c);
+const rnd=(a,b)=>a+Math.random()*(b-a);
+
+function labMolecule(b,co2,y){
+  return {x:LAB_X[b]+rnd(-50,50), y:y!=null?y:rnd(196,326), vx:rnd(-15,15), vy:co2&&y!=null?-rnd(60,190):rnd(-15,15),
+          a:rnd(0,180), va:rnd(-60,60), co2:co2, flash:0};
+}
+function labReset(){
+  Object.assign(LAB,{phase:'ready',c:0,t:0,T:{A:LAB_T0,B:LAB_T0},lamp:false,paused:false,tOff:null,Toff:null,
+    eq:{A:null,B:null},series:[],rows:[],p1:null,p2:null,fizz:0,ph:[],bub:[],fl:[],acc:{}});
+  LAB.mol={A:[],B:[]};
+  ['A','B'].forEach(b=>{ for(let i=0;i<7;i++) LAB.mol[b].push(labMolecule(b,false)); });
+  document.querySelectorAll('#labP1 .itm,#labP2 .itm').forEach(x=>x.classList.remove('ok'));
+  labUI(); labGraph(); labTable(); labBars();
+}
+
+/* ── 열 계산 ── */
+function labRate(b){
+  const P=LAB.lamp? LAB_BASE[LAB.dist] : 0;
+  return (P - labK(b)*(LAB.T[b]-LAB_T0))/LAB_C;
+}
+function labStep(dtMin){
+  let left=dtMin;
+  while(left>1e-9 && LAB.phase==='run'){
+    const h=Math.min(0.02,left,LAB_END-LAB.t);
+    const r={A:labRate('A'),B:labRate('B')};
+    LAB.T.A+=r.A*h; LAB.T.B+=r.B*h;
+    const prev=LAB.t; LAB.t+=h; left-=h;
+    if(Math.floor(LAB.t*10+1e-6)>Math.floor(prev*10+1e-6)) LAB.series.push([LAB.t,LAB.T.A,LAB.T.B]);
+    if(Math.floor(LAB.t+1e-6)>Math.floor(prev+1e-6)) LAB.rows.push([Math.round(LAB.t),LAB.T.A,LAB.T.B]);
+    if(LAB.lamp) ['A','B'].forEach(b=>{
+      if(!LAB.eq[b] && Math.abs(labRate(b))<0.05) LAB.eq[b]={t:LAB.t,T:LAB.T[b]}; });
+    if(LAB.t>=LAB_END-1e-6){ LAB.t=LAB_END; labFinish(); }
+  }
+}
+function labFinish(){
+  if(LAB.lamp && LAB.tOff==null) LAB.Toff={A:LAB.T.A,B:LAB.T.B};
+  LAB.phase='done'; labUI();
+}
+const labPlateau=b=>(LAB.Toff? LAB.Toff[b] : LAB.T[b]);
+
+/* ── 조작 ── */
+const labTabsEl=document.getElementById('labTabs');
+labTabsEl.addEventListener('input',()=>{
+  LAB.tabs=+labTabsEl.value;
+  document.getElementById('labTabsV').textContent=LAB.tabs+'개'+(LAB.tabs===0?' (B도 물만)':'');
+});
+function labPick(hostId,attr,fn){
+  document.getElementById(hostId).addEventListener('click',e=>{
+    const b=e.target.closest('.itm'); if(!b) return;
+    document.querySelectorAll('#'+hostId+' .itm').forEach(x=>x.classList.toggle('ok',x===b));
+    fn(b.dataset[attr]); labUI();
+  });
+}
+labPick('labDist','d',v=>{ LAB.dist=+v; });
+labPick('labSpeed','s',v=>{ LAB.speed=+v; });
+labPick('labP1','v',v=>{ LAB.p1=v; });
+labPick('labP2','v',v=>{ LAB.p2=v; });
+document.getElementById('labFizz').addEventListener('click',()=>{
+  if(LAB.phase!=='ready') return;
+  LAB.c=labCO2(LAB.tabs); LAB.phase='fizz'; LAB.fizz=0; labUI();
+});
+document.getElementById('labLamp').addEventListener('click',()=>{
+  if(LAB.phase==='sealed'){
+    if(!(LAB.p1&&LAB.p2)) return;
+    LAB.phase='run'; LAB.lamp=true; LAB.t=0;
+    LAB.series=[[0,LAB.T.A,LAB.T.B]]; LAB.rows=[[0,LAB.T.A,LAB.T.B]];
+  }else if(LAB.phase==='run' && LAB.lamp){
+    LAB.lamp=false; LAB.tOff=LAB.t; LAB.Toff={A:LAB.T.A,B:LAB.T.B};
+  }
+  labUI(); labGraph(); labTable(); labBars();
+});
+document.getElementById('labPause').addEventListener('click',()=>{
+  if(LAB.phase!=='run') return; LAB.paused=!LAB.paused; labUI();
+});
+document.getElementById('labReset').addEventListener('click',labReset);
+
+function labSetStep(id,cls){
+  const el=document.getElementById(id); el.classList.remove('dim','cur','lock'); if(cls) el.classList.add(cls);
+}
+function labUI(){
+  const ph=LAB.phase;
+  labSetStep('labStep1', ph==='ready'?'cur':'lock');
+  labSetStep('labStep2', ph==='sealed'?'cur':(ph==='ready'||ph==='fizz')?'dim':'lock');
+  labSetStep('labStep3', (ph==='run'||ph==='done')?'cur':ph==='sealed'?'':'dim');
+  labTabsEl.disabled=ph!=='ready';
+  const fz=document.getElementById('labFizz');
+  fz.disabled=ph!=='ready';
+  fz.textContent= ph==='ready'? (LAB.tabs? '발포 비타민 넣고 뚜껑 닫기' : '물만 넣고 뚜껑 닫기')
+                : ph==='fizz'? (LAB.tabs? '보글보글… CO₂가 생기는 중' : '뚜껑 닫는 중…') : '준비 완료 ✔';
+  const lp=document.getElementById('labLamp');
+  if(ph==='run'&&LAB.lamp){ lp.textContent='🌑 전등 끄기'; lp.disabled=false; lp.classList.remove('primary'); }
+  else if(ph==='run'){ lp.textContent='전등 꺼짐 — 식는 모습 관찰 중'; lp.disabled=true; }
+  else if(ph==='done'){ lp.textContent='측정 끝'; lp.disabled=true; }
+  else { lp.textContent=(ph==='sealed'&&!(LAB.p1&&LAB.p2))? '💡 예상을 먼저 고르세요' : '💡 전등 켜기';
+         lp.disabled=!(ph==='sealed'&&LAB.p1&&LAB.p2); lp.classList.add('primary'); }
+  const pb=document.getElementById('labPause');
+  pb.disabled=ph!=='run'; pb.textContent=LAB.paused?'▶ 계속':'⏸ 일시정지';
+  document.getElementById('labClock').textContent=LAB.t.toFixed(1)+'분';
+  labVerdict();
+}
+
+/* ── 막대 : 흡수 vs 방출 ── */
+function labBars(){
+  const P=LAB_BASE[LAB.dist], on=LAB.phase==='run'&&LAB.lamp;
+  const bar=(n,v,c)=>'<div class="lab-br"><span>'+n+'</span><div class="tr"><b style="width:'+
+    Math.min(100,Math.max(0,v)).toFixed(1)+'%;background:'+c+'"></b></div><span class="v">'+Math.round(v)+'</span></div>';
+  let h='<div class="lab-bars"><h4>에너지 수지 <span class="note" style="font-weight:500">(전등에서 흡수하는 양 = 100)</span></h4>';
+  ['A','B'].forEach(b=>{
+    const k=labK(b), dT=LAB.T[b]-LAB_T0, ab=on?100:0, em=Math.max(0,k*dT/P*100);
+    let st,sc;
+    if(LAB.phase==='ready'||LAB.phase==='fizz'||LAB.phase==='sealed'){ st='준비'; sc='#4a5a6b'; }
+    else if(LAB.phase==='done'){ st=LAB.eq[b]&&LAB.tOff==null?'측정 끝 · 평형 유지':'측정 끝'; sc='#4a5a6b'; }
+    else if(on){ if(LAB.eq[b]){ st='복사 평형 · 흡수 = 방출'; sc='#0b7d73'; }
+                 else { st='흡수 > 방출 · 온도 상승'; sc='#9c5c00'; } }
+    else { if(dT>0.15){ st='흡수 < 방출 · 온도 하강'; sc='#2563eb'; } else { st='처음 상태'; sc='#4a5a6b'; } }
+    h+='<div class="lab-bot"><div class="hd"><span style="color:'+LAB_COL[b]+'">'+
+      (b==='A'?'A 대조군':'B 실험군 (CO₂ ↑)')+' · '+LAB.T[b].toFixed(1)+' ℃</span>'+
+      '<span class="st" style="color:'+sc+';background:'+sc+'1a">'+st+'</span></div>'+
+      bar('흡수',ab,'#e0a800')+bar('방출',em,'#ef4444')+'</div>';
+  });
+  h+='<p class="note" style="font-size:.7rem;margin-top:6px">방출은 병이 뜨거울수록 커집니다. '+
+     '<b>같은 온도라면 B의 방출이 더 작습니다</b> — CO₂가 적외선 일부를 붙잡아 병 안으로 되돌리기 때문입니다. '+
+     '그래서 B는 더 높은 온도까지 올라가야 흡수와 방출이 같아집니다.</p></div>';
+  document.getElementById('labBars').innerHTML=h;
+}
+
+/* ── 그래프 ── */
+function labGraph(){
+  const W=640,H=270,L=42,R=62,T=14,B=34,x1=LAB_END,y0=18,y1=38;
+  const X=t=>L+t/x1*(W-L-R), Y=v=>T+(y1-Math.max(y0,Math.min(y1,v)))/(y1-y0)*(H-T-B);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,sans-serif">';
+  if(LAB.series.length){
+    const te=LAB.tOff!=null?LAB.tOff:LAB.t;
+    s+='<rect x="'+X(0)+'" y="'+T+'" width="'+(X(te)-X(0)).toFixed(1)+'" height="'+(H-T-B)+'" fill="rgba(250,204,21,.16)"/>';
+  }
+  for(let v=y0;v<=y1;v+=2) s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#e4eaf2"/>'+
+    '<text x="'+(L-6)+'" y="'+(Y(v)+3.5)+'" text-anchor="end" font-size="10" fill="#4a5a6b">'+v+'</text>';
+  for(let t=0;t<=x1;t+=5) s+='<line x1="'+X(t)+'" x2="'+X(t)+'" y1="'+T+'" y2="'+(H-B)+'" stroke="#e4eaf2"/>'+
+    '<text x="'+X(t)+'" y="'+(H-B+14)+'" text-anchor="middle" font-size="10" fill="#4a5a6b">'+t+'</text>';
+  s+='<rect x="'+L+'" y="'+T+'" width="'+(W-L-R)+'" height="'+(H-T-B)+'" fill="none" stroke="#cfdbe8"/>';
+  s+='<text x="'+((L+W-R)/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="#243141">시간 (분)</text>';
+  s+='<text transform="translate(12,'+((T+H-B)/2)+') rotate(-90)" text-anchor="middle" font-size="10.5" font-weight="700" fill="#243141">온도 (℃)</text>';
+  if(!LAB.series.length){
+    s+='<text x="'+((L+W-R)/2)+'" y="'+((T+H-B)/2)+'" text-anchor="middle" font-size="12" fill="#4a5a6b">전등을 켜면 그래프가 그려집니다</text>';
+  }else{
+    if(LAB.tOff!=null) s+='<line x1="'+X(LAB.tOff)+'" x2="'+X(LAB.tOff)+'" y1="'+T+'" y2="'+(H-B)+'" stroke="#4a5a6b" stroke-dasharray="4 3"/>'+
+      '<text x="'+(X(LAB.tOff)+4)+'" y="'+(T+12)+'" font-size="10" font-weight="700" fill="#4a5a6b">전등 끔</text>';
+    /* 평형 온도 보조선 — 두 값이 가까우면 글자를 벌려 둔다 */
+    const lab={};
+    ['A','B'].forEach(b=>{ if(LAB.eq[b]) lab[b]=Y(labPlateau(b)); });
+    if(lab.A!=null&&lab.B!=null&&Math.abs(lab.A-lab.B)<13){ const m=(lab.A+lab.B)/2;
+      if(lab.B<=lab.A){lab.B=m-6.5;lab.A=m+6.5;} else {lab.A=m-6.5;lab.B=m+6.5;} }
+    ['A','B'].forEach((b,i)=>{
+      const pts=LAB.series.map(p=>X(p[0]).toFixed(1)+','+Y(p[1+i]).toFixed(1)).join(' ');
+      s+='<polyline points="'+pts+'" fill="none" stroke="'+LAB_COL[b]+'" stroke-width="2.4" stroke-linejoin="round"/>';
+      if(LAB.eq[b]){
+        const e=LAB.eq[b], pv=labPlateau(b);
+        s+='<line x1="'+X(e.t)+'" x2="'+(W-R)+'" y1="'+Y(pv)+'" y2="'+Y(pv)+'" stroke="'+LAB_COL[b]+'" stroke-dasharray="3 3" opacity=".7"/>'+
+           '<circle cx="'+X(e.t)+'" cy="'+Y(e.T)+'" r="4.5" fill="#fff" stroke="'+LAB_COL[b]+'" stroke-width="2"/>'+
+           '<text x="'+(W-R+5)+'" y="'+(lab[b]+3.5)+'" font-size="10.5" font-weight="800" fill="'+LAB_COL[b]+'">'+b+' '+pv.toFixed(1)+'℃</text>';
+      }
+      const last=LAB.series[LAB.series.length-1];
+      s+='<circle cx="'+X(last[0])+'" cy="'+Y(last[1+i])+'" r="3.5" fill="'+LAB_COL[b]+'"/>';
+    });
+  }
+  s+='<g font-size="10.5" font-weight="700">'+
+     '<line x1="'+(L+10)+'" x2="'+(L+26)+'" y1="'+(T+12)+'" y2="'+(T+12)+'" stroke="'+LAB_COL.A+'" stroke-width="2.4"/>'+
+     '<text x="'+(L+30)+'" y="'+(T+15.5)+'" fill="#243141">A 대조군</text>'+
+     '<line x1="'+(L+92)+'" x2="'+(L+108)+'" y1="'+(T+12)+'" y2="'+(T+12)+'" stroke="'+LAB_COL.B+'" stroke-width="2.4"/>'+
+     '<text x="'+(L+112)+'" y="'+(T+15.5)+'" fill="#243141">B 실험군 (CO₂)</text>'+
+     '<circle cx="'+(L+214)+'" cy="'+(T+12)+'" r="4" fill="#fff" stroke="#4a5a6b" stroke-width="1.6"/>'+
+     '<text x="'+(L+222)+'" y="'+(T+15.5)+'" fill="#243141">복사 평형 도달</text></g>';
+  s+='</svg>';
+  document.getElementById('labGraph').innerHTML=s;
+}
+
+/* ── 기록표 ── */
+function labTable(){
+  const el=document.getElementById('labTbl');
+  const key=LAB.rows.length+'|'+(LAB.eq.A?1:0)+(LAB.eq.B?1:0);
+  if(el.dataset.k===key) return; el.dataset.k=key;
+  const both=LAB.eq.A&&LAB.eq.B? Math.max(LAB.eq.A.t,LAB.eq.B.t) : null;
+  el.innerHTML='<thead><tr><th>시간 (분)</th><th>A (℃)</th><th>B (℃)</th><th>B − A</th></tr></thead><tbody>'+
+    (LAB.rows.length? LAB.rows.map(r=>{
+      const eq=both!=null && r[0]>=both && (LAB.tOff==null || r[0]<=LAB.tOff);
+      return '<tr'+(eq?' class="eq"':'')+'><td>'+r[0]+'</td><td>'+r[1].toFixed(1)+'</td><td>'+r[2].toFixed(1)+
+        '</td><td>'+(r[2]-r[1]>=0.05?'+':'')+(r[2]-r[1]).toFixed(1)+'</td></tr>'; }).join('')
+      : '<tr><td colspan="4" style="color:var(--dim)">아직 기록이 없습니다</td></tr>')+'</tbody>';
+  const w=el.parentElement; w.scrollTop=w.scrollHeight;
+}
+
+/* ── 결과 해석 ── */
+function labVerdict(){
+  const v=document.getElementById('labVerdict');
+  let cls='', html='';
+  const both=LAB.eq.A&&LAB.eq.B, ph=LAB.phase;
+  if(ph==='run'||ph==='done'){
+    if(!both){
+      if(LAB.tOff!=null) { cls='warn'; html='<b>평형에 도달하기 전에 전등을 껐습니다.</b> 온도가 더 이상 오르지 않을 때까지 '+
+        '전등을 켜 두어야 복사 평형을 확인할 수 있습니다. <b>처음부터</b>를 눌러 다시 해 보세요.'; }
+    }else if(LAB.tabs===0){
+      cls='info'; html='<b>B 병에도 발포 비타민을 넣지 않았습니다.</b> 두 병의 조건이 완전히 같으므로 두 그래프가 겹칩니다. '+
+        '그래도 두 병 모두 전등을 켜 둔 채 <b>약 '+Math.round(LAB.eq.A.t)+'분 뒤부터 온도가 일정해진 것</b>(복사 평형)은 확인할 수 있습니다. '+
+        '조작 변인 하나만 다르게 해야 그 효과를 알 수 있습니다 — 이제 발포 비타민을 넣고 비교해 보세요.';
+    }else{
+      const a=labPlateau('A'), b=labPlateau('B');
+      const P1={A:'A가 더 높다',B:'B가 더 높다','=':'같다'}[LAB.p1], P2={up:'끝없이 계속 오른다',flat:'어느 온도에서 멈춘다'}[LAB.p2];
+      cls='ok';
+      html='<b>결과</b> — 전등을 계속 켜 두었는데도 A는 약 <b>'+Math.round(LAB.eq.A.t)+'분</b>, B는 약 <b>'+Math.round(LAB.eq.B.t)+
+        '분</b> 뒤부터 온도가 거의 변하지 않았습니다. 흡수와 방출이 같아진 <b class="hl">복사 평형</b>입니다.<br>'+
+        '평형 온도: <b style="color:'+LAB_COL.A+'">A '+a.toFixed(1)+' ℃</b> · <b style="color:'+LAB_COL.B+'">B '+b.toFixed(1)+
+        ' ℃</b> → CO₂가 많은 B가 <b class="hl-r">'+(b-a).toFixed(1)+' ℃ 더 높은 온도</b>에서 평형을 이루었습니다.<br>'+
+        '내 예상: ① '+P1+' '+(LAB.p1==='B'?'✔':'✘ (결과와 다름)')+' · ② '+P2+' '+(LAB.p2==='flat'?'✔':'✘ (결과와 다름)')+'<br>'+
+        '<b>왜 그럴까?</b> 두 병은 같은 전등에서 같은 양의 에너지를 흡수합니다. 그런데 B 병 속 CO₂는 물이 내보낸 적외선 일부를 '+
+        '흡수했다가 사방으로 다시 내보내(재복사) 일부를 병 안으로 되돌립니다. 같은 온도에서 B가 바깥으로 내보내는 에너지가 더 적으므로, '+
+        '<b>더 높은 온도까지 올라가야</b> 흡수 = 방출이 됩니다. 온실기체가 늘어난 지구가 더 높은 기온에서 새로운 복사 평형을 이루는 것과 같은 원리입니다.'+
+        (LAB.tOff!=null? '<br>전등을 끄자 흡수가 사라져 <b>흡수 &lt; 방출</b>이 되었고 두 병 모두 식었습니다. 어느 병이 더 천천히 식는지도 그래프에서 비교해 보세요.' : '');
+    }
+  }
+  if(v.dataset.h===cls+html) return; v.dataset.h=cls+html;
+  v.className='verdict'+(html?' show '+cls:''); v.innerHTML=html;
+}
+
+/* ── 애니메이션 ── */
+function labBottlePath(cx){
+  return 'M'+(cx-20)+',108 L'+(cx-20)+',132 C'+(cx-20)+',150 '+(cx-62)+',158 '+(cx-62)+',186 L'+(cx-62)+',380 Q'+
+    (cx-62)+',394 '+(cx-48)+',394 L'+(cx+48)+',394 Q'+(cx+62)+',394 '+(cx+62)+',380 L'+(cx+62)+',186 C'+
+    (cx+62)+',158 '+(cx+20)+',150 '+(cx+20)+',132 L'+(cx+20)+',108 Z';
+}
+const labLampY=()=>({20:150,30:120,40:90})[LAB.dist];
+function labAnim(dt){
+  const run=LAB.phase==='run'&&!LAB.paused, lampOn=LAB.lamp&&LAB.phase==='run';
+  const tdt=run? dt : (LAB.phase==='run'? 0 : dt);     /* 일시정지면 화면도 멈춘다 */
+  if(tdt<=0) return;
+  const ly=labLampY(), P=LAB_BASE[LAB.dist];
+  /* 발포 반응 */
+  if(LAB.phase==='fizz'){
+    LAB.fizz+=dt;
+    if(LAB.tabs && LAB.fizz>0.5 && LAB.fizz<2.6){
+      LAB.acc.bub=(LAB.acc.bub||0)+dt*(14+10*LAB.tabs);
+      while(LAB.acc.bub>=1){ LAB.acc.bub--; LAB.bub.push({x:LAB_X.B+rnd(-16,16),y:388,r:rnd(1.5,3.5),v:rnd(50,110)}); }
+    }
+    const want=Math.round(LAB.c*16*Math.min(1,Math.max(0,(LAB.fizz-0.6)/1.9)));
+    while(LAB.mol.B.filter(m=>m.co2).length<want) LAB.mol.B.push(labMolecule('B',true,330));
+    if(LAB.fizz>=3){ LAB.phase='sealed'; labUI(); }
+  }
+  LAB.bub.forEach(b=>{ b.y-=b.v*dt; b.x+=rnd(-12,12)*dt; });
+  LAB.bub=LAB.bub.filter(b=>b.y>LAB_WATER);
+  /* 분자 — 무작위 운동 */
+  ['A','B'].forEach(k=>{ const cx=LAB_X[k];
+    LAB.mol[k].forEach(m=>{
+      m.vx=(m.vx+rnd(-160,160)*tdt)*0.99; m.vy=(m.vy+rnd(-160,160)*tdt)*0.99;
+      m.x+=m.vx*tdt; m.y+=m.vy*tdt; m.a+=m.va*tdt; m.flash=Math.max(0,m.flash-tdt);
+      if(m.x<cx-52){m.x=cx-52;m.vx=Math.abs(m.vx);} if(m.x>cx+52){m.x=cx+52;m.vx=-Math.abs(m.vx);}
+      if(m.y<196){m.y=196;m.vy=Math.abs(m.vy);} if(m.y>328){m.y=328;m.vy=-Math.abs(m.vy);}
+    });
+  });
+  /* 빛 알갱이 만들기 */
+  if(LAB.ph.length<170) ['A','B'].forEach(k=>{
+    const cx=LAB_X[k];
+    if(lampOn){
+      LAB.acc['v'+k]=(LAB.acc['v'+k]||0)+tdt*1.5*P;
+      while(LAB.acc['v'+k]>=1){ LAB.acc['v'+k]--;
+        const sx=320+rnd(-8,8), sy=ly-14+rnd(-6,6), tx=cx+rnd(-50,50), ty=LAB_WATER+rnd(2,30);
+        const d=Math.hypot(tx-sx,ty-sy);
+        LAB.ph.push({k:'v',b:k,x:sx,y:sy,vx:(tx-sx)/d*330,vy:(ty-sy)/d*330,ty:ty,life:0}); }
+    }
+    if(LAB.phase==='run'||LAB.phase==='done'){
+      LAB.acc['i'+k]=(LAB.acc['i'+k]||0)+tdt*(1.2+1.4*Math.max(0,LAB.T[k]-LAB_T0));
+      while(LAB.acc['i'+k]>=1){ LAB.acc['i'+k]--;
+        const an=-Math.PI/2+rnd(-0.6,0.6);
+        LAB.ph.push({k:'i',b:k,x:cx+rnd(-46,46),y:LAB_WATER-2,vx:Math.cos(an)*115,vy:Math.sin(an)*115,life:0,cool:0,re:0}); }
+    }
+  });
+  /* 빛 알갱이 움직이기 */
+  LAB.ph.forEach(p=>{
+    p.x+=p.vx*tdt; p.y+=p.vy*tdt; p.life+=tdt;
+    if(p.k==='v'){ if(p.y>=p.ty){ p.dead=1; LAB.fl.push({x:p.x,y:p.y,t:0.25}); } return; }
+    const cx=LAB_X[p.b];
+    if(p.vy>0 && p.y>LAB_WATER+1 && Math.abs(p.x-cx)<60){ p.dead=1; LAB.fl.push({x:p.x,y:p.y,t:0.25,ir:1}); return; }
+    p.cool-=tdt;
+    if(p.b==='B' && p.cool<=0 && p.re<3 && p.y>186 && p.y<LAB_WATER && Math.abs(p.x-cx)<60){
+      const m=LAB.mol.B.find(m=>m.co2 && Math.abs(m.x-p.x)<9 && Math.abs(m.y-p.y)<9);
+      if(m){
+        if(Math.random()<0.6){ const an=rnd(0,Math.PI*2), sp=115;
+          p.x=m.x; p.y=m.y; p.vx=Math.cos(an)*sp; p.vy=Math.sin(an)*sp; p.re++; m.flash=0.35; }
+        p.cool=0.3;
+      }
+    }
+    if(p.x<-30||p.x>670||p.y<-30||p.y>450||p.life>5) p.dead=1;
+  });
+  LAB.ph=LAB.ph.filter(p=>!p.dead);
+  LAB.fl.forEach(f=>f.t-=tdt); LAB.fl=LAB.fl.filter(f=>f.t>0);
+}
+function labDraw(){
+  const ly=labLampY(), lampOn=LAB.lamp&&LAB.phase==='run', ph=LAB.phase;
+  let s='<svg viewBox="0 0 640 430" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,sans-serif">'+
+    '<defs><radialGradient id="labGlow"><stop offset="0" stop-color="#fde68a" stop-opacity=".9"/>'+
+    '<stop offset="1" stop-color="#fde68a" stop-opacity="0"/></radialGradient>'+
+    '<clipPath id="labClipA"><path d="'+labBottlePath(LAB_X.A)+'"/></clipPath>'+
+    '<clipPath id="labClipB"><path d="'+labBottlePath(LAB_X.B)+'"/></clipPath></defs>';
+  s+='<rect x="0" y="396" width="640" height="34" fill="#4b3a2a"/><rect x="0" y="396" width="640" height="3" fill="#6b5240"/>';
+  /* 전등 */
+  s+='<line x1="320" y1="0" x2="320" y2="'+(ly-48)+'" stroke="#64748b" stroke-width="2"/>';
+  if(lampOn) s+='<circle cx="320" cy="'+(ly-14)+'" r="62" fill="url(#labGlow)"/>';
+  s+='<rect x="309" y="'+(ly-50)+'" width="22" height="22" rx="3" fill="#64748b"/>'+
+     '<circle cx="320" cy="'+(ly-14)+'" r="17" fill="'+(lampOn?'#fef3c7':'#475569')+'" stroke="'+(lampOn?'#fbbf24':'#94a3b8')+'" stroke-width="1.5"/>'+
+     '<text x="320" y="'+(ly+18)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#cbd5e1">전등 · '+LAB.dist+' cm '+(lampOn?'ON':'OFF')+'</text>';
+  ['A','B'].forEach(k=>{
+    const cx=LAB_X[k], T=LAB.T[k], dT=Math.max(0,T-LAB_T0);
+    const capOff=(k==='B' && (ph==='ready' || (ph==='fizz' && LAB.fizz<0.9)))? -30 : 0;
+    s+='<path d="'+labBottlePath(cx)+'" fill="rgba(255,255,255,.06)"/>';
+    s+='<g clip-path="url(#labClip'+k+')">'+
+       '<rect x="'+(cx-70)+'" y="100" width="140" height="'+(LAB_WATER-100)+'" fill="rgba(248,113,113,'+Math.min(.32,dT/13*.28).toFixed(3)+')"/>'+
+       '<rect x="'+(cx-70)+'" y="'+LAB_WATER+'" width="140" height="60" fill="rgba(59,130,246,.55)"/>'+
+       '<line x1="'+(cx-70)+'" x2="'+(cx+70)+'" y1="'+LAB_WATER+'" y2="'+LAB_WATER+'" stroke="#93c5fd" stroke-width="1.5"/>';
+    if(k==='B'){
+      LAB.bub.forEach(b=>{ s+='<circle cx="'+b.x.toFixed(1)+'" cy="'+b.y.toFixed(1)+'" r="'+b.r+'" fill="none" stroke="#e0f2fe" stroke-width="1"/>'; });
+      if(ph==='fizz' && LAB.tabs){
+        const f=LAB.fizz;
+        if(f<0.5){ const y=100+(388-100)*(f/0.5); s+='<rect x="'+(cx-8)+'" y="'+(y-2.5)+'" width="16" height="5" rx="2" fill="#f8fafc"/>'; }
+        else if(f<2.6){ const w=16*(1-(f-0.5)/2.1); s+='<rect x="'+(cx-w/2)+'" y="386" width="'+w+'" height="5" rx="2" fill="#f8fafc"/>'; }
+      }
+    }
+    s+='</g>';
+    LAB.mol[k].forEach(m=>{
+      s+='<g transform="translate('+m.x.toFixed(1)+','+m.y.toFixed(1)+') rotate('+m.a.toFixed(0)+')">';
+      if(m.co2){
+        if(m.flash>0) s+='<circle r="11" fill="rgba(250,204,21,'+(m.flash*1.8).toFixed(2)+')"/>';
+        s+='<circle cx="-6" r="3.2" fill="#ef4444"/><circle cx="6" r="3.2" fill="#ef4444"/><circle r="3.8" fill="#334155" stroke="#cbd5e1" stroke-width=".7"/>';
+      }else s+='<circle cx="-2.4" r="2.6" fill="#94a3b8" opacity=".75"/><circle cx="2.4" r="2.6" fill="#94a3b8" opacity=".75"/>';
+      s+='</g>';
+    });
+    /* 온도계 (뚜껑과 함께 움직인다) */
+    const yT=252-(Math.min(40,Math.max(10,T))-10)/30*170;
+    s+='<g transform="translate(0,'+capOff+')">'+
+       '<rect x="'+(cx-3.5)+'" y="72" width="7" height="184" rx="3.5" fill="rgba(255,255,255,.18)" stroke="rgba(226,232,240,.6)"/>'+
+       '<rect x="'+(cx-1.6)+'" y="'+yT.toFixed(1)+'" width="3.2" height="'+(258-yT).toFixed(1)+'" fill="#ef4444"/>'+
+       '<circle cx="'+cx+'" cy="260" r="6" fill="#ef4444"/>'+
+       '<rect x="'+(cx-24)+'" y="94" width="48" height="15" rx="3" fill="'+(k==='A'?'#1d4ed8':'#b91c1c')+'"/></g>';
+    s+='<path d="'+labBottlePath(cx)+'" fill="none" stroke="rgba(226,232,240,.85)" stroke-width="2"/>';
+    /* 온도 표시 */
+    s+='<rect x="'+(cx-50)+'" y="34" width="100" height="28" rx="7" fill="#0f172a" stroke="'+(k==='A'?'#60a5fa':'#f87171')+'" stroke-width="1.5"/>'+
+       '<text x="'+cx+'" y="53.5" text-anchor="middle" font-size="15" font-weight="800" fill="'+(k==='A'?'#93c5fd':'#fca5a5')+'">'+k+'  '+T.toFixed(1)+' ℃</text>';
+    if(LAB.eq[k] && lampOn) s+='<text x="'+cx+'" y="26" text-anchor="middle" font-size="11" font-weight="800" fill="#5eead4">● 복사 평형</text>';
+    s+='<text x="'+cx+'" y="418" text-anchor="middle" font-size="11.5" font-weight="700" fill="#e2e8f0">'+
+       (k==='A'?'A · 대조군 (물만)':'B · 실험군 (물 + 발포 비타민 '+(ph==='ready'?LAB.tabs:LAB.c?LAB.tabs:0)+'개)')+'</text>';
+  });
+  if(ph==='ready' && LAB.tabs){
+    for(let i=0;i<LAB.tabs;i++) s+='<rect x="'+(LAB_X.B+80)+'" y="'+(300-i*10)+'" width="22" height="7" rx="3" fill="#f8fafc" stroke="#cbd5e1"/>';
+    s+='<text x="'+(LAB_X.B+91)+'" y="322" text-anchor="middle" font-size="10" fill="#cbd5e1">발포 비타민</text>';
+  }
+  /* 흡수 반짝임 */
+  LAB.fl.forEach(f=>{ s+='<circle cx="'+f.x.toFixed(1)+'" cy="'+f.y.toFixed(1)+'" r="'+(6-f.t*12).toFixed(1)+'" fill="none" stroke="'+
+    (f.ir?'#fca5a5':'#fde047')+'" stroke-width="1.2" opacity="'+(f.t*4).toFixed(2)+'"/>'; });
+  /* 빛 알갱이 */
+  LAB.ph.forEach(p=>{
+    const sp=Math.hypot(p.vx,p.vy)||1, ux=p.vx/sp, uy=p.vy/sp;
+    if(p.k==='v'){
+      s+='<line x1="'+p.x.toFixed(1)+'" y1="'+p.y.toFixed(1)+'" x2="'+(p.x-ux*13).toFixed(1)+'" y2="'+(p.y-uy*13).toFixed(1)+
+         '" stroke="#facc15" stroke-width="2.2" stroke-linecap="round"/>';
+    }else{
+      let d=''; for(let i=0;i<=8;i++){ const a=-i*2.3, o=2.8*Math.sin(i*1.25+p.life*16);
+        d+=(i?'L':'M')+(p.x+ux*a-uy*o).toFixed(1)+','+(p.y+uy*a+ux*o).toFixed(1); }
+      s+='<path d="'+d+'" stroke="'+(p.re?'#fb923c':'#f87171')+'" stroke-width="1.8" fill="none" stroke-linecap="round"/>';
+    }
+  });
+  if(ph==='fizz' && !LAB.tabs) s+='<text x="'+LAB_X.B+'" y="300" text-anchor="middle" font-size="11" fill="#cbd5e1">발포 비타민 없음</text>';
+  if(LAB.paused) s+='<text x="320" y="250" text-anchor="middle" font-size="16" font-weight="800" fill="#fbbf24">⏸ 일시정지</text>';
+  s+='</svg>';
+  document.getElementById('labSvgBox').innerHTML=s;
+}
+const labPage=document.querySelector('.page[data-page="1"]'), labSub=document.querySelector('.subpage[data-subpage="lab"]');
+let labLast=0, labUiT=0;
+function labFrame(ts){
+  requestAnimationFrame(labFrame);
+  const dt=Math.min(0.1,(ts-(labLast||ts))/1000); labLast=ts;
+  if(!labPage.classList.contains('on') || !labSub.classList.contains('on')) return;
+  if(LAB.phase==='run' && !LAB.paused){
+    const before=(LAB.eq.A?1:0)+(LAB.eq.B?1:0);
+    labStep(dt*LAB.speed);
+    labUiT+=dt;
+    const after=(LAB.eq.A?1:0)+(LAB.eq.B?1:0);
+    if(labUiT>0.08 || after!==before || LAB.phase!=='run'){ labUiT=0;
+      document.getElementById('labClock').textContent=LAB.t.toFixed(1)+'분';
+      labGraph(); labTable(); labBars(); labVerdict(); }
+  }
+  labAnim(dt); labDraw();
+}
+labReset();
+requestAnimationFrame(labFrame);
 
 /* ══════════════ 탭 1 : 지구 열수지 ══════════════ */
 const BLANKS=[
@@ -949,10 +1541,11 @@ document.getElementById('ipccHost').innerHTML=IPCC.map(s=>
    s.lo.toFixed(1)+'~'+s.hi.toFixed(1)+')</div></div></div>').join('');
 
 /* ══════════════ 탭 4 ══════════════ */
-const QIDS=['q0a','q1a','q1b','q2a','q3a','q3b'];
+const QIDS=['q0a','q0b','q0c','q1a','q1b','q2a','q3a','q3b'];
 const CHECKS=[
  '복사가 무엇인지 설명하고, 태양 복사와 지구 복사의 파장이 다른 이유를 말할 수 있다.',
  '복사 평형의 뜻을 알고, 그 덕분에 지구의 연평균 기온이 일정하게 유지됨을 설명할 수 있다.',
+ '발포 비타민 실험에서 두 병이 각각 일정한 온도(복사 평형)에 도달하고, CO₂가 많은 병의 평형 온도가 더 높은 까닭을 설명할 수 있다.',
  '태양 복사를 100으로 둔 지구 열수지에서 각 값을 계산해 낼 수 있다.',
  '지표 · 대기 · 우주 각 영역에서 들어오는 양과 나가는 양이 같음을 확인할 수 있다.',
  '온실효과 덕분에 지표 평균 온도가 −18 ℃가 아닌 +15 ℃로 유지됨을 안다.',
@@ -976,8 +1569,14 @@ function collectAnswers(){
                a:(nowEl? nowEl.value : (HOOK.now||'')).trim(), lines:5}];
   return head.concat(body, tail);
 }
+function labScore(){
+  if(LAB.eq.A&&LAB.eq.B) return '복사 평형 확인 — A '+labPlateau('A').toFixed(1)+' ℃ / B '+labPlateau('B').toFixed(1)+' ℃ (발포 비타민 '+LAB.tabs+'개)';
+  if(LAB.phase==='run'||LAB.phase==='done') return '진행 ('+LAB.t.toFixed(0)+'분까지 측정)';
+  return '미완료';
+}
 function scoreRows(){
   return [
+   ['발포 비타민 온실 실험', labScore()],
    ['지구 열수지 장부 맞추기', BLANKS.filter(b=>blDone[b.id]).length+' / '+BLANKS.length],
    ['에너지 과잉·부족 경계 위도 찾기', latFound?'찾음 (38°)':'미완료'],
    ['온난화 과정 단계 확인', gwStep+' / '+GW.length],
@@ -988,7 +1587,8 @@ const SUMMARY=[
  {h:'1. 복사와 복사 평형',
   body:['<b>복사</b>는 물질의 도움 없이 전자기파의 형태로 에너지가 직접 전달되는 현상입니다.',
         '태양은 뜨거워 <b>짧은 파장</b>(가시광선·자외선)을, 지구는 차가워 <b>긴 파장</b>(적외선)을 내보냅니다. 대기는 짧은 파장은 잘 통과시키고 긴 파장은 잘 흡수하는데, 이것이 온실효과의 출발점입니다.',
-        '지구가 흡수한 태양 복사 에너지와 우주로 방출한 지구 복사 에너지가 같은 상태를 <b>복사 평형</b>이라 하며, 그 덕분에 지구의 연평균 기온이 일정하게 유지됩니다.']},
+        '지구가 흡수한 태양 복사 에너지와 우주로 방출한 지구 복사 에너지가 같은 상태를 <b>복사 평형</b>이라 하며, 그 덕분에 지구의 연평균 기온이 일정하게 유지됩니다.',
+        '발포 비타민 실험 — 전등을 계속 비추어도 두 페트병의 온도는 어느 순간 일정해집니다(복사 평형). CO₂가 많은 병은 적외선을 더 많이 붙잡아 되돌리므로 <b>더 높은 온도에서</b> 복사 평형을 이룹니다.']},
  {h:'2. 지구 열수지 (태양 복사 = 100)',
   body:['입사한 100 중 30은 반사되고(대기·구름 23 + 지표 7), 70이 흡수됩니다(지표 47 + 대기 23).',
         '지표는 47에 대기의 재복사 98을 더해 145를 받고, 145를 내보냅니다(대기로 133, 우주로 12).',
@@ -1044,6 +1644,9 @@ function wsConfig(blank){
     standard:'[10통과2-02-03] 온실효과 강화로 인한 지구 온난화의 메커니즘을 이해하고, 엘니뇨, 사막화 등과 같은 현상이 지구 환경과 인간 생활에 미치는 영향과 대처 방안을 분석할 수 있다.',
     records:[
       {type:'table', h:'활동 기록', head:['활동','결과'], rows:scoreRows()},
+      {type:'table', h:'발포 비타민 온실 실험 (2분 간격)', head:['시간 (분)','A 대조군 (℃)','B 실험군 (℃)','B − A'],
+       rows:LAB.rows.filter(r=>r[0]%2===0).map(r=>[String(r[0]),r[1].toFixed(1),r[2].toFixed(1),(r[2]-r[1]).toFixed(1)]),
+       blankRows:16},
       {type:'table', h:'지구 열수지 (태양 복사 = 100)', head:['영역','들어오는 양','나가는 양'],
        rows:[['지표','47 + 98 = 145','133 + 12 = 145'],
              ['대기','23 + 133 = 156','58 + 98 = 156'],

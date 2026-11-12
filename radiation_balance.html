@@ -161,6 +161,11 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
 .bl .inrow{display:flex;gap:6px;align-items:center;}
 .bl input{width:78px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700;}
 
+/* 복사·비복사 수지 */
+.nr-box{background:linear-gradient(180deg,#eef5fc 0%,#e0f2fe 55%,#f1f5fa 100%);border:1px solid var(--line-2);
+  border-radius:11px;padding:6px;margin-top:12px;}
+.nr-box svg{width:100%;height:auto;display:block;}
+
 /* 위도 그래프 */
 .latbox{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;padding:6px;}
 .latbox svg{width:100%;height:auto;display:block;cursor:crosshair;}
@@ -585,6 +590,54 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
       우주로 나가는 지구 복사도 70입니다. 이것이 뜻하는 바를 '복사 평형'이라는 말을 써서 설명하세요.</label>
     <textarea id="q1b" data-q="Q3. 흡수 70과 방출 70이 같다는 것의 의미"></textarea>
   </div>
+
+  <div class="card">
+    <h3 class="sub3" style="margin-top:0">복사만으로 수지가 맞을까? — 대류·전도와 잠열</h3>
+    <p class="note">교과서에 따라 열수지 그림의 값이 조금씩 다릅니다. 아래 그림에는 <b>복사가 아닌 방법</b>으로
+      지표에서 대기로 옮겨 가는 에너지도 들어 있습니다. 공기가 직접 데워져 올라가는 <b class="hl">대류와 전도(7)</b>,
+      물이 증발할 때 품고 올라갔다가 구름이 될 때 내놓는 <b class="hl">잠열(23)</b>입니다.</p>
+    <div class="nr-box" id="nrDiagram"></div>
+    <div class="grid2" style="margin-top:12px">
+      <div>
+        <table class="dt">
+          <tr><th colspan="2">지표</th></tr>
+          <tr><td>태양 복사 흡수</td><td class="num">49</td></tr>
+          <tr><td>대기의 재복사 흡수</td><td class="num">95</td></tr>
+          <tr><td>지표 복사 → 대기가 흡수</td><td class="num">102</td></tr>
+          <tr><td>지표 복사 → 대기의 창으로 우주에</td><td class="num">12</td></tr>
+          <tr><td>대류와 전도 → 대기로</td><td class="num">7</td></tr>
+          <tr><td>잠열 → 대기로</td><td class="num">23</td></tr>
+        </table>
+      </div>
+      <div>
+        <table class="dt">
+          <tr><th colspan="2">대기</th></tr>
+          <tr><td>태양 복사 흡수</td><td class="num">20</td></tr>
+          <tr><td>지표 복사 흡수</td><td class="num">102</td></tr>
+          <tr><td>대류와 전도로 받음</td><td class="num">7</td></tr>
+          <tr><td>잠열로 받음</td><td class="num">23</td></tr>
+          <tr><td>우주로 방출</td><td class="num">57</td></tr>
+          <tr><td>지표로 재복사</td><td class="num">95</td></tr>
+        </table>
+        <p class="note" style="margin-top:6px;font-size:.72rem;color:var(--dim)">태양 복사 100 중 31(대기·구름 22 + 지표 9)은 반사됩니다.</p>
+      </div>
+    </div>
+
+    <h3 class="sub3">복사만 따로 떼어 계산해 보기</h3>
+    <p class="note" style="margin-bottom:8px"><b>복사로</b> 들어오고 나가는 양만 더하세요. 대류·전도와 잠열은 빼고 계산합니다.</p>
+    <div class="blanks" id="nrHost"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn sm primary" id="nrCheck">확인</button>
+      <button class="btn sm" id="nrReset">다시</button>
+    </div>
+    <div class="verdict" id="nrVerdict"></div>
+
+    <label class="lbl" style="margin-top:14px" for="q1c">Q4. 이 그림에서 <b>지표</b>와 <b>대기</b>는 각각 복사 평형을 이루고 있나요?
+      복사로 받는 양과 내보내는 양을 비교하고, 대류·전도(7)와 잠열(23)이 하는 역할을 들어 설명하세요.
+      또 <b>지구 전체</b>로 보면 어떤지도 써 보세요.</label>
+    <textarea id="q1c" data-q="Q4. 대류·전도와 잠열이 있을 때 지표와 대기는 복사 평형인가"
+      placeholder="예: 지표가 복사로 받는 양은 49 + 95 = …, 복사로 내보내는 양은 … 이므로 …"></textarea>
+  </div>
 </div></div></section>
 
 <!-- ══════ 2 ══════ -->
@@ -615,9 +668,9 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
   </div>
 
   <div class="card">
-    <label class="lbl" for="q2a">Q4. 저위도는 에너지가 남고 고위도는 부족한데도,
+    <label class="lbl" for="q2a">Q5. 저위도는 에너지가 남고 고위도는 부족한데도,
       저위도가 계속 뜨거워지거나 고위도가 계속 차가워지지 않습니다. 그 이유를 설명하세요.</label>
-    <textarea id="q2a" data-q="Q4. 위도별 에너지 불균형에도 기온 차가 무한정 커지지 않는 이유"></textarea>
+    <textarea id="q2a" data-q="Q5. 위도별 에너지 불균형에도 기온 차가 무한정 커지지 않는 이유"></textarea>
   </div>
 </div></div></section>
 
@@ -681,12 +734,12 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
   </div>
 
   <div class="card">
-    <label class="lbl" for="q3a">Q5. "온실기체가 늘어도 결국 새로운 복사 평형에 도달하니 괜찮다"는 주장이 있다면
+    <label class="lbl" for="q3a">Q6. "온실기체가 늘어도 결국 새로운 복사 평형에 도달하니 괜찮다"는 주장이 있다면
       어떻게 반박하겠습니까? 새 평형의 성질을 근거로 쓰세요.</label>
-    <textarea id="q3a" data-q="Q5. '새 평형에 도달하니 괜찮다'는 주장에 대한 반박"></textarea>
-    <label class="lbl" style="margin-top:11px" for="q3b">Q6. 빙하가 녹으면 지구가 태양 에너지를 더 많이 흡수하게 되고,
+    <textarea id="q3a" data-q="Q6. '새 평형에 도달하니 괜찮다'는 주장에 대한 반박"></textarea>
+    <label class="lbl" style="margin-top:11px" for="q3b">Q7. 빙하가 녹으면 지구가 태양 에너지를 더 많이 흡수하게 되고,
       그러면 기온이 더 올라 빙하가 더 녹습니다. 이런 되먹임이 왜 위험한지 설명하세요.</label>
-    <textarea id="q3b" data-q="Q6. 빙하 융해의 양의 되먹임이 위험한 이유"></textarea>
+    <textarea id="q3b" data-q="Q7. 빙하 융해의 양의 되먹임이 위험한 이유"></textarea>
   </div>
 </div></div></section>
 
@@ -1540,14 +1593,85 @@ document.getElementById('ipccHost').innerHTML=IPCC.map(s=>
  '<div class="gv" style="color:'+s.c+'">+'+s.v.toFixed(1)+' ℃<div class="note" style="font-size:.64rem">('+
    s.lo.toFixed(1)+'~'+s.hi.toFixed(1)+')</div></div></div>').join('');
 
+/* ══════════════ 탭 2 : 복사만으로 수지가 맞을까 (대류·전도, 잠열) ══════════════ */
+const NR=[
+ {id:'nr_si', v:144, q:'지표가 <b>복사로 받는</b> 양', hint:'태양 복사 흡수와 대기의 재복사 흡수를 더합니다.'},
+ {id:'nr_so', v:114, q:'지표가 <b>복사로 내보내는</b> 양', hint:'대기가 흡수하는 지표 복사와 대기의 창으로 나가는 지표 복사를 더합니다.'},
+ {id:'nr_ai', v:122, q:'대기가 <b>복사로 받는</b> 양', hint:'태양 복사 흡수와 지표 복사 흡수를 더합니다. 대류·전도와 잠열은 복사가 아닙니다.'},
+ {id:'nr_ao', v:152, q:'대기가 <b>복사로 내보내는</b> 양', hint:'우주로 방출하는 양과 지표로 재복사하는 양을 더합니다.'}
+];
+let nrDone={}, nrChecked=false;
+function drawNRDiagram(){
+  const SUN='#b45f06', IR='#dc2626', NRC='#7c3aed';
+  let s='<svg viewBox="0 0 830 330" xmlns="http://www.w3.org/2000/svg">';
+  s+='<rect x="24" y="96" width="782" height="96" rx="8" fill="rgba(96,165,250,.10)" stroke="#cfdbe8"/>';
+  s+='<text x="36" y="118" font-size="13" font-weight="800" fill="#2563eb">대기</text>';
+  s+='<rect x="24" y="268" width="782" height="50" rx="6" fill="#d9c7a7" stroke="#8a7660"/>';
+  s+='<text x="36" y="298" font-size="13" font-weight="800" fill="#3f3020">지표</text>';
+  s+='<text x="36" y="40" font-size="13" font-weight="800" fill="#243141">우주</text>';
+  /* 태양 복사 */
+  const lb=(x,y,t)=>'<text x="'+x+'" y="'+y+'" font-size="11" fill="#243141" font-weight="700">'+t+'</text>';
+  s+=arrow(110,8,266,SUN,6)+tag(110,232,'49',SUN,false);
+  s+=arrow(190,8,150,SUN,5)+tag(190,140,'20',SUN,false);
+  s+=lb(200,40,'태양 복사 흡수');
+  /* 비복사 */
+  s+=arrow(300,266,150,NRC,5)+tag(300,226,'7',NRC,false)+lb(310,176,'대류·전도');
+  s+=arrow(380,266,150,NRC,6)+tag(380,226,'23',NRC,false)+lb(390,176,'잠열');
+  /* 지표 복사 */
+  s+=arrow(480,266,150,IR,7)+tag(480,226,'102',IR,false)+lb(490,176,'지표 복사');
+  s+=arrow(560,266,14,IR,3)+tag(560,60,'12',IR,false)+lb(570,40,'대기의 창');
+  /* 대기 */
+  s+=arrow(660,150,266,'#03699f',7)+tag(660,226,'95',IR,false)+lb(670,176,'재복사');
+  s+=arrow(750,98,14,'#03699f',5)+tag(750,60,'57',IR,false)+lb(760,40,'우주로 방출');
+  s+='<g font-size="11" font-weight="700">'+
+     '<rect x="610" y="296" width="12" height="12" rx="2" fill="'+SUN+'"/><text x="626" y="306" fill="#243141">태양 복사</text>'+
+     '<rect x="690" y="296" width="12" height="12" rx="2" fill="'+IR+'"/><text x="706" y="306" fill="#243141">적외선 복사</text></g>'+
+     '<g font-size="11" font-weight="700"><rect x="610" y="278" width="12" height="12" rx="2" fill="'+NRC+'"/>'+
+     '<text x="626" y="288" fill="#243141">복사가 아닌 이동</text></g>';
+  s+='</svg>';
+  document.getElementById('nrDiagram').innerHTML=s;
+}
+function drawNR(){
+  document.getElementById('nrHost').innerHTML=NR.map(b=>
+    '<div class="bl'+(nrDone[b.id]?' done':'')+'"><div class="q">'+b.q+'</div>'+
+    (nrDone[b.id]? '<div class="inrow"><b style="font-size:1rem;color:var(--good)">'+b.v+'</b> ✔</div>'
+      : '<div class="inrow"><input type="number" id="in_'+b.id+'" placeholder="?"></div>'+
+        (nrChecked?'<div class="hint">'+b.hint+'</div>':''))+'</div>').join('');
+}
+function nrVerdict(){
+  const v=document.getElementById('nrVerdict');
+  const n=NR.filter(b=>nrDone[b.id]).length;
+  if(n<NR.length){
+    v.className='verdict show no';
+    v.innerHTML='<b>'+n+' / '+NR.length+'</b> 맞았습니다. 틀린 칸 아래 힌트를 보고 다시 계산해 보세요.';
+    return;
+  }
+  v.className='verdict show ok';
+  v.innerHTML='<b>복사만 보면 맞지 않습니다.</b> 지표는 복사로 <b>144</b>를 받고 <b>114</b>만 내보내 <b class="hl-r">30이 남고</b>, '+
+    '대기는 복사로 <b>122</b>를 받고 <b>152</b>를 내보내 <b class="hl-r">30이 모자랍니다</b>.<br>'+
+    '남는 30 = 대류·전도 <b>7</b> + 잠열 <b>23</b>. 이 30이 복사가 아닌 방법으로 지표에서 대기로 옮겨 가서 양쪽의 수지가 맞춰집니다.<br>'+
+    '이제 이 결과를 바탕으로 아래 Q4에 답해 보세요.';
+}
+document.getElementById('nrCheck').addEventListener('click',()=>{
+  NR.forEach(b=>{ const el=document.getElementById('in_'+b.id);
+    if(el && +el.value===b.v && el.value!=='') nrDone[b.id]=true; });
+  nrChecked=true; drawNR(); nrVerdict();
+});
+document.getElementById('nrReset').addEventListener('click',()=>{
+  nrDone={}; nrChecked=false; drawNR();
+  const v=document.getElementById('nrVerdict'); v.className='verdict'; v.innerHTML='';
+});
+drawNRDiagram(); drawNR();
+
 /* ══════════════ 탭 4 ══════════════ */
-const QIDS=['q0a','q0b','q0c','q1a','q1b','q2a','q3a','q3b'];
+const QIDS=['q0a','q0b','q0c','q1a','q1b','q1c','q2a','q3a','q3b'];
 const CHECKS=[
  '복사가 무엇인지 설명하고, 태양 복사와 지구 복사의 파장이 다른 이유를 말할 수 있다.',
  '복사 평형의 뜻을 알고, 그 덕분에 지구의 연평균 기온이 일정하게 유지됨을 설명할 수 있다.',
  '발포 비타민 실험에서 두 병이 각각 일정한 온도(복사 평형)에 도달하고, CO₂가 많은 병의 평형 온도가 더 높은 까닭을 설명할 수 있다.',
  '태양 복사를 100으로 둔 지구 열수지에서 각 값을 계산해 낼 수 있다.',
  '지표 · 대기 · 우주 각 영역에서 들어오는 양과 나가는 양이 같음을 확인할 수 있다.',
+ '대류·전도와 잠열이 있으면 지표와 대기가 각각 복사만으로는 평형이 아니지만, 비복사 이동까지 더하면 수지가 맞음을 설명할 수 있다.',
  '온실효과 덕분에 지표 평균 온도가 −18 ℃가 아닌 +15 ℃로 유지됨을 안다.',
  '지구가 둥글기 때문에 위도별 에너지 불균형이 생김을 설명할 수 있다.',
  '위도 약 38°를 경계로 에너지 과잉과 부족이 나뉨을 안다.',
@@ -1578,6 +1702,7 @@ function scoreRows(){
   return [
    ['발포 비타민 온실 실험', labScore()],
    ['지구 열수지 장부 맞추기', BLANKS.filter(b=>blDone[b.id]).length+' / '+BLANKS.length],
+   ['복사만 떼어 계산하기 (대류·전도, 잠열)', NR.filter(b=>nrDone[b.id]).length+' / '+NR.length],
    ['에너지 과잉·부족 경계 위도 찾기', latFound?'찾음 (38°)':'미완료'],
    ['온난화 과정 단계 확인', gwStep+' / '+GW.length],
    ['온난화의 영향 분류', efScore?'완료 (모두 정답)':'미완료']
@@ -1593,7 +1718,8 @@ const SUMMARY=[
   body:['입사한 100 중 30은 반사되고(대기·구름 23 + 지표 7), 70이 흡수됩니다(지표 47 + 대기 23).',
         '지표는 47에 대기의 재복사 98을 더해 145를 받고, 145를 내보냅니다(대기로 133, 우주로 12).',
         '대기는 23에 지표에서 온 133을 더해 156을 받고, 156을 내보냅니다(우주로 58, 지표로 98).',
-        '우주로 나가는 지구 복사는 12 + 58 = <b>70</b>으로 흡수한 70과 같습니다. 이것이 복사 평형입니다.'],
+        '우주로 나가는 지구 복사는 12 + 58 = <b>70</b>으로 흡수한 70과 같습니다. 이것이 복사 평형입니다.',
+        '대류·전도(7)와 잠열(23)까지 넣은 그림에서는 지표가 복사로 144를 받고 114를 내보내 30이 남고, 대기는 복사로 122를 받고 152를 내보내 30이 모자랍니다. 이 30을 <b>복사가 아닌 방법</b>(대류·전도 + 잠열)이 지표에서 대기로 옮겨 수지를 맞춥니다. 우주와는 복사로만 에너지를 주고받으므로, 지구 전체(흡수 69 = 방출 12 + 57)로는 복사 평형입니다.'],
   table:[['영역','들어오는 양','나가는 양','균형'],
          ['지표','47 + 98 = 145','133 + 12 = 145','같음'],
          ['대기','23 + 133 = 156','58 + 98 = 156','같음'],

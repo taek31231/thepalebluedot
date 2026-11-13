@@ -447,7 +447,7 @@ input[type=range]{width:100%;accent-color:var(--accent);}
   </div>
 
   <div class="card">
-    <h3 class="sub3" style="margin-top:0">네 가지 미션</h3>
+    <h3 class="sub3" style="margin-top:0">세 가지 미션</h3>
     <p class="note" style="margin-bottom:12px">각 미션마다 <b>예상을 먼저 쓰고</b> 확인하세요.
       예상과 다른 지점이 배울 거리입니다.</p>
     <div id="enMissions"></div>
@@ -1392,10 +1392,7 @@ const EN_MISSIONS=[
  {n:'미션 2', t:'지상과 상공을 비교하기',
   how:'같은 지점을 <b>지상</b>과 <b>상공 250 hPa</b>에서 각각 확인합니다. 화면 왼쪽 아래 earth → Height에서 바꿀 수 있습니다.',
   q:'같은 위도에서 두 높이의 바람 방향이 어떻게 달랐나요? 왜 그럴까요?'},
- {n:'미션 3', t:'제트 기류 찾기',
-  how:'<b>상공 250 hPa</b> 화면에서 위도 30°~50° 부근을 봅니다. 선이 유난히 빠르고 굵은 띠가 있습니다.',
-  q:'가장 빠른 곳의 풍속은 몇 m/s인가요? 우리나라 상공에서는 어느 쪽으로 흐르나요?'},
- {n:'미션 4', t:'적도의 무풍대 찾기',
+ {n:'미션 3', t:'적도의 무풍대 찾기',
   how:'<b>지상 바람</b>에서 적도 바로 위를 자세히 봅니다. 남북 무역풍이 만나는 곳입니다.',
   q:'적도 부근의 풍속은 다른 곳과 비교해 어떤가요? 그 이유를 ITCZ와 연결해 설명해 보세요.'}
 ];
@@ -1988,7 +1985,7 @@ document.getElementById('btn-kma').addEventListener('click',()=>{
 });
 
 /* ══════════════ 탭 6 ══════════════ */
-const QIDS=['q0a','q1b','en0','en1','en2','en3','q1a','q2a','q3a','q3b','q5a','q5b','q5c'];
+const QIDS=['q0a','q1b','en0','en1','en2','q1a','q2a','q3a','q3b','q5a','q5b','q5c'];
 const CHECKS=[
  '대기 대순환이 위도별 에너지 불균형 때문에 생긴다는 것을 설명할 수 있다.',
  '해들리 · 페렐 · 극 순환의 위치와 상승·하강 위도를 말할 수 있다.',

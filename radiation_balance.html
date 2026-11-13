@@ -694,16 +694,6 @@ table.dt td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:n
   </div>
 
   <div class="card">
-    <h3 class="sub3" style="margin-top:0">집안 살림으로 바꿔 보면</h3>
-    <table class="dt" id="moneyTbl"></table>
-    <div class="verdict warn show">
-      마지막 줄이 핵심입니다. 수입과 지출이 <b>다시 같아졌는데도</b>, 집안에는 동생이 챙긴 30만 원이 남아 있습니다.
-      지구도 마찬가지입니다. <b class="hl-r">새로운 복사 평형은 이전보다 더 높은 온도에서 이루어집니다.</b>
-      평형이 회복되었다고 해서 원래 기온으로 돌아가는 것이 아닙니다.
-    </div>
-  </div>
-
-  <div class="card">
     <h3 class="sub3" style="margin-top:0">지구 온난화가 가져오는 변화</h3>
     <p class="note" style="margin-bottom:10px">아래 항목을 눌러 두 갈래로 나눠 보세요.
       한 번 누르면 왼쪽, 다시 누르면 오른쪽, 한 번 더 누르면 제자리로 돌아갑니다.</p>
@@ -1505,15 +1495,6 @@ document.getElementById('gwNext').addEventListener('click',()=>{
   if(gwStep<GW.length){ gwStep++; drawGW(); }
 });
 document.getElementById('gwReset').addEventListener('click',()=>{ gwStep=0; drawGW(); });
-
-document.getElementById('moneyTbl').innerHTML=
- '<tr><th>상황</th><th>수입</th><th>실제로 집 밖으로 나간 돈</th><th>집에 쌓이는 돈</th><th>상태</th></tr>'+
- [['처음','70만 원','70만 원','0','균형'],
-  ['동생이 지출액 중 30만 원을 챙김','70만 원','40만 원','+30만 원씩 계속','균형이 깨짐'],
-  ['엄마가 지출을 100만 원으로 늘림','70만 원','70만 원','더 이상 쌓이지 않음','새 균형 (집에는 이미 30만 원이 남아 있음)']]
- .map((r,i)=>'<tr'+(i===2?' style="background:rgba(245,158,11,.09)"':'')+'>'+
-   r.map((c,j)=>'<td'+(j===0?' style="font-weight:700"':'')+'>'+c+'</td>').join('')+'</tr>').join('')+
- '<tr><th>지구로 바꾸면</th><td>태양 복사</td><td>우주로 나가는 지구 복사</td><td>지구에 쌓이는 열 (기온 상승)</td><td>동생 = 온실기체</td></tr>';
 
 /* 온난화의 영향 분류 */
 const EFFECTS=[
